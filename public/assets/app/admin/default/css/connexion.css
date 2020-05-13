@@ -1,0 +1,40 @@
+body#connexion {
+  display: flex;
+  justify-content: center;
+  background-color: rgb(240, 240, 240);
+  font-size: 1rem;
+}
+body#connexion #container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem;
+}
+body#connexion form, body#connexion .error-box {
+  width: 400px;
+  transition: .5s;
+}
+body#connexion form {
+  background-color: white;
+  box-shadow: .2rem .2rem .2rem rgba(230,230,230,1);
+}
+@media (max-width: 600px) {
+	body#connexion form, body#connexion .error-box {
+    width: 100%;
+  }
+}
+body#connexion form header {
+  padding: .7rem 1.5rem;
+  background-color: #2880b9;
+}
+body#connexion form .content {
+  margin-top: 1rem;
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+body#connexion input[type="text"], body#connexion input[type="password"] {
+  border: 1px solid #dddddd;
+  border-radius: 0.2rem;
+  width: 100%;
+  padding : .5rem ;
+  margin-bottom: 1rem;
+}

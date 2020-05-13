@@ -1,0 +1,266 @@
+body {
+	font-family: "Segoe UI", sans-serif, Verdana, "Cambria", "Cochin", Georgia, Times, serif, "Trebuchet MS", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", Arial;
+	color: #2D3A4A;
+	font-size: 0.92rem;
+}
+a {
+	color: #38A5EE;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: none;
+}
+.logo {
+	width: 5.5rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* Les Utilities */
+
+/* Les barres de navigation */
+.navbar-red {
+  background-color: #a40000;
+  color: #fff;
+}
+.navbar-blue {
+  background-color: #000226;
+  color: #fff;
+}
+.navbar-sombre {
+  background-color: #111111;
+  color: #fff;
+}
+.navbar-red a {
+  color: #fff;
+  text-decoration: none;
+}
+.navbar-blue a {
+  color: #fff;
+  text-decoration: none;
+}
+.navbar-dark a {
+    color: #fff;
+    text-decoration: none;
+}
+
+/** Au survol */
+.hv-bg-white:hover {
+	background-color: #fff;
+}
+
+.hv-bg-blue:hover {
+	background-color: #005a91;
+}
+
+.hv-bg-black:hover {
+	background-color: #000;
+}
+
+.hv-bg-danger:hover {
+	background-color: #d60000;
+}
+
+/** Les Backgrounds */
+.bg-blue {
+	background-color: rgb(41, 128, 185);
+}
+.app-btn.bg-blue:hover {
+	background-color: rgb(20, 93, 141);
+}
+.bg-beige {
+	background-color: #e0e0e0;
+}
+.bg-cloud {
+	background-color: rgb(236, 240, 241);
+}
+.bg-blue-violet {
+	background-color: #021873;
+}
+.bg-yellow {
+	background-color: rgb(241, 196, 15);
+}
+.bg-orange {
+	background-color: rgb(243, 156, 18);
+}
+.bg-facebook {
+	background-color: rgb(59, 88, 152);
+}
+.bg-gray {
+	background-color: rgb(189, 195, 199);
+}
+.bg-gray-strong {
+	background-color: rgb(44, 62, 80);
+}
+
+/* LES MARGES AUQUELLES BOOTSTRAP NE DONNENT PAS ACCES */
+
+/* Marges sur tous les cotés */
+.m-4 {
+	margin: .4rem;
+}
+.m-5 {
+	margin: .5rem;
+}
+.m-6 {
+	margin: .6rem;
+}
+
+/* Les marges à gauche */
+.ml-4 {
+	margin-left: .4rem;
+}
+.ml-5 {
+	margin-left: .5rem;
+}
+.ml-6 {
+	margin-left: .6rem;
+}
+
+/* marges à droite */
+.mr-4 {
+	margin-right: .4rem;
+}
+.mr-5 {
+	margin-right: .5rem;
+}
+.mr-6 {
+	margin-right: .6rem;
+}
+
+/** Les marges internes */
+.pt-6 {
+  padding-top: .6rem;
+}
+
+/** LES BORDURES */
+
+/* bordure gauche */
+.bl-pink {
+  border-left : .2rem solid #ff2ff8;
+}
+.bl-orange {
+  border-left : .2rem solid #ff5a17;
+}
+.bl-green {
+	border-left : .2rem solid #08720f;
+}
+
+/** Les bordures arrondies */
+.rd-2 {
+	border-radius : .15rem;
+}
+
+/* LES OMBRES */
+.shdw {
+	box-shadow: .1rem .1rem .15rem rgba(202, 202, 202, .5);
+}
+.bx-shdw-blue {
+	box-shadow: .1rem .1rem .1rem rgba(41, 128, 185, .5);
+}
+
+/* Les messages */
+.app-alert-danger,
+.app-alert-info,
+.app-alert-success {
+	background-color: white;
+	padding: .8rem;
+	box-shadow: .1rem .1rem .15rem rgba(202, 202, 202, .5);
+	border-left: 4px solid;
+}
+.app-alert-danger {
+	border-left-color: rgb(219, 51, 21);
+}
+.app-alert-info {
+	border-left-color: rgba(11, 162, 233, 0.678);
+}
+.app-alert-success {
+	border-left-color: rgba(8, 241, 105, 0.678);
+}
+.notice {
+	margin: 0;
+	padding: 0;
+	color: rgb(102, 102, 102);
+	font-size: .85rem;
+	font-style: italic;
+}
+.notice::after {
+	content: ".";
+}
+
+/* Images */
+.img-circle {
+	border-radius: 50%;
+}
+/**
+ * Image utilisateur.
+ * Doit être de petite taille
+ */
+.user-image {
+	width: 1.7rem;
+}
+
+/* Les textes */
+.text-small {
+	font-size: .8rem;
+}
+.text-italic {
+	font-style: italic;
+}
+.text-bold {
+	font-weight: bold;
+}
+/* Les couleurs des textes */
+.text-blue {
+	color: rgb(41, 128, 185);
+}
+a.text-blue:hover {
+	color: rgb(11, 72, 112);
+}
+
+/* Les cartes */
+.app-card {
+	border: 1px solid rgba(200, 200, 200, .5);
+	background-color: white;
+}
+.app-card-img {
+	width: 100%;
+	height: 100%;
+}
+.app-card-header, .app-card-body {
+	padding: .5rem;
+}
+.app-card-header {
+	font-weight: bold;
+	background-color: white;
+	border-bottom: 1px solid rgba(200, 200, 200, .5); ;
+}
+
+/* Dumper */
+.dumper {
+	background-color: rgba(200, 200, 200, .5);
+	padding: .5rem;
+}
+
+/* Formulaire */
+.app-form {
+	border: 1px solid rgba(200, 200, 200, .7);
+	padding: .3rem .4rem;
+}
+button {
+	border: none;
+	border-radius: .2rem;
+}
+
+/** Les boutons */
+.app-btn {
+	color: white;
+	text-decoration: none;
+	padding: .3rem .7rem;
+	border-radius: .2rem;
+}
+.app-btn:hover {
+	color: white;
+	text-decoration: none;
+}
