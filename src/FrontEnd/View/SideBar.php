@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\Layout;
+namespace App\FrontEnd\View;
 
 use App\BackEnd\APIs\Bdd;
 use App\BackEnd\Data\Data;
@@ -28,9 +28,9 @@ use App\BackEnd\Data\Data;
  * @version  "Release: package_version"
  * @link     Link
  */
-class SideBar extends Layout
+class SideBar extends View
 {
-    private $_links = [];
+    private $links = [];
 
     /**
      * Constructeur
@@ -39,17 +39,17 @@ class SideBar extends Layout
      */
     public function __construct()
     {
-        $this->_links[] = $this->setLink("", "fas fa-home", "Tableau de bord");
-        $this->_links[] = $this->setLink("formations", "fas fa-box", "Formations", true);
-        $this->_links[] = $this->setLink("themes", "fas fa-tag", "Thèmes", true);
-        $this->_links[] = $this->setLink("etapes", "fas fa-check", "Etapes", true);
-        $this->_links[] = $this->setLink("motivation-plus", "fas fa-tv", "Motivation plus");
-        $this->_links[] = $this->setLink("articles", "fas fa-pen-square", "Articles", true);
-        $this->_links[] = $this->setLink("videos", "fas fa-video", "Vidéos", true);
-        $this->_links[] = $this->setLink("livres", "fas fa-book", "Livres", true);
-        $this->_links[] = $this->setLink("ebooks", "fas fa-book", "Ebooks", true);
-        $this->_links[] = $this->setLink("minis-services", "fas fa-shopping-basket", "Minis services", true);
-        $this->_links[] = $this->setLink("parameters", "fas fa-cog", "Paramètres");
+        $this->links[] = $this->setLink("", "fas fa-home", "Tableau de bord");
+        $this->links[] = $this->setLink("formations", "fas fa-box", "Formations", true);
+        $this->links[] = $this->setLink("themes", "fas fa-tag", "Thèmes", true);
+        $this->links[] = $this->setLink("etapes", "fas fa-check", "Etapes", true);
+        $this->links[] = $this->setLink("motivation-plus", "fas fa-tv", "Motivation plus");
+        $this->links[] = $this->setLink("articles", "fas fa-pen-square", "Articles", true);
+        $this->links[] = $this->setLink("videos", "fas fa-video", "Vidéos", true);
+        $this->links[] = $this->setLink("livres", "fas fa-book", "Livres", true);
+        $this->links[] = $this->setLink("ebooks", "fas fa-book", "Ebooks", true);
+        $this->links[] = $this->setLink("minis-services", "fas fa-shopping-basket", "Minis services", true);
+        $this->links[] = $this->setLink("parameters", "fas fa-cog", "Paramètres");
     }
 
     /**
@@ -73,12 +73,13 @@ HTML;
     public function smallScreenSideBar()
     {
         return <<<HTML
-        <input class="d-lg-none" type="checkbox" id="check"> 
+        <input class="d-lg-none" type="checkbox" id="check">
         <label class="d-lg-none" for="check">
             <i class="fas fa-bars" id="btn"></i>
             <i class="fas fa-bars" id="cancel"></i>
         </label>
-        <div class="d-lg-none sidebar sidebar-shadow">
+        <div class="sidebar d-lg-none big-shadow">
+            {$this->appBrand()}
             {$this->links()}
         </div>
 HTML;
@@ -97,7 +98,8 @@ HTML;
             <i class="fas fa-bars" id="btn"></i>
             <i class="fas fa-bars" id="cancel"></i>
         </label>
-        <div class="d-none d-lg-block sidebar">
+        <div class="sidebar d-none d-lg-block">
+            {$this->appBrand()}
             {$this->links()}
         </div>
 HTML;
@@ -112,14 +114,15 @@ HTML;
     {
         $public_url = PUBLIC_URL;
         $links = null;
-        for ($i = 0; $i < count($this->_links); $i++) {
-            $links .= $this->_links[$i];
+        for ($i = 0; $i < count($this->links); $i++) {
+            $links .= $this->links[$i];
         }
+        
         return <<<HTML
         <div>
             <a class="py-2 px-3" href="{$public_url}">
-                <div class="row">
-                    <i class="col-3"></i>
+                <div class="row align-items-center">
+                    <i class="col-3 icons fas fa-home fa-lg"></i>
                     <span class="col-7 texts p-0">Aller vers le site</span>
                 </div>
             </a>

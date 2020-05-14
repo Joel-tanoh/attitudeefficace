@@ -2,15 +2,14 @@
 	position: fixed;
 	font-size: .95rem;
 	height: 100%;
-	width: 12rem;
-	top: 3rem;
-	left: -15rem;
+	width: 15rem;
+	top: 0;
+	left: -15rem; /* permet de cacher la sidebar */
 	background-color: rgb(41,128,185);
 	padding-top: 1.2rem;
-	z-index: 2;
+	z-index: 10000;
 	transition: .5s;
 }
-
 .sidebar a {
 	display: block;
 	width: 100%;
@@ -18,21 +17,16 @@
 	text-decoration: none;
 }
 
-/* Le comportement des liens de la sidebar
- * au survol et lorsqu'il sont actif
- */
-.sidebar a:hover, .sidebar a.active {
+/* Le comportement des liens de la sidebar au survol et lorsqu'il sont actif */
+.sidebar a:not(.brand):hover, .sidebar a:not(.brand).active {
 	background-color: rgb(19, 58, 88);
 }
-
-.sidebar-shadow {
+.big-shadow {
 	box-shadow: 0 .5rem 2rem rgba(50, 50, 50, 1);
 }
-
 #check {
 	display: none;
 }
-
 label #btn, label #cancel {
 	position: fixed;
 	cursor: pointer;
@@ -41,29 +35,24 @@ label #btn, label #cancel {
 	z-index: 10002;
 	background-color: rgb(107, 169, 250);
 }
-
 label #btn {
 	left: 1rem;
 	top: .5rem;
 	padding: 2px 6px;
 	font-size: 2.5rem;
 }
-
 label #cancel {
 	left: -5rem;
 	padding: 2px 6px;
 	font-size: 2.5rem;
 }
-
 #check:checked ~ .sidebar {
 	left: 0;
 }
-
 #check:checked ~ label #btn {
 	opacity: 0;
 	pointer-events: none;
 }
-
 #check:checked ~ label #cancel {
 	left: 1rem;
 	top: .5rem;

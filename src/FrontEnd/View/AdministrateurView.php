@@ -12,10 +12,10 @@
  * @link     link
  */
 
-namespace App\FrontEnd\Layout;
+namespace App\FrontEnd\View;
 
 use App\BackEnd\Data\Personnes\Administrateur;
-use App\FrontEnd\Layout\Html\Form;
+use App\FrontEnd\View\Html\Form;
 
 /**
  * Gère toutes les vues concernant les comptes administrateurs.
@@ -26,24 +26,25 @@ use App\FrontEnd\Layout\Html\Form;
  * @license  url.com license
  * @link     link
  */
-class AdministrateurLayout
+class AdministrateurView extends View
 {
     /**
      * Liste tous les comptes administrateurs créées sur le site.
      * 
-     * @param $accounts 
+     * @param $users 
      * 
      * @return string
      */
-    public function listAccounts($accounts)
+    public function listAccounts($users)
     {
         $accounts_list = null;
-        if (!empty($accounts)) {
-            foreach ($accounts as $acc) {
-                $account = new Administrateur($acc['code']);
-                $accounts_list .= $this->_listRow($account);
+        if (!empty($users)) {
+            foreach ($users as $user) {
+                $user = new Administrateur($user['code']);
+                $accounts_list .= $this->listRow($user);
             }
         }
+
         return <<<HTML
         <div>
             <table class="table table-responsive-md">
@@ -63,17 +64,17 @@ HTML;
     /**
      * Unle ligne du tableau qui liste les comptes administrateurs.
      * 
-     * @param $account Un Objet compte.
+     * @param $user
      * 
      * @return string
      */
-    private function _listRow($account)
+    private function listRow($user)
     {
         return <<<HTML
         <tr>
-            <td>{$account->get("login")}</td>
-            <td>{$account->get("statut")}</td>
-            <td>{$account->get("email")}</td>
+            <td>{$user->get("login")}</td>
+            <td>{$user->get("statut")}</td>
+            <td>{$user->get("email")}</td>
         </tr>
 HTML;
     }
@@ -88,8 +89,7 @@ HTML;
     public function userImage($user)
     {
         return <<<HTML
-        <img src="{$user->get('avatar_src')}" class="user-image img-circle shdw mr-2"
-            alt="User Image">
+        <img src="{$user->get('avatar_src')}" class="user-image img-circle shdw mr-2" alt="User Image">
 HTML;
     }
 

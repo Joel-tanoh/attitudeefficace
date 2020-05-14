@@ -273,6 +273,22 @@ class Data
     }
 
     /**
+     * Retourne certains caractères de la description.
+     * 
+     * @param $item 
+     * @param int $length Le nombre de caractères qu'on veut.
+     * 
+     * @return string
+     */
+    public function getDescriptionExtrait($item, $length)
+    {
+        $description_length = strlen($item->get("description"));
+        return $description_length > $length
+            ? substr($item->get("description"), 0, $length) . '...'
+            : $item->get("description");
+    }
+
+    /**
      * Vérifie si la chaîne passée en paramètre la catégorie d'un item.
      * 
      * @param string $string La chaîne sur laquelle on fait la vérification.

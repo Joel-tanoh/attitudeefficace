@@ -10,12 +10,6 @@ a {
 a:hover {
 	text-decoration: none;
 }
-.logo {
-	width: 5.5rem;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
 
 /* Les Utilities */
 
@@ -263,4 +257,23 @@ button {
 .app-btn:hover {
 	color: white;
 	text-decoration: none;
+}
+
+/* Lorsque le logo est dans la sidebar */
+.sidebar-brand {
+	width: 6rem;
+}
+
+/* Conteneur d'une layout avec une fixed sidebar et une navbar */
+.container-with-fixed-sidebar-and-navbar {
+	margin-left: 15rem;
+	margin-top: 5rem;
+}
+
+/* */
+@media (max-width: 992px) {
+	.container-with-fixed-sidebar-and-navbar  {
+		margin-top: 3.1rem;
+		margin-left: 0;
+	}
 }

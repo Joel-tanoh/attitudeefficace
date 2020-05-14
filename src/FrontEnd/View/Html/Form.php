@@ -12,7 +12,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\Layout\Html;
+namespace App\FrontEnd\View\Html;
 
 use App\BackEnd\APIs\Bdd;
 use App\BackEnd\Data\Data;

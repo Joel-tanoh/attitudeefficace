@@ -12,18 +12,17 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\Layout;
+namespace App\FrontEnd\View;
 
 /**
  * Gère tout ce qui concerne le pied de page
  * 
  * @category Category
- * @package  Namespace_App\FrontEnd\Outils
  * @author   Joel <joel.developpeur@gmail.com>
  * @license  url.com License
  * @link     Link
  */
-class Footer extends Layout
+class Footer extends View
 {
     /**
      * Pied de page

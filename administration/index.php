@@ -27,8 +27,8 @@ try {
     if (!someoneIsConnected()) { Utils::header(ADMIN_URL . "/connexion"); }
     $url = isset($_GET['url']) ? explode('/', $_GET['url']) : "";
     $router = new Router($url);
-    $page = $router->adminRouter();
-    $page = new Page($page["title"], $page["content"]);
+    $route = $router->adminRouter();
+    $page = new Page($route["meta_title"], $route["content"]);
     echo $page->adminPage();
 
 } catch(Error|TypeError|Exception|PDOException $e) {

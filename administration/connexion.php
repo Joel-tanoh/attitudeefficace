@@ -7,7 +7,7 @@
  * 
  * @category Category
  * @package  Package
- * @author   Joel Tanoh <tanohbassapatrick@gmail.com>
+ * @author   Joel Tanoh <joel.developpeur@gmail.com>
  * @license  url.com license
  * @link     Link
  */
@@ -18,19 +18,19 @@ require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 use App\BackEnd\Data\Personnes\Administrateur;
 use App\BackEnd\Utils\Notification;
 use App\BackEnd\Utils\Utils;
+use App\FrontEnd\View\View;
 use App\FrontEnd\Page;
 
 try {
-    ob_start();
+
     if (!someoneIsConnected()) {
         $notification = new Notification();
-        $page_title = ' Connexion';
+        $meta_title = APP_NAME . ' - Connexion';
         $admin_login = '';
         $admin_password = '';
         $error = null;
 
         if (isset($_POST['connexion'])) {
-
             extract($_POST);
             $input_admin_login = $admin_login;
             $admin_login = htmlentities($admin_login);
@@ -44,7 +44,7 @@ try {
                     $admin = Administrateur::getByLogin($admin_login);
                     if ($admin->isAuthentified($admin_login, $admin_password)) {
                         $admin->setSession("admin_login");
-                        if ($_POST["activate_cookie"] == "oui") {
+                        if ($activate_cookie == "oui") {
                             $admin->setCookie("admin_login", $admin->get("login"));
                         }
                         Utils::header(ADMIN_URL);
@@ -55,18 +55,21 @@ try {
                     $error = $notification->errorLogin();
                 }
             }
+
             $admin_login = $input_admin_login;
         }
-        $page_content = ob_get_clean();
-        $page = new Page($page_title, $page_content);
-        echo $page->connexionPage($admin_login, $admin_password, $error);
+        
+        $view = new View();
+        $page = new Page($meta_title, $view->connexionFormView($admin_login, $admin_password, $error));
+        echo $page->connexionPage();
+
     } else {
-        Utils::header();
+        Utils::header(ADMIN_URL);
     }
+
 } catch(Error|TypeError|Exception|PDOException $e) {
     $exception = 'Erreur : '    . $e->getMessage()
         . ', Fichier : ' . $e->getFile()
         . ' Ligne : '    . $e->getLine();
+    require ROOT_PATH . 'notifier-exception.php';
 }
-
-require ROOT_PATH . 'notifier-exception.php';

@@ -22,7 +22,7 @@
     display: none;
     position: absolute;
     top: 2.4rem;
-    left: -9.9rem;
+    right: 0;
     width: 12rem;
     background-color: rgba(255,255,255,1);
     border: 1px solid rgba(172,172,172,.3);
@@ -47,8 +47,8 @@
 .btn-administrateur .content {
     position: absolute;
     top: 2.8rem;
-    left: -6rem;
-    width: 10rem;
+    right: 1rem;
+    width: 12rem;
     background: rgba(255,255,255,1);
     box-shadow: 0 0 .5rem rgba(0,0,0,0.1);
     border-radius: .5rem;

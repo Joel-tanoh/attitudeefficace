@@ -60,31 +60,31 @@ class Router
 
         // administrateurs
         elseif ($this->url[0] == 'administrateurs' && empty($this->url[1])) 
-            $route = $controller->read();
+            $route = $controller->listAdminUsersAccounts();
 
         // categorie
         elseif (Data::isCategorie($this->url[0]) && empty($this->url[1]))
-            $route = $controller->read();
+            $route = $controller->listCategorieItems();
 
         // categorie/create
         elseif (Data::isCategorie($this->url[0]) && $this->url[1] == "create" && empty($this->url[2]))
-            $route = $controller->create();
+            $route = $controller->createItem();
         
         // categorie/delete
         elseif (Data::isCategorie($this->url[0]) && $this->url[1] == "delete" && empty($this->url[2]))
-            $route = $controller->delete();
+            $route = $controller->deleteOneOrManyItems();
         
         // categorie/slug
         elseif (Data::isCategorie($this->url[0]) && Data::isSlug($this->url[1]) && empty($this->url[2]))
-            $route = $controller->read();
+            $route = $controller->readItem();
 
         // categorie/slug/edit
         elseif (Data::isCategorie($this->url[0]) && Data::isSlug($this->url[1]) && $this->url[2] == "edit")
-            $route = $controller->edit();
+            $route = $controller->editItem();
         
         // categorie/slug/delete
         elseif (Data::isCategorie($this->url[0]) && Data::isSlug($this->url[1]) && $this->url[2] == "delete")
-            $route = $controller->edit();
+            $route = $controller->deleteOneOrManyItems();
 
         // Page 404
         else $route = $controller->adminError404();
@@ -109,6 +109,19 @@ class Router
         else $route = $controller->publicError404();
 
         return $route;
+    }
+
+    /**
+     * Permet de vérifier la concordance en une chaine de caractère passé en
+     * paramètre et l'url.
+     * 
+     * @param string $string
+     * 
+     * @return bool
+     */
+    private function match(string $string)
+    {
+
     }
 
 }

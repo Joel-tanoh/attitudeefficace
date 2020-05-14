@@ -14,6 +14,7 @@ use App\BackEnd\Utils\Notification;
 use App\FrontEnd\Page;
 use App\BackEnd\Utils\Validator;
 use App\BackEnd\Utils\Utils;
+use App\FrontEnd\View\View;
 
 /**
  * Gère le controlleur. Une méthode du controlleur peut être appelée en fonction du routage.
@@ -23,8 +24,6 @@ use App\BackEnd\Utils\Utils;
 class Controller
 {
     private $url;
-    private $model;
-    private $page;
 
     /**
      * Permet d'instancier un controlleur.
@@ -36,6 +35,7 @@ class Controller
     function __construct($url)
     {
         $this->url = $url;
+        $this->view = new View();
     }
 
     /**
@@ -45,11 +45,11 @@ class Controller
      */
     public function publicAccueilPage()
     {
-        $page_title = "Bienvenu sur " . APP_NAME;
-        $page = new Page($page_title);
+        $meta_title = "Bienvenu sur " . APP_NAME;
+
         return [
-            "title" => $page_title,
-            "content" => $page->publicAccueilPage()
+            "meta_title" => $meta_title,
+            "content" => $this->view->publicAccueil()
         ];
     }
 
@@ -60,11 +60,12 @@ class Controller
      */
     function dashboard()
     {
-        $page_title = "Tableau de bord";
-        $page = new Page($page_title);
+        $meta_title = "Tableau de bord";
+        $view = new View();
+
         return [
-            "title" => $page_title,
-            "content" => $page->dashboard(),
+            "meta_title" => $meta_title,
+            "content" => $view->adminDashboard()
         ];
     }
       
@@ -73,10 +74,11 @@ class Controller
      * 
      * @return array
      */
-    function create()
+    function createItem()
     {
         $errors = null;
-        $page_title = Data::getCreatePageTitle($this->url[0]);
+        $meta_title = Data::getCreatePageTitle($this->url[0]);
+
         if (isset($_POST['enregistrement'])) {
             $validator = new Validator($_POST);
             $errors = $validator->getErrors();
@@ -84,43 +86,58 @@ class Controller
               Data::create($this->url[0], $_POST);
             }
         }
-        $page = new Page($page_title);
+
         return [
-            "title" => $page_title,
-            "content" => $page->create($this->url[0], $errors),
+            "meta_title" => $meta_title,
+            "content" => $this->view->createItem($this->url[0], $errors)
         ];
     }
 
     /**
-     * Controlleur d'affichage d'un item.
+     * Controlleur de listing d'items.
+     * 
+     * @return string
+     */
+    public function listCategorieItems()
+    {
+        $meta_title = "Mes " . Data::getTypeFormated($this->url[0], "pluriel");
+
+        if ($this->url[0] == "motivation-plus") { $items = Bdd::getchildrenOf("-1", "videos"); }
+        else { $items = Bdd::getAllFrom(Data::getTableNameFrom($this->url[0]), $this->url[0]); }
+
+        return [
+            "meta_title" => $meta_title,
+            "content" => $this->view->listItems($items, $this->url[0]),
+        ];
+    }
+
+    /**
+     * Controlleur pour l'url : administrateur.
      * 
      * @return array
      */
-    function read()
+    public function listAdminUsersAccounts()
     {
-        if (isset($this->url[1])) {
-            $item = Data::getObjectBy("slug", $this->url[1], Data::getTableNameFrom($this->url[0]), $this->url[0]);
-            $page_title = ucfirst($item->get("categorie")) . ' &#8250; ' . ucfirst($item->get("title"));
-            $page = new Page($page_title);
-            $page_content = $page->read($item);
-
-        } elseif ($this->url[0] == "administrateurs") {
-            $page_title = "Comptes";
-            $accounts = Bdd::getAllFrom(Data::getTableNameFrom($this->url[0]), "utilisateur");
-            $page = new Page($page_title);
-            $page_content = $page->listAccounts($accounts);
-
-        } else {
-            $page_title = "Mes " . Data::getTypeFormated($this->url[0], "pluriel");
-            if ($this->url[0] == "motivation-plus") { $items = Bdd::getchildrenOf("-1", "videos"); }
-            else { $items = Bdd::getAllFrom(Data::getTableNameFrom($this->url[0]), $this->url[0]); }
-            $page = new Page($page_title);
-            $page_content = $page->listItems($items, $this->url[0]);
-        }
+        $meta_title = "Comptes";
+        $accounts = Bdd::getAllFrom( Data::getTableNameFrom( $this->url[0] ), "utilisateur" );
 
         return [
-            "title" => $page_title,
-            "content" => $page_content,
+            "meta_title" => $meta_title,
+            "content" => $this->view->listAccounts($accounts)
+        ];
+    }
+
+    /**
+     * Controlleur pour lire un item.
+     */
+    public function readItem()
+    {
+        $item = Data::getObjectBy("slug", $this->url[1], Data::getTableNameFrom($this->url[0]), $this->url[0]);
+        $meta_title = ucfirst($item->get("categorie")) . ' &#8250; ' . ucfirst($item->get("meta_title"));
+
+        return [
+            "meta_title" => $meta_title,
+            "content" => $this->view->readItem($item)
         ];
     }
 
@@ -129,11 +146,11 @@ class Controller
      * 
      * @return array
      */
-    function edit()
+    function editItem()
     {
         $item = Data::getObjectBy("slug", $this->url[1], Data::getTableNameFrom($this->url[0]), $this->url[0]);
         $errors = null;
-        $page_title = ucfirst($item->get("categorie")) . " &#8250 " . ucfirst($item->get("title")) . " &#8250 Editer";
+        $meta_title = ucfirst($item->get("categorie")) . " &#8250 " . ucfirst($item->get("meta_title")) . " &#8250 Editer";
 
         if (isset($_POST["enregistrement"])) {
             $validator = new Validator($_POST);
@@ -142,11 +159,10 @@ class Controller
                 $item->edit($this->url[0], $_POST);
             }
         }
-        
-        $page = new Page($page_title);
+
         return [
-            "title" => $page_title,
-            "content" => $page->edit($item, $this->url[0], $errors),
+            "meta_title" => $meta_title,
+            "content" => $this->view->editItem($item, $this->url[0], $errors)
         ];
     }
 
@@ -155,7 +171,7 @@ class Controller
      * 
      * @return array
      */
-    function delete()
+    public function deleteOneOrManyItems()
     {
         if (isset($this->url[2])) {
             $item = Data::getObjectBy("slug", $this->url[1], Data::getTableNameFrom($this->url[0]), $this->url[0]);
@@ -164,7 +180,7 @@ class Controller
             }
         } else {
             $items = Bdd::getAllFrom(Data::getTableNameFrom($this->url[0]), $this->url[0]);
-            $page_title = "Supprimer des " . Data::getTypeFormated($this->url[0], "pluriel");
+            $meta_title = "Supprimer des " . Data::getTypeFormated($this->url[0], "pluriel");
     
             if (isset($_POST["suppression"])) {
                 if (empty($_POST["codes"])) {
@@ -176,10 +192,9 @@ class Controller
                 }
             }
     
-            $page = new Page($page_title);
             return [
-                "title" => $page_title,
-                "content" => $page->delete($items, $this->url[0], $error),
+                "meta_title" => $meta_title,
+                "content" => $this->view->deleteItems($items, $this->url[0], $error)
             ];
         }
     }
@@ -191,11 +206,10 @@ class Controller
      */
     function adminError404()
     {
-        $page_title = "Page non trouvée";
-        $page = new Page($page_title);
+        $meta_title = "Page non trouvée";
         return [
-            "title" => $page_title,
-            "content" => $page->adminError404(),
+            "meta_title" => $meta_title,
+            "content" => $this->view->adminError404()
         ];
     }
 
@@ -206,11 +220,10 @@ class Controller
      */
     function publicError404()
     {
-        $page_title = "Page non trouvée";
-        $page = new Page($page_title);
+        $meta_title = "Page non trouvée";
         return [
-            "title" => $page_title,
-            "content" => $page->publicError404(),
+            "meta_title" => $meta_title,
+            "content" => $this->view->publicError404()
         ];
     }
 

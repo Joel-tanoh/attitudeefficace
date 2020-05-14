@@ -12,7 +12,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\Layout;
+namespace App\FrontEnd\View;
 
 use App\BackEnd\Data\Personnes\Administrateur;
 
@@ -25,7 +25,7 @@ use App\BackEnd\Data\Personnes\Administrateur;
  * @license  url.com License
  * @link     Link
  */
-class Navbar extends Layout
+class Navbar extends View
 {
     private $brand;
     private $style;
@@ -40,7 +40,7 @@ class Navbar extends Layout
         return <<<HTML
         <div class="navbar fixed-top bg-marron">
             <div class="container navbar-content w-100 d-flex justify-content-between">
-                {$this->navbarBrand()}
+                {$this->appBrand()}
             </div>
         </div>
 HTML;
@@ -56,11 +56,10 @@ HTML;
     {
         return <<<HTML
         <div class="navbar fixed-top bg-white border-bottom">
-            <div class="navbar-content w-100 d-flex justify-content-between ml-5 ml-lg-0">
-                {$this->navbarBrand()}
+            <div class="navbar-content w-100 d-flex justify-content-end ml-5 ml-lg-0">
                 <ul class="navbar-nav d-flex align-items-center flex-row">
                     {$this->_getLinksOfAdd()}
-                    {$this->_getAdminManagementButton()}
+                    {$this->getAdminManagementButtons()}
                 </ul>
             </div>
         </div>
@@ -107,12 +106,12 @@ HTML;
      * @author Joel
      * @return string
      */
-    private function _getAdminManagementButton()
+    private function getAdminManagementButtons()
     {
         $admin_url = ADMIN_URL;
         $admin_login = $_SESSION["admin_login"] ?? $_COOKIE["admin_login"];
         $admin = Administrateur::getByLogin($admin_login);
-        $admin_layout = new AdministrateurLayout();
+        $admin_layout = new AdministrateurView();
         $private_buttons = $admin->get("type") == "administrateur" ? $this->navbarPrivateButtons() : null;
 
         return <<<HTML
@@ -131,21 +130,6 @@ HTML;
                 </li>
             </ul>
         </li>
-HTML;
-    }
-
-    /**
-     * Affiche le logo dans une div.logo-box.
-     * 
-     * @return string
-     */
-    private function navbarBrand() : string
-    {
-        $logos_dir = LOGOS_DIR;
-        return <<<HTML
-        <a class="navbar-brand" href="">
-            <img src="{$logos_dir}/logo_2.png" alt="Attitude efficace" class="logo">
-        </a>
 HTML;
     }
 

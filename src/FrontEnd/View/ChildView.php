@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\Layout;
+namespace App\FrontEnd\View;
 
 /**
  * Gère tout ce qui concerne l'affichage au niveau des catégories
@@ -25,7 +25,7 @@ namespace App\FrontEnd\Layout;
  * @version  "Release: package_version"
  * @link     Link
  */
-class ChildLayout extends Layout
+class ChildView extends View
 {
     /**
      * Retourne la page d'affichage d'un item enfant.
@@ -34,15 +34,15 @@ class ChildLayout extends Layout
      * 
      * @return string
      */
-    public static function read($item)
+    public static function readChild($item)
     {
         $layout = new parent;
         $self_layout = new self;
         return <<<HTML
         <div class="mb-3">
-            {$layout->manageButtons($item, true, true, true, true)}
+            {$layout->manageButtons($item)}
             {$layout->showData($item)}
-            {$self_layout->_showArticleContent($item)}
+            {$self_layout->showArticle($item)}
         </div>
 HTML;
     }
@@ -54,7 +54,7 @@ HTML;
      * 
      * @return string
      */
-    private function _showArticleContent($item)
+    private function showArticle($item)
     {
         if ($item->get("article_content")) {
             return <<<HTML
