@@ -64,7 +64,7 @@ class Page
         </head>
         <body>
             {$this->view}
-            {$this->appJs()}
+            {$this->generalAppJs()}
         </body>
         </html>
 HTML;
@@ -163,16 +163,13 @@ HTML;
     }
 
     /**
-     * Retourne les fichiers css selon le thème passé en paramètre.
-     *  
+     * Retourne les fichiers Css de la partie publique.
+     * 
      * @return string
      */
-    private function appCss()
+    private function publicCss()
     {
-        return <<<HTML
-        {$this->vendorCss()}
-        {$this->callCssFile("app/main.css")}
-HTML;
+        return $this->generalAppCss();
     }
 
     /**
@@ -184,7 +181,7 @@ HTML;
     {
         $theme = "default";
         return <<<HTML
-        {$this->appCss()}
+        {$this->generalAppCss()}
         {$this->callCssFile("app/admin/" . $theme . "/css/connexion.css")}
         {$this->callCssFile("app/admin/" . $theme . "/css/navbar.css")}
         {$this->callCssFile("app/admin/" . $theme . "/css/sidebar.css")}
@@ -192,25 +189,13 @@ HTML;
     }
 
     /**
-     * Retourne les fichiers Css de la partie publique.
+     * Javascript de la partie publique.
      * 
      * @return string
      */
-    private function publicCss()
-    {
-        return $this->appCss();
-    }
-
-    /**
-     * Retourne les fichiers JS appelés.
-     * 
-     * @return string
-     */
-    private function appJs()
+    private function publicJs()
     {
         return <<<HTML
-        {$this->vendorJs()}
-        {$this->callJsFile("app/main.js")}
 HTML;
     }
 
@@ -229,6 +214,32 @@ HTML;
     }
 
     /**
+     * Retourne les fichiers css selon le thème passé en paramètre.
+     *  
+     * @return string
+     */
+    private function generalAppCss()
+    {
+        return <<<HTML
+        {$this->vendorCss()}
+        {$this->callCssFile("app/main.css")}
+HTML;
+    }
+
+    /**
+     * Retourne les fichiers JS appelés.
+     * 
+     * @return string
+     */
+    private function generalAppJs()
+    {
+        return <<<HTML
+        {$this->vendorJs()}
+        {$this->callJsFile("app/main.js")}
+HTML;
+    }
+
+    /**
      * Retourne eles fichiers CSS utilisés sur toutes les pages.
      * 
      * @return string
@@ -238,13 +249,13 @@ HTML;
         return <<<HTML
         <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
          rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-         crossorigin="anonymous"> -->
-        {$this->callCssFile("vendor/bootstrap/css/bootstrap.min.css")}
-        {$this->callCssFile("vendor/bootstrap/css/icheck-bootstrap.min.css")}
-        <!-- <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+         crossorigin="anonymous">
+        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
          rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
          crossorigin="anonymous"> -->
+        {$this->callCssFile("vendor/bootstrap/css/bootstrap.min.css")}
         {$this->callCssFile("vendor/fontawesome/css/fontawesome.min.css")}
+        {$this->callCssFile("vendor/bootstrap/css/icheck-bootstrap.min.css")}
         {$this->callCssFile("vendor/select2/css/select2.min.css")}
 HTML;
     }

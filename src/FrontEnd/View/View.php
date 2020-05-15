@@ -404,7 +404,7 @@ HTML;
      * 
      * @return string Code de la page.
      */
-    public function deletItems($items, $categorie, $error = null)
+    public function deleteItems($items, $categorie, $error = null)
     {
         $notification = new Notification();
         if (empty($items)) {

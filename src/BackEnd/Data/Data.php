@@ -496,7 +496,7 @@ class Data
      * 
      * @return string
      */
-    public static function getCreatePageTitle(string $categorie)
+    public static function getCreateItemPageTitle(string $categorie)
     {
         $femininCategorie = ["formations", "etapes", "videos"];
         $voyelleCategorie = ["articles", "ebooks"];

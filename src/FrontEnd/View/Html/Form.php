@@ -61,6 +61,7 @@ class Form
         default :
             Utils::header(ADMIN_URL);
         }
+
         return $form;
     }
 
@@ -74,10 +75,10 @@ class Form
     public function adminForm($admin = null)
     {
         $form_content = "";
-        $form_content .= $this->loginInput($admin, "col-12 app-form");
-        $form_content .= $this->passwordInput("col-12 app-form");
-        $form_content .= $this->confirmPasswordInput("col-12 app-form");
-        $form_content .= $this->emailInput($admin, "col-12 app-form");
+        $form_content .= $this->loginInput($admin, "col-12 form-control");
+        $form_content .= $this->passwordInput("col-12 form-control");
+        $form_content .= $this->confirmPasswordInput("col-12 form-control");
+        $form_content .= $this->emailInput($admin, "col-12 form-control");
         $form_content .= $this->chooseAdminAccountType();
         $form_content .= $this->avatarInput();
 
@@ -115,7 +116,7 @@ HTML;
         $form_content = "";
         $form_content .= $this->firstBox($item, $prix_label);
         $form_content .= $this->imageInput();
-        return $this->_returnForm($form_content);
+        return $this->returnForm($form_content);
     }
  
     /**
@@ -128,18 +129,19 @@ HTML;
      */
     public function childForm($item = null, string $categorie = null)
     {
-        $pdf_uploaded = $categorie == "ebooks" ? true : false;
+        $uploadPdf = $categorie == "ebooks" ? true : false;
         $prix_label = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
-        accéder à cet élément</p>
+        avoir accès à cet élément</p>
 HTML;
-        $form_content = "";
-        $form_content .= $this->firstBox($item, $prix_label);
-        $form_content .= $this->articleContentTextarea($item);
-        $form_content .= $this->imageInput();
-        $form_content .= $this->pdfFileInput($pdf_uploaded);
-        return $this->_returnForm($form_content);
+
+        $formContent = $this->firstBox($item, $prix_label);
+        $formContent .= $this->articleContentTextarea($item);
+        $formContent .= $this->imageInput();
+        $formContent .= $this->pdfFileInput($uploadPdf);
+
+        return $this->returnForm($formContent);
     }
 
     /**
@@ -157,9 +159,9 @@ HTML;
             Cette somme sera affichée aux utilisateurs qui voudront ce service.
         </p>
 HTML;
-        $form_content = "";
-        $form_content .= $this->firstBox($item, $mini_service_label);
-        return $this->_returnForm($form_content);
+        $form_content = $this->firstBox($item, $mini_service_label);
+
+        return $this->returnForm($form_content);
     }
 
     /**
@@ -176,16 +178,16 @@ HTML;
     {
         return <<<HTML
         <div class="row">
-            <div class="col-12 col-md-5">
+            <div class="col-md-6">
                 {$this->selectParent()}
                 {$this->titleInput($item)}
                 {$this->prixInput($item, $prix_label)}
                 {$this->rangInput($item)}
                 {$this->videoInput($item)}
             </div>
-            <div class="col-12 col-md-7">
-                {$this->descriptionInput($item)}
-                {$this->informUsersInput()}
+            <div class="col-md-6">
+                {$this->descriptionTextarea($item)}
+                {$this->notifyUsersBox()}
             </div>
         </div>
 
@@ -208,7 +210,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("login", "Login")}
-            {$this->_text('login', 'login', $login, "Login", $class)}
+            {$this->inputText('login', 'login', $login, "Login", $class)}
         </div>
 HTML;
     }
@@ -227,7 +229,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("password", "Entrez le mot de passe")}
-            {$this->_password('password', 'password', $password, "Saisir le mot de passe", $class)}
+            {$this->inputPassword('password', 'password', $password, "Saisir le mot de passe", $class)}
         </div>
 HTML;
     }
@@ -247,7 +249,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("email", "Adresse email")}
-            {$this->_email('email', 'email', $email, "johny@mail.com", $class)}
+            {$this->email('email', 'email', $email, "johny@mail.com", $class)}
         </div>
 HTML;
     }
@@ -263,10 +265,10 @@ HTML;
         {$this->label("", "Type de compte :")}
         <div class="row mb-2">
             <div class="col-6">
-                {$this->_radio("account_type", "administrateur", "Administrateur")}
+                {$this->inputRadio("account_type", "administrateur", "Administrateur")}
             </div>
             <div>
-                {$this->_radio("account_type", "utilisateur", "Utilisateur")}
+                {$this->inputRadio("account_type", "utilisateur", "Utilisateur")}
             </div>
         </div>
 HTML;
@@ -281,12 +283,12 @@ HTML;
      */
     public function confirmPasswordInput(string $class = null)
     {
-        $confirm_password = "";
+        $confirminputPassword = "";
         extract($_POST);
         return <<<HTML
         <div class="form-group">
             {$this->label("confirmPassword", "Confirmez le mot de passe")}
-            {$this->_password("confirm_password", "confirmPassword", $confirm_password, "Confirmer le mot de passe", $class)}
+            {$this->inputPassword("confirminputPassword", "confirmPassword", $confirminputPassword, "Confirmer le mot de passe", $class)}
         </div>
 HTML;
     }
@@ -303,8 +305,7 @@ HTML;
     public function selectParent(bool $choose_parent = null)
     {
         global $url;
-        $choose_parent = $url[0] != "minis-services"
-            && Data::isChildCategorie($url[0])
+        $choose_parent = $url[0] !== "minis-services" && Data::isChildCategorie($url[0])
             ? true
             : false;
 
@@ -312,12 +313,12 @@ HTML;
             return <<<HTML
             <div id="chooseParentBox" class="mb-3">
                 {$this->label("categorieId", "Choisir le parent :")}
-                <select name="parent_id" id="categorieId" class="col-12 select2">
+                <select name="parent_id" id="selectParentList" class="col-12 form-control select2">
                     <option value="0">-- Sans parent --</option>
                     <option value="-1">Motivation plus</option>
-                    {$this->_parentList("themes", "Thèmes")}
-                    {$this->_parentList("etapes", "Etapes")}
-                    {$this->_parentList("formations", "Formations")}
+                    {$this->parentList("themes", "Thèmes")}
+                    {$this->parentList("etapes", "Etapes")}
+                    {$this->parentList("formations", "Formations")}
                 </select>
             </div>
 HTML;
@@ -337,7 +338,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("title", "Titre")}
-            {$this->_text('title', 'title', $title, "Saisir le titre", "col-12 app-form")}
+            {$this->inputText('title', 'title', $title, "Saisir le titre", "col-12 form-control")}
         </div>
 HTML;
     }
@@ -350,13 +351,14 @@ HTML;
      * 
      * @return string Le code HTML de la description.
      */
-    public function descriptionInput($item)
+    public function descriptionTextarea($item)
     {
         $description = !is_null($item) ? $item->get("description") : "";
+
         return <<<HTML
         <div class="form-group">
-            {$this->label("description", "Description")}
-            {$this->_textarea('description', 'description', "Saisir la description", $description, null, "7")}
+            {$this->label("descriptionTextarea", "Description")}
+            {$this->inputTextarea('description', 'descriptionTextarea', "Saisir la description...", $description, null, "5")}
         </div>
 HTML;
     }
@@ -372,14 +374,13 @@ HTML;
     {
         global $url;
         $article_content = !is_null($item) ? $item->get("article_content")
-            : $url[0] == "articles"
-                ? ""
-                : null;
+            : $url[0] == "articles" ? "" : null;
+
         if (!is_null($article_content)) {
             return <<<HTML
             <div class="form-group">
                 {$this->label("editor", "Contenu de l'article")}
-                {$this->_textarea('article_content', 'editor', "Commencez à écrire...", $article_content)}
+                {$this->inputTextarea('article_content', "editor", "Commencez à écrire...", $article_content, null, "10")}
             </div>
 HTML;
         }
@@ -399,7 +400,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("Prix", $label)}
-            {$this->_number('prix', 'Prix', $prix, "Prix", "col-12 app-form", 0)}
+            {$this->inputNumber('prix', 'Prix', $prix, "Prix", "col-12 form-control", 0)}
         </div>
 HTML;
     }
@@ -434,7 +435,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("rang", $label)}
-            {$this->_number('rang', 'Rang', $rang, "Rang", "col-12 app-form", 0)}
+            {$this->inputNumber('rang', 'Rang', $rang, "Rang", "col-12 form-control", 0)}
         </div>
 HTML;
     }
@@ -456,7 +457,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("videoLink", $label)}
-            {$this->_text('video_link', 'videoLink', $video_link, 'www.youtube.com?v={ID}', "col-12 app-form")}
+            {$this->inputText('video_link', 'videoLink', $video_link, 'www.youtube.com?v={ID}', "col-12 form-control")}
         </div>
 HTML;
     }
@@ -471,7 +472,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("avatarUploaded", "Importer un avatar :")}
-            {$this->_file("avatar_uploaded", "avatarUploaded")}
+            {$this->inputFile("avatar_uploaded", "avatarUploaded")}
         </div>
 HTML;
     }
@@ -489,7 +490,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("imageUploaded", "Importer une image de couverture :")}
-            {$this->_file("image_uploaded", "imageUploaded", "col-md-5")}
+            {$this->inputFile("image_uploaded", "imageUploaded", "col-md-5")}
         </div>
 HTML;
     }
@@ -508,7 +509,7 @@ HTML;
             return <<<HTML
             <div class="form-group">
                 {$this->label("pdfUploaded", "Importer un fichier PDF :")}
-                {$this->_file("pdf_uploaded", "pdfUploaded", "col-md-5")}
+                {$this->inputFile("pdf_uploaded", "pdfUploaded", "col-md-5")}
             </div>
 HTML;
         }
@@ -520,10 +521,10 @@ HTML;
      * 
      * @return string|null
      */
-    public function informUsersInput()
+    public function notifyUsersBox()
     {
         return <<<HTML
-        <div class="p-3 bg-cloud">
+        <div class="p-3 bg-cloud card">
             <div class="mb-2">Notifier :</div>
             <div class="custom-control custom-radio">
                 <input class="custom-control-input" type="radio" id="informAll" name="notify_users" value="all">
@@ -575,7 +576,7 @@ HTML;
         string $text = null,
         string $class = null
     ) {
-        return $this->_button("submit", $name, $text, $class);
+        return $this->button("submit", $name, $text, $class);
     }
 
     /**
@@ -585,7 +586,7 @@ HTML;
      * 
      * @return string
      */
-    private function _returnForm($form_content)
+    private function returnForm($form_content)
     {
         if ($form_content) {
             return <<<HTML
@@ -611,7 +612,7 @@ HTML;
      * 
      * @return string
      */
-    private function _parentList($categorie = null, $label = null)
+    private function parentList($categorie = null, $label = null)
     {
         $options = null;
         $items = Bdd::getAllFrom(Data::getTableNameFrom($categorie), $categorie);
@@ -637,15 +638,14 @@ HTML;
      * 
      * @return string
      */
-    private function _file(string $name = null, string $id = null, string $class = null)
+    private function inputFile(string $name = null, string $id = null, string $class = null)
     {
         return <<<HTML
         <div class="row">
             <div class="col-12 {$class}">
                 <div class="custom-file">
-                    {$this->_input("file", $name, $id, null, null, "custom-file-input")}
-                    <label class="custom-file-label" for="customFile">
-                        Importer</label>
+                    {$this->input("file", $name, $id, null, null, "custom-file-input")}
+                    <label class="custom-file-label" for="customFile">Importer</label>
                 </div>
             </div>
         </div>
@@ -663,14 +663,14 @@ HTML;
      * 
      * @return string
      */
-    private function _text(
+    private function inputText(
         string $name = null, 
         string $id = null, 
         string $value = null, 
         string $placeholder = null,
         string $class = null
     ) {
-        return $this->_input("text", $name, $id, $value, $placeholder, $class);
+        return $this->input("text", $name, $id, $value, $placeholder, $class);
     }
     
     /**
@@ -684,14 +684,14 @@ HTML;
      * 
      * @return string
      */
-    private function _password(
+    private function inputPassword(
         string $name = null, 
         string $id = null, 
         string $value = null, 
         string $placeholder = null, 
         string $class = null
     ) {
-        return$this->_input("password", $name, $id, $value, $placeholder, $class);
+        return$this->input("password", $name, $id, $value, $placeholder, $class);
     }
 
     /**
@@ -706,14 +706,14 @@ HTML;
      * @author Joel
      * @return string [[Description]]
      */
-    private function _email(
+    private function email(
         string $name = null, 
         string $id = null,
         string $value = null, 
         string $placeholder = null,
         string $class = null
     ) {
-        return $this->_input("email", $name, $id, $value, $placeholder, $class);
+        return $this->input("email", $name, $id, $value, $placeholder, $class);
     }
 
     /**
@@ -726,7 +726,7 @@ HTML;
      * 
      * @return string
      */
-    private function _radio(
+    private function inputRadio(
         string $name = null, 
         string $value = null,
         string $text = null, 
@@ -754,7 +754,7 @@ HTML;
      * @author Joel
      * @return string [[Description]]
      */
-    private function _number(
+    private function inputNumber(
         string $name = null,
         string $id = null,
         string $value = null,
@@ -763,7 +763,7 @@ HTML;
         int $min = null,
         int $max = null
     ) {
-        return $this->_input(
+        return $this->input(
             "number", $name, $id, $value, $placeholder, $class, $min, $max
         );
     }
@@ -782,7 +782,7 @@ HTML;
      * 
      * @return string
      */
-    private function _input(
+    private function input(
         string $type = null,
         string $name = null,
         string $id = null,
@@ -811,7 +811,7 @@ HTML;
      * @author Joel
      * @return string 
      */
-    private function _textarea(
+    private function inputTextarea(
         string $name = null,
         string $id = null,
         string $placeholder = null,
@@ -820,8 +820,8 @@ HTML;
         string $rows = null
     ) {
         return <<<HTML
-        <textarea name="{$name}" id="{$id}" rows="{$rows}"
-			placeholder="{$placeholder}" class="col-12 app-form {$class}">{$value}</textarea>
+        <textarea name="{$name}" id="{$id}" rows="{$rows}" placeholder="{$placeholder}"
+            class="col-12 form-control {$class}">{$value}</textarea>
 HTML;
     }
 
@@ -837,12 +837,8 @@ HTML;
      * @author Joel
      * @return string [[Description]]
      */
-    private function _button(
-        string $type = null,
-        string $name = null, 
-        string $text = null,
-        string $class = null
-    ) {
+    private function button(string $type = null, string $name = null,  string $text = null, string $class = null)
+    {
         return <<<HTML
 		<button type="{$type}" name="{$name}" class="app-btn bg-primary {$class}">
 			{$text}

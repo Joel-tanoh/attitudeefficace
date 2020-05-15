@@ -77,7 +77,7 @@ class Controller
     function createItem()
     {
         $errors = null;
-        $meta_title = Data::getCreatePageTitle($this->url[0]);
+        $meta_title = Data::getCreateItemPageTitle($this->url[0]);
 
         if (isset($_POST['enregistrement'])) {
             $validator = new Validator($_POST);
@@ -87,9 +87,11 @@ class Controller
             }
         }
 
+        $view = new View();
+
         return [
             "meta_title" => $meta_title,
-            "content" => $this->view->createItem($this->url[0], $errors)
+            "content" => $view->createItem($this->url[0], $errors)
         ];
     }
 
@@ -105,9 +107,11 @@ class Controller
         if ($this->url[0] == "motivation-plus") { $items = Bdd::getchildrenOf("-1", "videos"); }
         else { $items = Bdd::getAllFrom(Data::getTableNameFrom($this->url[0]), $this->url[0]); }
 
+        $view = new View();
+
         return [
             "meta_title" => $meta_title,
-            "content" => $this->view->listItems($items, $this->url[0]),
+            "content" => $view->listItems($items, $this->url[0]),
         ];
     }
 
@@ -121,9 +125,11 @@ class Controller
         $meta_title = "Comptes";
         $accounts = Bdd::getAllFrom( Data::getTableNameFrom( $this->url[0] ), "utilisateur" );
 
+        $view = new View();
+
         return [
             "meta_title" => $meta_title,
-            "content" => $this->view->listAccounts($accounts)
+            "content" => $view->listAccounts($accounts)
         ];
     }
 
@@ -135,9 +141,11 @@ class Controller
         $item = Data::getObjectBy("slug", $this->url[1], Data::getTableNameFrom($this->url[0]), $this->url[0]);
         $meta_title = ucfirst($item->get("categorie")) . ' &#8250; ' . ucfirst($item->get("meta_title"));
 
+        $view = new View();
+
         return [
             "meta_title" => $meta_title,
-            "content" => $this->view->readItem($item)
+            "content" => $view->readItem($item)
         ];
     }
 
@@ -160,9 +168,11 @@ class Controller
             }
         }
 
+        $view = new View();
+
         return [
             "meta_title" => $meta_title,
-            "content" => $this->view->editItem($item, $this->url[0], $errors)
+            "content" => $view->editItem($item, $this->url[0], $errors)
         ];
     }
 
@@ -192,9 +202,11 @@ class Controller
                 }
             }
     
+            $view = new View();
+
             return [
                 "meta_title" => $meta_title,
-                "content" => $this->view->deleteItems($items, $this->url[0], $error)
+                "content" => $view->deleteItems($items, $this->url[0], $error)
             ];
         }
     }
@@ -207,9 +219,12 @@ class Controller
     function adminError404()
     {
         $meta_title = "Page non trouvée";
+        
+        $view = new View();
+        
         return [
             "meta_title" => $meta_title,
-            "content" => $this->view->adminError404()
+            "content" => $view->adminError404()
         ];
     }
 
@@ -221,9 +236,12 @@ class Controller
     function publicError404()
     {
         $meta_title = "Page non trouvée";
+
+        $view = new View();
+
         return [
             "meta_title" => $meta_title,
-            "content" => $this->view->publicError404()
+            "content" => $view->publicError404()
         ];
     }
 
