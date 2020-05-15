@@ -206,9 +206,10 @@ HTML;
      */
     private function adminJs()
     {
+        $theme = "default";
         return <<<HTML
-        {$this->vendorJs()}
         {$this->generalAppJs()}
+        {$this->callJsFile("app/admin/" . $theme . "/js/admin.js")}
 HTML;
     }
 
@@ -236,7 +237,6 @@ HTML;
         return <<<HTML
         {$this->vendorJs()}
         {$this->callJsFile("app/main.js")}
-        {$this->callJsFile("app/admin/" . $theme . "/js/admin.js")}
 HTML;
     }
 
@@ -280,7 +280,7 @@ HTML;
         <!-- Jquery -->
         {$this->callJsFile("vendor/jquery/jquery.min.js")}
         <!-- Popper -->
-        {$this->callJsFile("vendor/popper/popper.js")}
+        {$this->callJsFile("vendor/popper/popper.min.js")}
         <!-- Bootstrap -->
         {$this->callJsFile("vendor/bootstrap/js/bootstrap.bundle.min.js")}
         <!-- Fontawesome -->
