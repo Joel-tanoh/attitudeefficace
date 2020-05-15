@@ -1,11 +1,11 @@
 $(document).ready(function(){
 
-	// Afficher le sous-menu du bouton dans la barre supérieure
+	// Faire apparaître le sous-menu caché lors du clic sur l'avatar dans la barre supérieure
 	$('#btnAdministrateurIcon').click( function () {
 		$('#btnAdministrateurContent').toggle('fast');
 	});
 
-	// Afficher le sous-menu du bouton 'créer' de la side-bar
+	// Faire apparaître le sous-menu du bouton 'créer' de la navbar
 	$('.add-button-icon').click( function () {
 		$('.add-button-content').toggle('fast');
   	});

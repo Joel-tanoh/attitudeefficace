@@ -84,9 +84,9 @@ HTML;
         {$this->debutDePage("fr")}
         <head>
             {$this->metaData()}
-            {$this->adminCss()}  
+            {$this->adminCss()}
         </head>
-        <body id="adminPart">
+        <body id="adminPart" class="bg-cloud">
             {$layout->fixedNavbarAndFixedSidebarAndContainer( $view->navbar("admin"), $view->adminSidebar(), $this->view ) }
             {$this->adminJs()}
         </body>
@@ -206,10 +206,9 @@ HTML;
      */
     private function adminJs()
     {
-        $theme = "default";
         return <<<HTML
         {$this->vendorJs()}
-        {$this->callJsFile("app/admin/" . $theme . "/js/admin.js")}
+        {$this->generalAppJs()}
 HTML;
     }
 
@@ -233,9 +232,11 @@ HTML;
      */
     private function generalAppJs()
     {
+        $theme = "default";
         return <<<HTML
         {$this->vendorJs()}
         {$this->callJsFile("app/main.js")}
+        {$this->callJsFile("app/admin/" . $theme . "/js/admin.js")}
 HTML;
     }
 
@@ -247,16 +248,24 @@ HTML;
     private function vendorCss()
     {
         return <<<HTML
+        <!-- Bootstrap -->
         <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-         rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-         crossorigin="anonymous">
-        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-         rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
-         crossorigin="anonymous"> -->
+            rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+            crossorigin="anonymous"> -->
         {$this->callCssFile("vendor/bootstrap/css/bootstrap.min.css")}
+        <!-- Fontawesome -->
+        <!-- <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+            rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+            crossorigin="anonymous"> -->
         {$this->callCssFile("vendor/fontawesome/css/fontawesome.min.css")}
-        {$this->callCssFile("vendor/bootstrap/css/icheck-bootstrap.min.css")}
+        <!-- icheck-bootstrap -->
+        {$this->callCssFile("vendor/icheck-bootstrap/icheck-bootstrap.min.css")}
+        <!-- Select2 -->
         {$this->callCssFile("vendor/select2/css/select2.min.css")}
+        <!-- summernote -->
+        {$this->callCssFile("vendor/summernote/summernote-bs4.min.css")}
+        <!-- Google Font: Source Sans Pro -->
+        <!-- <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet"> -->
 HTML;
     }
 
@@ -268,13 +277,23 @@ HTML;
     private function vendorJs()
     {
         return <<<HTML
+        <!-- Jquery -->
         {$this->callJsFile("vendor/jquery/jquery.min.js")}
+        <!-- Popper -->
+        {$this->callJsFile("vendor/popper/popper.js")}
+        <!-- Bootstrap -->
         {$this->callJsFile("vendor/bootstrap/js/bootstrap.bundle.min.js")}
-        {$this->callJsFile("vendor/bootstrap/js/bs-custom-file-input.min.js")}
+        <!-- Fontawesome -->
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js"></script> -->
         {$this->callJsFile("vendor/fontawesome/js/all.min.js")}
+        <!-- Bootstrap Custom File Input -->
+        {$this->callJsFile("vendor/bs-custom-file-input/bs-custom-file-input.min.js")}
+        <!-- Select2 -->
         {$this->callJsFile("vendor/select2/js/select2.full.min.js")}
-        {$this->callJsFile("vendor/ckeditor/ckeditor.js")}
+        <!-- Summernote -->
+        {$this->callJsFile("vendor/summernote/summernote-bs4.min.js")}
+        <!-- Summernote Langue -->
+        {$this->callJsFile("vendor/summernote/lang/summernote-fr-FR.min.js")}
 HTML;
     }
 

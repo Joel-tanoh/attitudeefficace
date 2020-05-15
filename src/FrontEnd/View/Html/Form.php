@@ -305,15 +305,13 @@ HTML;
     public function selectParent(bool $choose_parent = null)
     {
         global $url;
-        $choose_parent = $url[0] !== "minis-services" && Data::isChildCategorie($url[0])
-            ? true
-            : false;
+        $choose_parent = $url[0] !== "minis-services" && Data::isChildCategorie($url[0]) ? true : false;
 
         if ($choose_parent) {
             return <<<HTML
             <div id="chooseParentBox" class="mb-3">
-                {$this->label("categorieId", "Choisir le parent :")}
-                <select name="parent_id" id="selectParentList" class="col-12 form-control select2">
+                {$this->label("selectParentList", "Choisir le parent :")}
+                <select name="parent_id" id="selectParentList" class="select2 col-12 form-control">
                     <option value="0">-- Sans parent --</option>
                     <option value="-1">Motivation plus</option>
                     {$this->parentList("themes", "Thèmes")}
@@ -358,7 +356,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("descriptionTextarea", "Description")}
-            {$this->inputTextarea('description', 'descriptionTextarea', "Saisir la description...", $description, null, "5")}
+            {$this->inputTextarea('description', 'descriptionTextarea', "Saisir la description...", $description, "form-control", "5")}
         </div>
 HTML;
     }
@@ -378,9 +376,8 @@ HTML;
 
         if (!is_null($article_content)) {
             return <<<HTML
-            <div class="form-group">
-                {$this->label("editor", "Contenu de l'article")}
-                {$this->inputTextarea('article_content', "editor", "Commencez à écrire...", $article_content, null, "10")}
+            <div class="form-group mt-2">
+                {$this->inputTextarea('article_content', "summernote", null, $article_content, null)}
             </div>
 HTML;
         }
@@ -397,6 +394,7 @@ HTML;
     public function prixInput($item = null, $label = null)
     {
         $prix =  !is_null($item) ? $item->get("prix") : "";
+
         return <<<HTML
         <div class="form-group">
             {$this->label("Prix", $label)}
@@ -524,8 +522,8 @@ HTML;
     public function notifyUsersBox()
     {
         return <<<HTML
-        <div class="p-3 bg-cloud card">
-            <div class="mb-2">Notifier :</div>
+        <div class="card p-3">
+            <div class="mb-2">Envoyer une notification à :</div>
             <div class="custom-control custom-radio">
                 <input class="custom-control-input" type="radio" id="informAll" name="notify_users" value="all">
                 <label for="informAll" class="custom-control-label">Tous les utilisateurs :</label>
@@ -551,14 +549,15 @@ HTML;
      * 
      * @param string $for   [[Description]]
      * @param string $label [[Description]]
+     * @param string $class
      * 
      * @author Joel
      * @return string
      */
-    public function label(string $for = null, string $label = null) : string
+    public function label(string $for = null, string $label = null, string $class = null) : string
     {
         return <<<HTML
-		<label for="{$for}">{$label}</label>
+		<label for="{$for}" class="{$class}">{$label}</label>
 HTML;
     }
 
@@ -571,11 +570,8 @@ HTML;
      * 
      * @return string
      */
-    public function submitButton(
-        string $name = null, 
-        string $text = null,
-        string $class = null
-    ) {
+    public function submitButton(string $name = null,  string $text = null, string $class = null)
+    {
         return $this->button("submit", $name, $text, $class);
     }
 
@@ -592,8 +588,7 @@ HTML;
             return <<<HTML
             <div class="card">
                 <div class="card-body">
-                    <form id="myForm" method="post" enctype="multipart/form-data"
-                        action="{$_SERVER['REQUEST_URI']}"/>
+                    <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
                         {$form_content}
                         {$this->submitButton('enregistrement', 'Enregistrer')}
                     </form>
@@ -645,7 +640,7 @@ HTML;
             <div class="col-12 {$class}">
                 <div class="custom-file">
                     {$this->input("file", $name, $id, null, null, "custom-file-input")}
-                    <label class="custom-file-label" for="customFile">Importer</label>
+                    {$this->label("customFile", "Importer", "custom-file-label")}
                 </div>
             </div>
         </div>
@@ -734,8 +729,7 @@ HTML;
     ) {
         return <<<HTML
         <label>
-            <input type="radio" name="{$name}" id="" value="{$value}"
-                class="{$class}"> {$text}
+            <input type="radio" name="{$name}" id="" value="{$value}" class="{$class}"> {$text}
         </label>
 HTML;
     }
@@ -821,7 +815,7 @@ HTML;
     ) {
         return <<<HTML
         <textarea name="{$name}" id="{$id}" rows="{$rows}" placeholder="{$placeholder}"
-            class="col-12 form-control {$class}">{$value}</textarea>
+            class="col-12 {$class}">{$value}</textarea>
 HTML;
     }
 
