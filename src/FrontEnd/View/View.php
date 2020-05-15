@@ -507,8 +507,9 @@ HTML;
     public function appBrand() : string
     {
         $logos_dir = LOGOS_DIR;
+        $admin_url = ADMIN_URL;
         return <<<HTML
-        <a class="brand text-center" href="">
+        <a class="brand text-center" href="{$admin_url}">
             <img src="{$logos_dir}/logo_3.png" alt="Attitude efficace" class="sidebar-brand my-3">
         </a>
 HTML;

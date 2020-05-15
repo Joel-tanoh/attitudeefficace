@@ -16,7 +16,7 @@
 
 session_start();
 
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use App\Router;
@@ -25,6 +25,7 @@ use App\FrontEnd\Page;
 use App\BackEnd\Utils\Notification;
 
 try {
+
     if (!someoneIsConnected()) { Utils::header(ADMIN_URL . "/connexion"); }
     $url = isset($_GET['url']) ? explode('/', $_GET['url']) : "";
     $router = new Router($url);
