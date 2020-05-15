@@ -22,6 +22,7 @@ require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 use App\Router;
 use App\BackEnd\Utils\Utils;
 use App\FrontEnd\Page;
+use App\BackEnd\Utils\Notification;
 
 try {
     if (!someoneIsConnected()) { Utils::header(ADMIN_URL . "/connexion"); }
@@ -32,8 +33,7 @@ try {
     echo $page->adminPage();
 
 } catch(Error|TypeError|Exception|PDOException $e) {
-    $exception = 'Erreur : ' . $e->getMessage()
-        . ', Fichier : ' . $e->getFile()
-        . ', Ligne : ' . $e->getLine();
-    require ROOT_PATH . 'notifier-exception.php';
+    $exception = 'Erreur : ' . $e->getMessage() . ', Fichier : ' . $e->getFile() . ', Ligne : ' . $e->getLine();
+    $notification = new Notification();
+    echo $notification->exception($exception);
 }

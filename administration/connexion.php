@@ -22,9 +22,9 @@ use App\FrontEnd\View\View;
 use App\FrontEnd\Page;
 
 try {
-
+    $notification = new Notification();
+    
     if (!someoneIsConnected()) {
-        $notification = new Notification();
         $meta_title = APP_NAME . ' - Connexion';
         $admin_login = '';
         $admin_password = '';
@@ -68,8 +68,6 @@ try {
     }
 
 } catch(Error|TypeError|Exception|PDOException $e) {
-    $exception = 'Erreur : '    . $e->getMessage()
-        . ', Fichier : ' . $e->getFile()
-        . ' Ligne : '    . $e->getLine();
-    require ROOT_PATH . 'notifier-exception.php';
+    $exception = 'Erreur : '    . $e->getMessage() . ', Fichier : ' . $e->getFile() . ' Ligne : '    . $e->getLine();
+    echo $notification->exception($exception);
 }

@@ -11,6 +11,7 @@ session_start();
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
+use App\BackEnd\Utils\Notification;
 use App\Router;
 use App\FrontEnd\Page;
 
@@ -25,6 +26,7 @@ try {
     $exception = 'Erreur : ' . $e->getMessage()
         . ', Fichier : ' . $e->getFile()
         . ', Ligne : ' . $e->getLine();
+    
+    $notification = new Notification;
+    echo $notification->exception($exception);
 }
-
-require ROOT_PATH . 'notifier-exception.php';
