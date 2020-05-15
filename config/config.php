@@ -45,7 +45,7 @@ define("ADMIN_URL", "http://attitudeefficace.com/administration");
 define("ASSETS_DIR", PUBLIC_URL . "/assets");
 define("FILES_DIR", PUBLIC_URL . "/files");
 define("PDF_DIR", FILES_DIR . "/pdf");
-define("IMAGES_DIR", PUBLIC_URL . "/images");
+define("IMAGES_DIR", FILES_DIR . "/images");
 define("COVERS_DIR", IMAGES_DIR . "/covers");
 define("THUMBS_DIR", IMAGES_DIR . "/thumbs");
 define("AVATARS_DIR", IMAGES_DIR . "/avatars");
