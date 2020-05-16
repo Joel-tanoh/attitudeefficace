@@ -79,18 +79,4 @@ HTML;
 HTML;
     }
 
-    /**
-     * Retourne l'image miniature de l'utilisateur connecté.
-     * 
-     * @param $user 
-     * 
-     * @return string
-     */
-    public function userImage($user)
-    {
-        return <<<HTML
-        <img src="{$user->get('avatar_src')}" class="user-image img-circle shdw mr-2" alt="User Image">
-HTML;
-    }
-
 }

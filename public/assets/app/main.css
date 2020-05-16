@@ -188,11 +188,13 @@ a:hover {
 	border-radius: 50%;
 }
 /**
- * Image utilisateur.
- * Doit être de petite taille
+ * Image utilisateur
  */
-.user-image {
+.navbar-user-avatar {
 	width: 1.7rem;
+}
+.sidebar-user-avatar {
+	width: 7rem;
 }
 
 /* Les textes */

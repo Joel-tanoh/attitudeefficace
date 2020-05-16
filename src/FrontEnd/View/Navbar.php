@@ -27,9 +27,6 @@ use App\BackEnd\Models\Personnes\Administrateur;
  */
 class Navbar extends View
 {
-    private $brand;
-    private $style;
-
     /**
      * Barre de navigation supérieure de la partie publique.
      * 
@@ -56,10 +53,10 @@ HTML;
     {
         return <<<HTML
         <div class="navbar fixed-top bg-white border-bottom">
-            <div class="navbar-content w-100 d-flex justify-content-end ml-5 ml-lg-0">
+            <div class="navbar-content w-100 d-flex justify-content-end">
                 <ul class="navbar-nav d-flex align-items-center flex-row">
-                    {$this->_getLinksOfAdd()}
-                    {$this->getAdminManagementButtons()}
+                    {$this->addItemsLinksView()}
+                    {$this->getAdminManagementButtonsView()}
                 </ul>
             </div>
         </div>
@@ -71,11 +68,11 @@ HTML;
      * 
      * @return string code HTML
      */
-    private function _getLinksOfAdd()
+    public function addItemsLinksView()
     {
         $admin_url = ADMIN_URL;
         return <<<HTML
-        <li id="addButton">
+        <li id="addButton" class="mr-3">
             <a class="add-button-icon">
                 <i class="fas fa-plus"></i>
             </a>
@@ -106,18 +103,16 @@ HTML;
      * @author Joel
      * @return string
      */
-    private function getAdminManagementButtons()
+    public function getAdminManagementButtonsView()
     {
         $admin_url = ADMIN_URL;
-        $admin_login = $_SESSION["admin_login"] ?? $_COOKIE["admin_login"];
-        $admin = Administrateur::getByLogin($admin_login);
-        $admin_layout = new AdministrateurView();
-        $private_buttons = $admin->get("type") == "administrateur" ? $this->navbarPrivateButtons() : null;
+        $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
+        $private_buttons = $admin_user->get("type") == "administrateur" ? $this->adminReservedAcrions() : null;
 
         return <<<HTML
-        <li class="btn-administrateur nav-item">
-            <a id="btnAdministrateurIcon" class="nav-link d-flex align-items-center px-3">
-                {$admin_layout->userImage($admin)}
+        <li class="btn-administrateur">
+            <a id="btnAdministrateurIcon" class="nav-link d-flex align-items-center">
+                {$this->navbarUserAvatar($admin_user->get("avatar_src"), $admin_user->get("login"))}
                 <span class="fas fa-caret-down"></span>
             </a>
             <ul id="btnAdministrateurContent" class="content border list-unstyled">
@@ -139,7 +134,7 @@ HTML;
      * 
      * @return string
      */
-    private function navbarPrivateButtons()
+    private function adminReservedAcrions()
     {
         $admin_url = ADMIN_URL;
         return <<<HTML

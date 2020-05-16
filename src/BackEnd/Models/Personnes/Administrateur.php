@@ -201,7 +201,7 @@ class Administrateur extends Personne
         $rep = $bdd->prepare($query);
         $rep->execute([mb_strtolower($login)]);
         $result = $rep->fetch();
-        return new Administrateur($result["code"]);
+        return new self($result["code"]);
     }
 
     /**

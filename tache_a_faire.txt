@@ -1,1 +1,3 @@
 Vérification effectif du fonctionnement du code php du backend
+
+Creation de la vue sidebarUserAvatar

@@ -16,6 +16,7 @@
 namespace App\FrontEnd\View;
 
 use App\BackEnd\APIs\Bdd;
+use App\BackEnd\Models\Personnes\Administrateur;
 use App\BackEnd\Models\Model;
 
 /**
@@ -92,6 +93,7 @@ HTML;
      **/
     public function largeScreenSideBar()
     {
+        $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
         return <<<HTML
         <input type="checkbox" id="check" checked> 
         <label class="d-lg-none" for="check">
@@ -100,6 +102,7 @@ HTML;
         </label>
         <div class="sidebar d-none d-lg-block">
             {$this->sidebarBrand()}
+            {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
             {$this->links()}
         </div>
 HTML;

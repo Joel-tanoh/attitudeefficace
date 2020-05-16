@@ -9,6 +9,7 @@
 namespace App\FrontEnd\View;
 
 use App\BackEnd\APIs\Bdd;
+use App\BackEnd\Data\Personnes\Personne;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Notification;
 use App\FrontEnd\View\Html\Form;
@@ -129,18 +130,57 @@ HTML;
         $sidebar = new Sidebar();
         return $sidebar->adminSidebar();
     }
-    
+       
     /**
      * Affiche l'avatar d'un utilisateur.
      * 
-     * @param Personne $person Celui dont on doit afficher l'avatar.
+     * @param string $avatar_src
+     * @param string $alt_information
      * 
      * @return string
      */
-    public function showAvatar($person)
+    public function showAvatar(string $avatar_src, string $alt_information = null)
     {
         return <<<HTML
-        <img src="{$person->get('avatar_src')}" alt="{$person->get('login')}" class="img-fluid"/>
+        <div>
+            <img src="{$avatar_src}" alt="{$alt_information}" class="user-avatar img-fluid"/>
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne l'image miniature de l'utilisateur connecté dans la navbar.
+     * 
+     * @param string $avatar_src
+     * @param string $alt_information
+     * 
+     * @param $user 
+     * 
+     * @return string
+     */
+    public function navbarUserAvatar(string $avatar_src, string $alt_information = null)
+    {
+        return <<<HTML
+        <div>
+            <img src="{$avatar_src}" alt="{$alt_information}" class="navbar-user-avatar img-circle shdw mr-2"/>
+        </div>
+HTML;
+    }
+
+    /**
+     * Peremet d'afficher l'avatar de l'utilisateur dans la sidebar.
+     * 
+     * @param string $avatar_src
+     * @param string $alt_information
+     * 
+     * @return string
+     */
+    public function sidebarUserAvatar(string $avatar_src, string $alt_information = null)
+    {
+        return <<<HTML
+        <div class="text-center">
+            <img src="{$avatar_src}" alt="{$alt_information}" class="sidebar-user-avatar img-circle img-fluid"/>
+        </div>
 HTML;
     }
 
