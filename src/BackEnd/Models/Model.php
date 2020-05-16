@@ -36,7 +36,7 @@ use App\BackEnd\Models\Personnes\Administrateur;
  * @license  url.com license_name
  * @link     Link
  */
-class Data
+class Model
 {
     /**
      * ID de l'instance dans la base de données

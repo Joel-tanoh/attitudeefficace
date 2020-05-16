@@ -149,7 +149,7 @@ HTML;
         $admin_url = ADMIN_URL;
 
         if ($badge) {
-            $count = Bdd::countTableItems(Data::getTableNameFrom($href), "categorie", $href);
+            $count = Bdd::countTableItems(Model::getTableNameFrom($href), "categorie", $href);
             if (!empty($count) || $count == 0) {
                 $badge_box = '<span class="float-right badge bg-orange">' . $count . '</span>';
             }

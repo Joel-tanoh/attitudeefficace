@@ -46,11 +46,11 @@ class Form
             $form = $this->adminForm($item);
             break;
 
-        case Data::isParentCategorie($categorie) :
+        case Model::isParentCategorie($categorie) :
             $form = $this->parentForm($item);
             break;
 
-        case Data::isChildCategorie($categorie) :
+        case Model::isChildCategorie($categorie) :
             $form = $this->childForm($item, $categorie);
             break;
 
@@ -305,7 +305,7 @@ HTML;
     public function selectParent(bool $choose_parent = null)
     {
         global $url;
-        $choose_parent = $url[0] !== "minis-services" && Data::isChildCategorie($url[0]) ? true : false;
+        $choose_parent = $url[0] !== "minis-services" && Model::isChildCategorie($url[0]) ? true : false;
 
         if ($choose_parent) {
             return <<<HTML
@@ -417,7 +417,7 @@ HTML;
             ? $item->get("rang")
             : Bdd::getMaxValueOf(
                 "rang",
-                Data::getTableNameFrom($url[0]),
+                Model::getTableNameFrom($url[0]),
                 "categorie",
                 "categorie",
                 $url[0]
@@ -610,9 +610,9 @@ HTML;
     private function parentList($categorie = null, $label = null)
     {
         $options = null;
-        $items = Bdd::getAllFrom(Data::getTableNameFrom($categorie), $categorie);
+        $items = Bdd::getAllFrom(Model::getTableNameFrom($categorie), $categorie);
         foreach ($items as $i) {
-            $item = Data::returnObject($categorie, $i["code"]);
+            $item = Model::returnObject($categorie, $i["code"]);
             $options .= '<option value="'. $item->get("id") . '">';
             $options .= '<span>'. ucfirst($item->get('categorie')) . '</span>';
             $options .= ' - ';

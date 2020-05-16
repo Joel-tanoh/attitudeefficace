@@ -253,11 +253,11 @@ HTML;
      */
     public function voirAussi($exclu)
     {
-        $table = Data::getTableNameFrom($exclu->get("categorie"));
+        $table = Model::getTableNameFrom($exclu->get("categorie"));
         $items = Bdd::getAllFromTableWithout($table, $exclu->get("id"), $exclu->get("categorie"));
         $list = '';
         foreach ($items as $item) {
-            $item = Data::returnObject($exclu->get("categorie"), $item["code"]);
+            $item = Model::returnObject($exclu->get("categorie"), $item["code"]);
             $list .= $this->voirAussiRow($item);
         }
         if (empty($list)) $list = '<div>Vide</div>';
@@ -398,7 +398,7 @@ HTML;
     /**
      * Retourne la page de suppression de plusieurs items selon la catégorie.
      * 
-     * @param Data   $items     La liste des items qu'on veut supprimer.
+     * @param Model   $items     La liste des items qu'on veut supprimer.
      * @param string $categorie La catégorie des items à supprimer.
      * @param string $error     Au cas où il y'a une erreur à afficher.
      * 
@@ -408,7 +408,7 @@ HTML;
     {
         $notification = new Notification();
         if (empty($items)) {
-            $content = $notification->info( $notification->nothingToDelete( Data::getTypeFormated($categorie) ) );
+            $content = $notification->info( $notification->nothingToDelete( Model::getTypeFormated($categorie) ) );
         } else {
             $content = "Vous verez s'afficher un tableau avec les items à supprimer";
         }
@@ -445,7 +445,7 @@ HTML;
         } else {
             $list = "";
             foreach ($items as $item) {
-                $object = Data::returnObject($class_name, $item["code"]);
+                $object = Model::returnObject($class_name, $item["code"]);
                 $list .= $this->rowOfListingItems($object);
             }
 

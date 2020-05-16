@@ -77,13 +77,13 @@ class Controller
     function createItem()
     {
         $errors = null;
-        $meta_title = Data::getCreateItemPageTitle($this->url[0]);
+        $meta_title = Model::getCreateItemPageTitle($this->url[0]);
 
         if (isset($_POST['enregistrement'])) {
             $validator = new Validator($_POST);
             $errors = $validator->getErrors();
             if (empty($errors)) {
-              Data::create($this->url[0], $_POST);
+              Model::create($this->url[0], $_POST);
             }
         }
 
@@ -102,10 +102,10 @@ class Controller
      */
     public function listCategorieItems()
     {
-        $meta_title = "Mes " . Data::getTypeFormated($this->url[0], "pluriel");
+        $meta_title = "Mes " . Model::getTypeFormated($this->url[0], "pluriel");
 
         if ($this->url[0] == "motivation-plus") { $items = Bdd::getchildrenOf("-1", "videos"); }
-        else { $items = Bdd::getAllFrom(Data::getTableNameFrom($this->url[0]), $this->url[0]); }
+        else { $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]); }
 
         $view = new View();
 
@@ -123,7 +123,7 @@ class Controller
     public function listAdminUsersAccounts()
     {
         $meta_title = "Comptes";
-        $accounts = Bdd::getAllFrom( Data::getTableNameFrom( $this->url[0] ), "utilisateur" );
+        $accounts = Bdd::getAllFrom( Model::getTableNameFrom( $this->url[0] ), "utilisateur" );
 
         $view = new View();
 
@@ -138,7 +138,7 @@ class Controller
      */
     public function readItem()
     {
-        $item = Data::getObjectBy("slug", $this->url[1], Data::getTableNameFrom($this->url[0]), $this->url[0]);
+        $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
         $meta_title = ucfirst($item->get("categorie")) . ' &#8250; ' . ucfirst($item->get("meta_title"));
 
         $view = new View();
@@ -156,7 +156,7 @@ class Controller
      */
     function editItem()
     {
-        $item = Data::getObjectBy("slug", $this->url[1], Data::getTableNameFrom($this->url[0]), $this->url[0]);
+        $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
         $errors = null;
         $meta_title = ucfirst($item->get("categorie")) . " &#8250 " . ucfirst($item->get("meta_title")) . " &#8250 Editer";
 
@@ -184,20 +184,20 @@ class Controller
     public function deleteOneOrManyItems()
     {
         if (isset($this->url[2])) {
-            $item = Data::getObjectBy("slug", $this->url[1], Data::getTableNameFrom($this->url[0]), $this->url[0]);
+            $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
             if ($item->delete()) {
                 Utils::header(ADMIN_URL . "/" . $this->url[0]);
             }
         } else {
-            $items = Bdd::getAllFrom(Data::getTableNameFrom($this->url[0]), $this->url[0]);
-            $meta_title = "Supprimer des " . Data::getTypeFormated($this->url[0], "pluriel");
+            $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
+            $meta_title = "Supprimer des " . Model::getTypeFormated($this->url[0], "pluriel");
     
             if (isset($_POST["suppression"])) {
                 if (empty($_POST["codes"])) {
                     $notification = new Notification();
                     $error = $notification->nothingSelected();
                 } else {
-                    Data::deleteItems($this->url[0]);
+                    Model::deleteItems($this->url[0]);
                     Utils::header(ADMIN_URL . "/" . $this->url[0]);
                 }
             }

@@ -29,7 +29,7 @@ use App\BackEnd\APIs\SqlQuery;
  * @version  "Release: package_version"
  * @link     Link
  */
-class ItemChild extends Data
+class ItemChild extends Model
 {
     const TABLE_NAME = "item_childs";
     const CATEGORIES = [
@@ -39,7 +39,6 @@ class ItemChild extends Data
         "livre","livres",
         "mini-service","mini-services","minis-service","minis-services",
     ];
-    // "motivation-plus",
 
     /**
      * Instancie un nouvel élement en prenant en paramètre le code.
@@ -112,7 +111,7 @@ class ItemChild extends Data
                 $rep->execute([$this->parent_id]);
                 $result = $rep->fetch();
                 if (!empty($result)) {
-                    $this->parent = Data::returnObject($result["categorie"], $result["code"]);
+                    $this->parent = Model::returnObject($result["categorie"], $result["code"]);
                 }
             }
         } else {

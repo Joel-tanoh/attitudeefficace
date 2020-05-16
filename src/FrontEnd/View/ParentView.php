@@ -94,7 +94,7 @@ HTML;
             $children_list = '<div class="col-12 text-italic">Vide</div>';
         } else {
             foreach ($children as $child) {
-                $child = Data::returnObject($children_type, $child["code"]);
+                $child = Model::returnObject($children_type, $child["code"]);
                 $children_list .= $this->smallCard($child);
             }
         }

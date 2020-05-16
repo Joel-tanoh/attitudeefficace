@@ -63,27 +63,27 @@ class Router
             $route = $controller->listAdminUsersAccounts();
 
         // categorie
-        elseif (Data::isCategorie($this->url[0]) && empty($this->url[1]))
+        elseif (Model::isCategorie($this->url[0]) && empty($this->url[1]))
             $route = $controller->listCategorieItems();
 
         // categorie/create
-        elseif (Data::isCategorie($this->url[0]) && $this->url[1] == "create" && empty($this->url[2]))
+        elseif (Model::isCategorie($this->url[0]) && $this->url[1] == "create" && empty($this->url[2]))
             $route = $controller->createItem();
         
         // categorie/delete
-        elseif (Data::isCategorie($this->url[0]) && $this->url[1] == "delete" && empty($this->url[2]))
+        elseif (Model::isCategorie($this->url[0]) && $this->url[1] == "delete" && empty($this->url[2]))
             $route = $controller->deleteOneOrManyItems();
         
         // categorie/slug
-        elseif (Data::isCategorie($this->url[0]) && Data::isSlug($this->url[1]) && empty($this->url[2]))
+        elseif (Model::isCategorie($this->url[0]) && Model::isSlug($this->url[1]) && empty($this->url[2]))
             $route = $controller->readItem();
 
         // categorie/slug/edit
-        elseif (Data::isCategorie($this->url[0]) && Data::isSlug($this->url[1]) && $this->url[2] == "edit")
+        elseif (Model::isCategorie($this->url[0]) && Model::isSlug($this->url[1]) && $this->url[2] == "edit")
             $route = $controller->editItem();
         
         // categorie/slug/delete
-        elseif (Data::isCategorie($this->url[0]) && Data::isSlug($this->url[1]) && $this->url[2] == "delete")
+        elseif (Model::isCategorie($this->url[0]) && Model::isSlug($this->url[1]) && $this->url[2] == "delete")
             $route = $controller->deleteOneOrManyItems();
 
         // Page 404

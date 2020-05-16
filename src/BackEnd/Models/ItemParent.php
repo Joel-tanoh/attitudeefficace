@@ -28,7 +28,7 @@ use App\BackEnd\APIs\SqlQuery;
  * @version  "Release: package_version"
  * @link     Link
  */
-class ItemParent extends Data
+class ItemParent extends Model
 {
     const TABLE_NAME = "item_parents";
     const CATEGORIES = [

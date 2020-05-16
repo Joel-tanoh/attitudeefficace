@@ -27,7 +27,7 @@ use App\BackEnd\Models\Model;
  * @license  url.com license
  * @link     link
  */
-class Personne extends Data
+class Personne extends Model
 {
     /**
      * ID
@@ -76,7 +76,7 @@ class Personne extends Data
      * 
      * @var string
      */
-    protected $firstname;
+    protected $first_name;
     
     /**
      * Date de naissance
