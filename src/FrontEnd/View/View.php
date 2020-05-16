@@ -500,19 +500,31 @@ HTML;
     }
 
     /**
-     * Affiche le logo dans une div.logo-box.
+     * Affiche le logo dans la sidebar
      * 
      * @return string
      */
-    public function appBrand() : string
+    public function sidebarBrand() : string
     {
         $logos_dir = LOGOS_DIR;
         $admin_url = ADMIN_URL;
         return <<<HTML
-        <a class="brand text-center" href="{$admin_url}">
-            <img src="{$logos_dir}/logo_3.png" alt="Attitude efficace" class="sidebar-brand my-3">
+        <a class="brand" href="{$admin_url}">
+            <img src="{$logos_dir}/logo_3.png" alt="Attitude efficace" class="brand sidebar-brand mb-2">
         </a>
 HTML;
+    }
+
+    /**
+     * Permet d'afficher le logo dans la navbar.
+     * 
+     * @param string $logo_url L'url de
+     * 
+     * @return string
+     */
+    public function navbarBrand()
+    {
+
     }
 
     /**

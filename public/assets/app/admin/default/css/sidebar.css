@@ -16,8 +16,6 @@
 	color: white;
 	text-decoration: none;
 }
-
-/* Le comportement des liens de la sidebar au survol et lorsqu'il sont actif */
 .sidebar a:not(.brand):hover, .sidebar a:not(.brand).active {
 	background-color: rgb(19, 58, 88);
 }
@@ -56,4 +54,7 @@ label #cancel {
 #check:checked ~ label #cancel {
 	left: 1rem;
 	top: .5rem;
+}
+.sidebar-brand {
+	margin-left: 3.95rem;
 }

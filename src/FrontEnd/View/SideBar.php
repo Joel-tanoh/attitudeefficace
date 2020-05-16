@@ -79,7 +79,7 @@ HTML;
             <i class="fas fa-bars" id="cancel"></i>
         </label>
         <div class="sidebar d-lg-none big-shadow">
-            {$this->appBrand()}
+            {$this->sidebarBrand()}
             {$this->links()}
         </div>
 HTML;
@@ -99,7 +99,7 @@ HTML;
             <i class="fas fa-bars" id="cancel"></i>
         </label>
         <div class="sidebar d-none d-lg-block">
-            {$this->appBrand()}
+            {$this->sidebarBrand()}
             {$this->links()}
         </div>
 HTML;

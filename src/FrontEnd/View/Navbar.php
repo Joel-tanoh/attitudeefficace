@@ -40,7 +40,7 @@ class Navbar extends View
         return <<<HTML
         <div class="navbar fixed-top bg-marron">
             <div class="container navbar-content w-100 d-flex justify-content-between">
-                {$this->appBrand()}
+                {$this->navbarBrand()}
             </div>
         </div>
 HTML;

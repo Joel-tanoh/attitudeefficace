@@ -259,9 +259,14 @@ button {
 	text-decoration: none;
 }
 
+/* Taille du logo */
+.brand {
+	width: 5rem;
+}
+
 /* Lorsque le logo est dans la sidebar */
 .sidebar-brand {
-	width: 6rem;
+	width: 6rem !important;
 }
 
 /* Conteneur d'une layout avec une fixed sidebar et une navbar */

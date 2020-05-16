@@ -19,7 +19,7 @@ try {
     $url = isset($_GET['url']) ? explode('/', $_GET['url']) : "";
     $router = new Router($url);
     $page = $router->publicRouter();
-    $view = new Page($page["title"], $page["content"]);
+    $view = new Page($page["meta_title"], $page["content"]);
     echo $view->publicPage();
 
 } catch(Error|TypeError|Exception|PDOException $e) {
