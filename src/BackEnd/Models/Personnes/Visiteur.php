@@ -13,27 +13,27 @@
  * @link     Link
  */
 
- namespace App\BackEnd\Data\Personnes;
+namespace App\BackEnd\Models\Personnes;
 
 /**
- * Un Learner est celui ou celle qui suit(lit) un item.
-
+ * Gère tout ce qui est en rapport au visiteur.
+ * 
+ * PHP verison 7.1.9
+ * 
  * @category Category
  * @package  Package
  * @author   Joel <joel.developpeur@gmail.com>
  * @license  url.com license
  * @link     Link
  */
-class Learner
+class Visiteur extends Personne
 {
-    const TABLE_NAME = "learners";
-
     /**
-     * Retourne la liste de tous ceux qui suivent un item.
+     * Retourne la liste des visiteurs.
      * 
      * @return array
      */
-    public function getLearners()
+    public function getVisitors()
     {
         
     }

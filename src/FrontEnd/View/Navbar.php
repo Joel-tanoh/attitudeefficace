@@ -14,7 +14,7 @@
 
 namespace App\FrontEnd\View;
 
-use App\BackEnd\Data\Personnes\Administrateur;
+use App\BackEnd\Models\Personnes\Administrateur;
 
 /**
  * Perlet de gérer tout ce qui concerne la barre de navigation supérieure.

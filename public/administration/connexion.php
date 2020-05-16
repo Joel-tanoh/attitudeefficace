@@ -15,7 +15,7 @@ session_start();
 require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-use App\BackEnd\Data\Personnes\Administrateur;
+use App\BackEnd\Models\Personnes\Administrateur;
 use App\BackEnd\Utils\Notification;
 use App\BackEnd\Utils\Utils;
 use App\FrontEnd\View\View;

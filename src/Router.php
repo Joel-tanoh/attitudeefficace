@@ -15,7 +15,7 @@
 
 namespace App;
 
-use App\BackEnd\Data\Data;
+use App\BackEnd\Models\Model;
 use App\Controller;
 
 /**

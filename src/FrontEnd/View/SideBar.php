@@ -16,7 +16,7 @@
 namespace App\FrontEnd\View;
 
 use App\BackEnd\APIs\Bdd;
-use App\BackEnd\Data\Data;
+use App\BackEnd\Models\Model;
 
 /**
  * Permet de gérer les barres de menu sur le coté.

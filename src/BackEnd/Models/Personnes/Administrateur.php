@@ -12,7 +12,7 @@
  * @link     link
  */
 
-namespace App\BackEnd\Data\Personnes;
+namespace App\BackEnd\Models\Personnes;
 
 use App\BackEnd\APIs\Bdd;
 use App\BackEnd\APIs\Files\Image;

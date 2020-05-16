@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\BackEnd\Data\Personnes;
+namespace App\BackEnd\Models\Personnes;
 
 use App\BackEnd\APIs\Bdd;
 

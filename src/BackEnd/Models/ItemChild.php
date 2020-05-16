@@ -13,9 +13,9 @@
  * @link     Link
  */
 
-namespace App\BackEnd\Data;
+namespace App\BackEnd\Models;
 
-use App\BackEnd\Data\Data;
+use App\BackEnd\Models\Model;
 use App\BackEnd\APIs\Bdd;
 use App\BackEnd\APIs\SqlQuery;
 

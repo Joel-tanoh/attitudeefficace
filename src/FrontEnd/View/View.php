@@ -9,7 +9,7 @@
 namespace App\FrontEnd\View;
 
 use App\BackEnd\APIs\Bdd;
-use App\BackEnd\Data\Data;
+use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Notification;
 use App\FrontEnd\View\Html\Form;
 use App\FrontEnd\View\Layout;

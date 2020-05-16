@@ -13,7 +13,7 @@
  */
 
 
-namespace App\BackEnd\Data;
+namespace App\BackEnd\Models;
 
 /**
  * Gère le dashboard, les statistiques, les compteurs de vue, les performances.

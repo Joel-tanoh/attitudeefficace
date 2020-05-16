@@ -16,9 +16,9 @@
 namespace App\FrontEnd\View;
 
 use App\BackEnd\APIs\Bdd;
-use App\BackEnd\Data\Data;
-use App\BackEnd\Data\ItemParent;
-use App\BackEnd\Data\ItemChild;
+use App\BackEnd\Models\Model;
+use App\BackEnd\Models\ItemParent;
+use App\BackEnd\Models\ItemChild;
 
 /**
  * Gère tout ce qui concerne l'affichage au niveau des catégories

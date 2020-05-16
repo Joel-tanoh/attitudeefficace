@@ -16,8 +16,8 @@
 namespace App\BackEnd\Utils;
 
 use App\BackEnd\APIs\Files\FileUploaded;
-use App\BackEnd\Data\Data;
-use App\BackEnd\Data\Personnes\Administrateur;
+use App\BackEnd\Models\Model;
+use App\BackEnd\Models\Personnes\Administrateur;
 use App\BackEnd\Utils\Notification;
 
 /**

@@ -13,17 +13,17 @@
  * @link     Link
  */
 
-namespace App\BackEnd\Data;
+namespace App\BackEnd\Models;
 
 use Exception;
 use App\BackEnd\APIs\Bdd;
 use App\BackEnd\APIs\Email;
-use App\BackEnd\Data\ItemParent;
-use App\BackEnd\Data\ItemChild;
+use App\BackEnd\Models\ItemParent;
+use App\BackEnd\Models\ItemChild;
 use App\BackEnd\Utils\Utils;
 use App\BackEnd\APIs\Files\Image;
 use App\BackEnd\APIs\Files\Pdf;
-use App\BackEnd\Data\Personnes\Administrateur;
+use App\BackEnd\Models\Personnes\Administrateur;
 
 /**
  * Classe de gestion des données.

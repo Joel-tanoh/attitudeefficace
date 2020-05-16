@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\BackEnd\Data\Personnes;
+namespace App\BackEnd\Models\Personnes;
 
 /**
  * Classe qui gère tout ce qui est en relation avec le client.

@@ -9,7 +9,7 @@
 namespace App;
 
 use App\BackEnd\APIs\Bdd;
-use App\BackEnd\Data\Data;
+use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Notification;
 use App\FrontEnd\Page;
 use App\BackEnd\Utils\Validator;

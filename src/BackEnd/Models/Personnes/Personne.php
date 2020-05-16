@@ -12,9 +12,9 @@
  * @link     link
  */
 
-namespace App\BackEnd\Data\Personnes;
+namespace App\BackEnd\Models\Personnes;
 
-use App\BackEnd\Data\Data;
+use App\BackEnd\Models\Model;
 
 /**
  * Gère tout ce qui concerne une personne.

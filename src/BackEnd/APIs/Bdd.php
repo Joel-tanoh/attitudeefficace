@@ -15,8 +15,8 @@
 
 namespace App\BackEnd\APIs;
 
-use App\BackEnd\Data\ItemChild;
-use App\BackEnd\Data\Personnes\Learner;
+use App\BackEnd\Models\ItemChild;
+use App\BackEnd\Models\Personnes\Learner;
 use PDO;
 use PDOException;
 
@@ -44,7 +44,7 @@ class Bdd
             $charset = "utf8";
             $sgbd = 'mysql';
             $bdd = new PDO(
-                $sgbd.':host=' . DB_ADDRESS . '; dbname=' . DB_NAME . '; charset=' . $charset, DB_LOGIN, DB_PASSWORD,
+                $sgbd. ':host=' . DB_ADDRESS . '; dbname=' . DB_NAME . '; charset=' . $charset, DB_LOGIN, DB_PASSWORD,
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -53,7 +53,7 @@ class Bdd
             return $bdd;
 
         } catch (PDOException $e) {
-            $exception = 'Erreur de connexion à la base de données, veuillez contacter votre administrateur !';
+            echo '<h1>Erreur de connexion à la base de données, veuillez contacter votre administrateur !</h1>';
         }
     }
 
@@ -123,11 +123,8 @@ class Bdd
      * 
      * @return string Code de l'item.
      */
-    public static function getItemBy(
-        string $col = null,
-        string $col_value = null,
-        string $table = null
-    ) {
+    public static function getItemBy(string $col = null, string $col_value = null, string $table = null)
+    {
         $sql_query = new SqlQuery();
         $query = $sql_query
             ->select("code")

@@ -15,7 +15,7 @@
 
 namespace App\BackEnd\APIs;
 
-use App\BackEnd\Data\Personnes\Learner;
+use App\BackEnd\Models\Personnes\Learner;
 
 /**
  * Gère les envois d'email.

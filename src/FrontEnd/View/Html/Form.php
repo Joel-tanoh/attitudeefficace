@@ -15,7 +15,7 @@
 namespace App\FrontEnd\View\Html;
 
 use App\BackEnd\APIs\Bdd;
-use App\BackEnd\Data\Data;
+use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Utils;
 
 /**
