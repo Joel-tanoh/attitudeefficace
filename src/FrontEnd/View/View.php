@@ -178,7 +178,7 @@ HTML;
     public function sidebarUserAvatar(string $avatar_src, string $alt_information = null)
     {
         return <<<HTML
-        <div class="text-center">
+        <div class="text-center my-2">
             <img src="{$avatar_src}" alt="{$alt_information}" class="sidebar-user-avatar img-circle img-fluid"/>
         </div>
 HTML;

@@ -1,14 +1,15 @@
 .sidebar {
 	position: fixed;
 	font-size: .95rem;
-	height: 100%;
-	width: 15rem;
 	top: 0;
-	left: -15rem; /* permet de cacher la sidebar */
+	left: -15rem; /* Permet de cacher la sidebar */
+	width: 15rem;
+	height: 100%;
 	background-color: rgb(41,128,185);
-	padding-top: 1.2rem;
+	padding-top: .75rem;
 	z-index: 10000;
 	transition: .5s;
+	overflow-y: scroll;
 }
 .sidebar a {
 	display: block;
@@ -18,9 +19,6 @@
 }
 .sidebar a:not(.brand):hover, .sidebar a:not(.brand).active {
 	background-color: rgb(19, 58, 88);
-}
-.big-shadow {
-	box-shadow: 0 .5rem 2rem rgba(50, 50, 50, 1);
 }
 #check {
 	display: none;

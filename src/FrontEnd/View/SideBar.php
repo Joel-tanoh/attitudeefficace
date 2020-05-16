@@ -73,6 +73,7 @@ HTML;
      **/
     public function smallScreenSideBar()
     {
+        $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
         return <<<HTML
         <input class="d-lg-none" type="checkbox" id="check">
         <label class="d-lg-none" for="check">
@@ -81,6 +82,7 @@ HTML;
         </label>
         <div class="sidebar d-lg-none big-shadow">
             {$this->sidebarBrand()}
+            {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
             {$this->links()}
         </div>
 HTML;
@@ -100,7 +102,7 @@ HTML;
             <i class="fas fa-bars" id="btn"></i>
             <i class="fas fa-bars" id="cancel"></i>
         </label>
-        <div class="sidebar d-none d-lg-block">
+        <div class="sidebar d-none d-lg-block big-shadow">
             {$this->sidebarBrand()}
             {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
             {$this->links()}

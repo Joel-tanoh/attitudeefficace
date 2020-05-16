@@ -153,6 +153,9 @@ a:hover {
 .bx-shdw-blue {
 	box-shadow: .1rem .1rem .1rem rgba(41, 128, 185, .5);
 }
+.big-shadow {
+	box-shadow: 0 .5rem 2rem rgba(50, 50, 50, 1);
+}
 
 /* Les messages */
 .app-alert-danger,
