@@ -46,10 +46,11 @@ class Controller
     public function publicAccueilPage()
     {
         $meta_title = "Bienvenu sur " . APP_NAME;
+        $view = new View();
 
         return [
             "meta_title" => $meta_title,
-            "content" => $this->view->publicAccueil()
+            "content" => $view->publicAccueil()
         ];
     }
 
@@ -78,6 +79,7 @@ class Controller
     {
         $errors = null;
         $meta_title = Model::getCreateItemPageTitle($this->url[0]);
+        $view = new View();
 
         if (isset($_POST['enregistrement'])) {
             $validator = new Validator($_POST);
@@ -86,8 +88,6 @@ class Controller
               Model::create($this->url[0], $_POST);
             }
         }
-
-        $view = new View();
 
         return [
             "meta_title" => $meta_title,
@@ -103,11 +103,10 @@ class Controller
     public function listCategorieItems()
     {
         $meta_title = "Mes " . Model::getTypeFormated($this->url[0], "pluriel");
+        $view = new View();
 
         if ($this->url[0] == "motivation-plus") { $items = Bdd::getchildrenOf("-1", "videos"); }
         else { $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]); }
-
-        $view = new View();
 
         return [
             "meta_title" => $meta_title,
@@ -124,7 +123,6 @@ class Controller
     {
         $meta_title = "Comptes";
         $accounts = Bdd::getAllFrom( Model::getTableNameFrom( $this->url[0] ), "utilisateur" );
-
         $view = new View();
 
         return [
@@ -140,7 +138,6 @@ class Controller
     {
         $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
         $meta_title = ucfirst($item->get("categorie")) . ' &#8250; ' . ucfirst($item->get("meta_title"));
-
         $view = new View();
 
         return [
@@ -159,6 +156,7 @@ class Controller
         $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
         $errors = null;
         $meta_title = ucfirst($item->get("categorie")) . " &#8250 " . ucfirst($item->get("meta_title")) . " &#8250 Editer";
+        $view = new View();
 
         if (isset($_POST["enregistrement"])) {
             $validator = new Validator($_POST);
@@ -168,8 +166,6 @@ class Controller
             }
         }
 
-        $view = new View();
-
         return [
             "meta_title" => $meta_title,
             "content" => $view->editItem($item, $this->url[0], $errors)
@@ -177,38 +173,43 @@ class Controller
     }
 
     /**
+     * Contrilolleur de suppression d'un item.
+     * 
+     * @return void
+     */
+    public function deleteItem()
+    {
+        $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
+        if ($item->delete()) {
+            Utils::header(ADMIN_URL . "/" . $this->url[0]);
+        }
+    }
+
+    /**
      * Controlleur de suppression d'un item ou de plusieurs items.
      * 
      * @return array
      */
-    public function deleteOneOrManyItems()
+    public function deleteManyItems()
     {
-        if (isset($this->url[2])) {
-            $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
-            if ($item->delete()) {
+        $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
+        $meta_title = "Supprimer des " . Model::getTypeFormated($this->url[0], "pluriel");
+        $view = new View();
+
+        if (isset($_POST["suppression"])) {
+            if (empty($_POST["codes"])) {
+                $notification = new Notification();
+                $error = $notification->nothingSelected();
+            } else {
+                Model::deleteItems($this->url[0]);
                 Utils::header(ADMIN_URL . "/" . $this->url[0]);
             }
-        } else {
-            $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
-            $meta_title = "Supprimer des " . Model::getTypeFormated($this->url[0], "pluriel");
-    
-            if (isset($_POST["suppression"])) {
-                if (empty($_POST["codes"])) {
-                    $notification = new Notification();
-                    $error = $notification->nothingSelected();
-                } else {
-                    Model::deleteItems($this->url[0]);
-                    Utils::header(ADMIN_URL . "/" . $this->url[0]);
-                }
-            }
-    
-            $view = new View();
-
-            return [
-                "meta_title" => $meta_title,
-                "content" => $view->deleteItems($items, $this->url[0], $error)
-            ];
         }
+
+        return [
+            "meta_title" => $meta_title,
+            "content" => $view->deleteItems($items, $this->url[0], $error)
+        ];
     }
 
     /**

@@ -41,7 +41,7 @@ class Router
      */
     public function __construct($url)
     {
-        $this->url = $url;
+        $this->url = explode('/', $url);
     }
 
     /**
@@ -72,7 +72,7 @@ class Router
         
         // categorie/delete
         elseif (Model::isCategorie($this->url[0]) && $this->url[1] == "delete" && empty($this->url[2]))
-            $route = $controller->deleteOneOrManyItems();
+            $route = $controller->deleteManyItems();
         
         // categorie/slug
         elseif (Model::isCategorie($this->url[0]) && Model::isSlug($this->url[1]) && empty($this->url[2]))
@@ -84,7 +84,7 @@ class Router
         
         // categorie/slug/delete
         elseif (Model::isCategorie($this->url[0]) && Model::isSlug($this->url[1]) && $this->url[2] == "delete")
-            $route = $controller->deleteOneOrManyItems();
+            $route = $controller->deleteItem();
 
         // Page 404
         else $route = $controller->adminError404();

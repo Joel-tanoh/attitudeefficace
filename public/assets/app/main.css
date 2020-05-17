@@ -190,9 +190,7 @@ a:hover {
 .img-circle {
 	border-radius: 50%;
 }
-/**
- * Image utilisateur
- */
+/** Image utilisateur */
 .navbar-user-avatar {
 	width: 1.7rem;
 }
@@ -274,9 +272,10 @@ button {
 	width: 6rem !important;
 }
 
+/* Les layouts */
 /* Conteneur d'une layout avec une fixed sidebar et une navbar */
 .container-with-fixed-sidebar-and-navbar {
-	margin-left: 15rem;
+	margin-left: 16rem;
 	margin-top: 5rem;
 }
 

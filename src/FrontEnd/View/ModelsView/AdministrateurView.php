@@ -12,7 +12,7 @@
  * @link     link
  */
 
-namespace App\FrontEnd\View;
+namespace App\FrontEnd\View\ModelsView;
 
 use App\BackEnd\Models\Personnes\Administrateur;
 use App\FrontEnd\View\Html\Form;
@@ -26,7 +26,7 @@ use App\FrontEnd\View\Html\Form;
  * @license  url.com license
  * @link     link
  */
-class AdministrateurView extends View
+class AdministrateurView extends \App\FrontEnd\View\View
 {
     /**
      * Liste tous les comptes administrateurs créées sur le site.

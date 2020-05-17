@@ -9,11 +9,13 @@
 namespace App\FrontEnd\View;
 
 use App\BackEnd\APIs\Bdd;
-use App\BackEnd\Data\Personnes\Personne;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Notification;
 use App\FrontEnd\View\Html\Form;
 use App\FrontEnd\View\Layout;
+use App\FrontEnd\View\ModelsView\AdministrateurView;
+use App\FrontEnd\View\ModelsView\ParentView;
+use App\FrontEnd\View\ModelsView\ChildView;
 
 /**
  * Une vue est un bloc ou un ensemble de bloc de code HTML qui a une fonctionnalité
@@ -404,8 +406,13 @@ HTML;
      */
     public function readItem($item)
     {
-        if ($item->isParent()) { return ParentView::readItem($item); }
-        if ($item->isChild()) { return ChildView::readItem($item); }
+        if ($item->isParent()) {
+            $parent_view = new ParentView();
+            return $parent_view->readItem($item);
+        } elseif ($item->isChild()) { 
+            $child_view = new ChildView();
+            return $child_view->readItem($item);
+        }
     }
 
     /**

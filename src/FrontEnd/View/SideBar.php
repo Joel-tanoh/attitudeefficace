@@ -40,17 +40,17 @@ class SideBar extends View
      */
     public function __construct()
     {
-        $this->links[] = $this->setLink("", "fas fa-home", "Tableau de bord");
-        $this->links[] = $this->setLink("formations", "fas fa-box", "Formations", true);
-        $this->links[] = $this->setLink("themes", "fas fa-tag", "Thèmes", true);
-        $this->links[] = $this->setLink("etapes", "fas fa-check", "Etapes", true);
-        $this->links[] = $this->setLink("motivation-plus", "fas fa-tv", "Motivation plus");
-        $this->links[] = $this->setLink("articles", "fas fa-pen-square", "Articles", true);
-        $this->links[] = $this->setLink("videos", "fas fa-video", "Vidéos", true);
-        $this->links[] = $this->setLink("livres", "fas fa-book", "Livres", true);
-        $this->links[] = $this->setLink("ebooks", "fas fa-book", "Ebooks", true);
-        $this->links[] = $this->setLink("minis-services", "fas fa-shopping-basket", "Minis services", true);
-        $this->links[] = $this->setLink("parameters", "fas fa-cog", "Paramètres");
+        $this->links[] = $this->setLink(PUBLIC_URL, "fas fa-home", "Aller vers le site");
+        $this->links[] = $this->setLink(ADMIN_URL, "fas fa-desktop", "Tableau de bord");
+        $this->links[] = $this->setLink(ADMIN_URL."/formations", "fas fa-box", "Formations", true);
+        $this->links[] = $this->setLink(ADMIN_URL."/themes", "fas fa-box", "Thèmes", true);
+        $this->links[] = $this->setLink(ADMIN_URL."/etapes", "fas fa-box", "Etapes", true);
+        $this->links[] = $this->setLink(ADMIN_URL."/motivation-plus", "fas fa-tv", "Motivation plus");
+        $this->links[] = $this->setLink(ADMIN_URL."/articles", "fas fa-pen-square", "Articles", true);
+        $this->links[] = $this->setLink(ADMIN_URL."/videos", "fas fa-video", "Vidéos", true);
+        $this->links[] = $this->setLink(ADMIN_URL."/livres", "fas fa-book", "Livres", true);
+        $this->links[] = $this->setLink(ADMIN_URL."/ebooks", "fas fa-book", "Ebooks", true);
+        $this->links[] = $this->setLink(ADMIN_URL."/minis-services", "fas fa-shopping-basket", "Minis services", true);
     }
 
     /**
@@ -80,7 +80,7 @@ HTML;
             <i class="fas fa-bars" id="btn"></i>
             <i class="fas fa-bars" id="cancel"></i>
         </label>
-        <div class="sidebar d-lg-none big-shadow">
+        <div class="sidebar d-lg-none">
             {$this->sidebarBrand()}
             {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
             {$this->links()}
@@ -102,7 +102,7 @@ HTML;
             <i class="fas fa-bars" id="btn"></i>
             <i class="fas fa-bars" id="cancel"></i>
         </label>
-        <div class="sidebar d-none d-lg-block big-shadow">
+        <div class="sidebar d-none d-lg-block">
             {$this->sidebarBrand()}
             {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
             {$this->links()}
@@ -117,7 +117,6 @@ HTML;
      */
     private function links()
     {
-        $public_url = PUBLIC_URL;
         $links = null;
         for ($i = 0; $i < count($this->links); $i++) {
             $links .= $this->links[$i];
@@ -125,12 +124,6 @@ HTML;
         
         return <<<HTML
         <div>
-            <a class="py-2 px-3" href="{$public_url}">
-                <div class="row align-items-center">
-                    <i class="col-3 icons fas fa-home fa-lg"></i>
-                    <span class="col-7 texts p-0">Aller vers le site</span>
-                </div>
-            </a>
             {$links}
         </div>
 HTML;
@@ -151,10 +144,10 @@ HTML;
     private function setLink(string $href, string $fontawesome_class, string $text, bool $badge = null)
     {
         $badge_box = null;
-        $admin_url = ADMIN_URL;
-
+        
         if ($badge) {
-            $count = Bdd::countTableItems(Model::getTableNameFrom($href), "categorie", $href);
+            $item_type = explode("/", $href)[array_key_last(explode("/", $href))];
+            $count = Bdd::countTableItems(Model::getTableNameFrom($item_type), "categorie", $item_type);
             if (!empty($count) || $count == 0) {
                 $badge_box = '<span class="float-right badge bg-orange">' . $count . '</span>';
             }
@@ -165,7 +158,7 @@ HTML;
         $active = in_array($href, $uri) ? "active" : null;
 
         return <<<HTML
-        <a class="py-2 px-3 {$active}" href="{$admin_url}/{$href}">
+        <a class="py-2 px-3 {$active}" href="{$href}">
             <div class="row align-items-center">
                 <i class="col-3 icons {$fontawesome_class} fa-lg"></i>
                 <span class="col-7 texts p-0">{$text}</span>

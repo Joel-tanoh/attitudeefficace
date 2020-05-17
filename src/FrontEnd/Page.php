@@ -183,8 +183,6 @@ HTML;
         return <<<HTML
         {$this->generalAppCss()}
         {$this->callCssFile("app/admin/" . $theme . "/css/connexion.css")}
-        {$this->callCssFile("app/admin/" . $theme . "/css/navbar.css")}
-        {$this->callCssFile("app/admin/" . $theme . "/css/sidebar.css")}
 HTML;
     }
 
@@ -223,6 +221,8 @@ HTML;
         return <<<HTML
         {$this->vendorCss()}
         {$this->callCssFile("app/main.css")}
+        {$this->callCssFile("app/navbar.css")}
+        {$this->callCssFile("app/sidebar.css")}
 HTML;
     }
 

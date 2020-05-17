@@ -2,8 +2,8 @@
 	position: fixed;
 	font-size: .95rem;
 	top: 0;
-	left: -15rem; /* Permet de cacher la sidebar */
-	width: 15rem;
+	left: -16rem; /* Permet de cacher la sidebar */
+	width: 16rem;
 	height: 100%;
 	background-color: rgb(41,128,185);
 	padding-top: .75rem;
@@ -44,6 +44,7 @@ label #cancel {
 }
 #check:checked ~ .sidebar {
 	left: 0;
+	box-shadow: 0 .5rem 2rem rgba(50, 50, 50, 1);
 }
 #check:checked ~ label #btn {
 	opacity: 0;

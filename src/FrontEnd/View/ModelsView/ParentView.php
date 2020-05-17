@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\View;
+namespace App\FrontEnd\View\ModelsView;
 
 use App\BackEnd\APIs\Bdd;
 use App\BackEnd\Models\Model;
@@ -21,7 +21,7 @@ use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\ItemChild;
 
 /**
- * Gère tout ce qui concerne l'affichage au niveau des catégories
+ * Gère tout ce qui concerne l'affichage au niveau des items parents dans l'app.
  * 
  * @category Category
  * @package  Package
@@ -30,7 +30,7 @@ use App\BackEnd\Models\ItemChild;
  * @version  "Release: package_version"
  * @link     Link
  */
-class ParentView extends View
+class ParentView extends \App\FrontEnd\View\View
 {
     /**
      * Retourne la page qui permet d'afficher un parent parent et toutes ses
@@ -40,14 +40,14 @@ class ParentView extends View
      * 
      * @return string
      */
-    public static function readParent($parent)
+    public function readParent($parent)
     {
-        $layout = new parent;
+        $view = new parent;
         $self_layout = new self;
         return <<<HTML
         <div class="mb-3">
-            {$layout->manageButtons($parent)}
-            {$layout->showData($parent)}
+            {$view->manageButtons($parent)}
+            {$view->showData($parent)}
             {$self_layout->showChildren($parent)}
         </div>
 HTML;

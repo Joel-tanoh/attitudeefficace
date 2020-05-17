@@ -35,6 +35,7 @@ class ItemParent extends Model
         "formation","formations",
         "theme","themes",
         "etape","etapes",
+        "motivation-plus"
     ];
 
     /**
