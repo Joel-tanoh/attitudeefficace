@@ -11,6 +11,7 @@ namespace App\FrontEnd\View;
 use App\BackEnd\APIs\Bdd;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Notification;
+use App\BackEnd\Utils\Utils;
 use App\FrontEnd\View\Html\Form;
 use App\FrontEnd\View\Layout;
 use App\FrontEnd\View\ModelsView\AdministrateurView;
@@ -182,24 +183,6 @@ HTML;
         return <<<HTML
         <div class="text-center my-2">
             <img src="{$avatar_src}" alt="{$alt_information}" class="sidebar-user-avatar img-circle img-fluid"/>
-        </div>
-HTML;
-    }
-
-    /**
-     * Retourne le menu.
-     * 
-     * @return string
-     */
-    public function menu()
-    {
-        global $url;
-        $link = "/" . $url[0];
-
-        return <<<HTML
-        <div>
-            {$this->menuLink($link."/create", "fas fa-plus", "Ajouter")}
-            {$this->menuLink($link."/delete", "fas fa-trash-alt", "Supprimer")}
         </div>
 HTML;
     }
@@ -498,6 +481,7 @@ HTML;
 
             return <<<HTML
             <div class="mb-3">
+                {$this->crumbs()}
                 {$list}
             </div>
 HTML;
@@ -547,31 +531,84 @@ HTML;
     }
 
     /**
-     * Affiche le logo dans la sidebar
+     * Permet d'afficher le logo dans la navbar.
+     * 
+     * @param string $brand_src        Le lien vers l'image.
+     * @param bool   $set_it_clickable Permet de rendre le logo clickable.
+     * @param string $click_direction  L'url exécuté lors du click sur le logo.
      * 
      * @return string
      */
-    public function sidebarBrand() : string
+    public function navbarBrand(string $brand_src, bool $set_it_clickable = false, string $click_direction = null)
     {
-        $logos_dir = LOGOS_DIR;
-        $admin_url = ADMIN_URL;
+        if ($set_it_clickable) {
+            return <<<HTML
+            <a class="brand" href="{$click_direction}">
+                <img src="{$brand_src}" alt="Attitude efficace" class="brand navbar-brand mb-2">
+            </a>
+HTML;
+        } else {
+            return <<<HTML
+            <img src="{$brand_src}" alt="Attitude efficace" class="brand navbar-brand mb-2">
+HTML;
+        }
+    }
+
+    /**
+     * Affiche le logo dans la sidebar.
+     *
+     * @param string $brand_src        Le lien vers l'image.
+     * @param bool   $set_it_clickable Permet de rendre le logo clickable.
+     * @param string $click_direction  L'url exécuté lors du click sur le logo.
+     * 
+     * @return string
+     */
+    public function sidebarBrand(string $brand_src, bool $set_it_clickable = false, string $click_direction = null) : string
+    {
+        if ($set_it_clickable) {
+            return <<<HTML
+            <a class="brand" href="{$click_direction}">
+                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand mb-2">
+            </a>
+HTML;
+        } else {
+            return <<<HTML
+            <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand mb-2">
+HTML;
+        }
+    }
+
+    /**
+     * Retourne un crumbs.
+     * 
+     * @return string
+     */
+    public function crumbs()
+    {
+        $title = ucfirst(Model::getTypeFormated(Utils::slicedUrl()[1], "pluriel"));
         return <<<HTML
-        <a class="brand" href="{$admin_url}">
-            <img src="{$logos_dir}/logo_3.png" alt="Attitude efficace" class="brand sidebar-brand mb-2">
-        </a>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="h1">{$title}</span>
+            {$this->menu()}
+        </div>
 HTML;
     }
 
     /**
-     * Permet d'afficher le logo dans la navbar.
-     * 
-     * @param string $logo_url L'url de
+     * Retourne le menu.
      * 
      * @return string
      */
-    public function navbarBrand()
+    public function menu()
     {
-
+        global $url;
+        
+        return <<<HTML
+        <div>
+            {$this->menuLink($url."/create", "Ajouter", "btn btn-primary mr-2",  "fas fa-plus")}
+            {$this->menuLink($url."/delete", "Supprimer", "text-danger", "fas fa-trash-alt")}
+        </div>
+HTML;
     }
 
     /**
@@ -581,24 +618,26 @@ HTML;
      *
      * @return string
      */
-    public function rowOfListingItems($item)
+    private function rowOfListingItems($item)
     {
         $title = ucfirst($item->get("title"));
         $childrenNumber = $item->isParent() ? ParentView::itemchildrenNumber($item) : null;
 
         return <<<HTML
-        <div class="mb-3">
-            <h5 class="mb-2">{$title}</h5>
-            <div>
-                Créé le {$item->get("day_creation")} |
-                Visité {$item->get("views")} fois |
-                {$childrenNumber} |
-                {$item->get("classement")}
-            </div>
-            <div>
-                <a href="{$item->get('url')}" class="text-success">Détails</a>
-                <a href="{$item->get('editer')}" class="text-blue">Editer</a>
-                <a href="{$item->get('delete_url')}" class="text-danger">Supprimer</a>
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="mb-2">{$title}</h5>
+                <div>
+                    Créé le {$item->get("day_creation")} |
+                    Visité {$item->get("views")} fois |
+                    {$childrenNumber} |
+                    {$item->get("classement")}
+                </div>
+                <div>
+                    <a href="{$item->get('url')}" class="text-success">Détails</a>
+                    <a href="{$item->get('editer')}" class="text-blue">Editer</a>
+                    <a href="{$item->get('delete_url')}" class="text-danger">Supprimer</a>
+                </div>
             </div>
         </div>
 HTML;
@@ -680,16 +719,19 @@ HTML;
      * 
      * @param string $href 
      * @param string $text 
-     * @param string $class 
+     * @param string $btn_class 
+     * @param string $fa_icon_class 
      *
      * @return string
      */
-    private function menuLink(string $href, string $text, string $class = null)
+    private function menuLink(string $href, string $text, string $btn_class = null, string $fa_icon_class = null)
     {
-        $adminUrl = ADMIN_URL;
-
+        if (null !== $fa_icon_class) {
+            $fa_icon_class = '<i class="{$fa_icon_class}"></i>';
+        }
         return <<<HTML
-        <a class="{$class}" href="{$adminUrl}{$href}">
+        <a class="{$btn_class}" href="{$href}">
+            {$fa_icon_class}
             <span>{$text}</span>
         </a>
 HTML;

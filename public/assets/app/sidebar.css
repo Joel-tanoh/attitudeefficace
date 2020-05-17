@@ -9,7 +9,7 @@
 	padding-top: .75rem;
 	z-index: 10000;
 	transition: .5s;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 .sidebar a {
 	display: block;
@@ -44,7 +44,7 @@ label #cancel {
 }
 #check:checked ~ .sidebar {
 	left: 0;
-	box-shadow: 0 .5rem 2rem rgba(50, 50, 50, 1);
+	box-shadow: 0 0 1rem rgba(50, 50, 50, .7);
 }
 #check:checked ~ label #btn {
 	opacity: 0;

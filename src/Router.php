@@ -41,7 +41,11 @@ class Router
      */
     public function __construct($url)
     {
-        $this->url = explode('/', $url);
+        if ($url == "") {
+            $this->url = "";
+        } else {
+            $this->url = explode('/', $url);
+        }
     }
 
     /**

@@ -76,4 +76,17 @@ class Utils
         return $slugify->slugify($string);
     }
 
+    /**
+     * Permet de découper l'url en plusieurs parties.
+     * 
+     * @return array
+     */
+    static function slicedUrl()
+    {
+        $slicedUrl = [];
+        $slicedUrl = substr($_SERVER["REQUEST_URI"], 1);
+        $slicedUrl = explode("/", $slicedUrl);
+        return $slicedUrl;
+    }
+
 }
