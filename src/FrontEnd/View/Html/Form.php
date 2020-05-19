@@ -15,6 +15,7 @@
 namespace App\FrontEnd\View\Html;
 
 use App\BackEnd\APIs\Bdd;
+use App\BackEnd\APIs\Url;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Utils;
 
@@ -74,8 +75,7 @@ class Form
      */
     public function adminForm($admin = null)
     {
-        $form_content = "";
-        $form_content .= $this->loginInput($admin, "col-12 form-control");
+        $form_content = $this->loginInput($admin, "col-12 form-control");
         $form_content .= $this->passwordInput("col-12 form-control");
         $form_content .= $this->confirmPasswordInput("col-12 form-control");
         $form_content .= $this->emailInput($admin, "col-12 form-control");
@@ -113,9 +113,7 @@ HTML;
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         accéder à cet élément</p>
 HTML;
-        $form_content = "";
-        $form_content .= $this->firstBox($item, $prix_label);
-        $form_content .= $this->imageInput();
+        $form_content = $this->firstBox($item, $prix_label);
         return $this->returnForm($form_content);
     }
  
@@ -138,7 +136,6 @@ HTML;
 
         $formContent = $this->firstBox($item, $prix_label);
         $formContent .= $this->articleContentTextarea($item);
-        $formContent .= $this->imageInput();
         $formContent .= $this->pdfFileInput($uploadPdf);
 
         return $this->returnForm($formContent);
@@ -177,16 +174,17 @@ HTML;
     public function firstBox($item = null, $prix_label = null)
     {
         return <<<HTML
-        <div class="row">
+        <div class="row mb-3">
             <div class="col-md-6">
                 {$this->selectParent()}
                 {$this->titleInput($item)}
-                {$this->prixInput($item, $prix_label)}
-                {$this->rangInput($item)}
+                {$this->descriptionTextarea($item)}
                 {$this->videoInput($item)}
+                {$this->imageInput()}
             </div>
             <div class="col-md-6">
-                {$this->descriptionTextarea($item)}
+                {$this->prixInput($item, $prix_label)}
+                {$this->rangInput($item)}
                 {$this->notifyUsersBox()}
             </div>
         </div>
@@ -305,7 +303,7 @@ HTML;
     public function selectParent(bool $choose_parent = null)
     {
         global $url;
-        $choose_parent = $url[0] !== "minis-services" && Model::isChildCategorie($url[0]) ? true : false;
+        $choose_parent = Url::slicedUrl()[1] !== "minis-services" && Model::isChildCategorie(Url::slicedUrl()[1]) ? true : false;
 
         if ($choose_parent) {
             return <<<HTML
@@ -371,8 +369,7 @@ HTML;
     public function articleContentTextarea($item = null)
     {
         global $url;
-        $article_content = !is_null($item) ? $item->get("article_content")
-            : $url[0] == "articles" ? "" : null;
+        $article_content = !is_null($item) ? $item->get("article_content") : Url::slicedUrl()[1] == "articles" ? "" : null;
 
         if (!is_null($article_content)) {
             return <<<HTML
@@ -413,14 +410,11 @@ HTML;
     public function rangInput($item = null)
     {
         global $url;
-        $rang = !is_null($item)
-            ? $item->get("rang")
-            : Bdd::getMaxValueOf(
-                "rang",
-                Model::getTableNameFrom($url[0]),
+        $rang = !is_null($item) ? $item->get("rang") : Bdd::getMaxValueOf( "rang",
+                Model::getTableNameFrom( Url::slicedUrl()[1] ),
                 "categorie",
                 "categorie",
-                $url[0]
+                Url::slicedUrl()[1]
             ) + 1;
         $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
 
@@ -428,7 +422,7 @@ HTML;
 
         $label = <<<HTML
         Donnez un rang à cet élément :
-        <p class="notice"> Classement actuelle : {$rang_actuel}</p>
+        <p class="notice"> Cet élément apparaîtra : {$rang_actuel}</p>
 HTML;
         return <<<HTML
         <div class="form-group">
@@ -488,7 +482,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("imageUploaded", "Importer une image de couverture :")}
-            {$this->inputFile("image_uploaded", "imageUploaded", "col-md-5")}
+            {$this->inputFile("image_uploaded", "imageUploaded")}
         </div>
 HTML;
     }

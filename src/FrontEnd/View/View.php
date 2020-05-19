@@ -9,6 +9,7 @@
 namespace App\FrontEnd\View;
 
 use App\BackEnd\APIs\Bdd;
+use App\BackEnd\APIs\Url;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Notification;
 use App\BackEnd\Utils\Utils;
@@ -374,6 +375,7 @@ HTML;
 
         return <<<HTML
         <div class="mb-3">
+            {$this->crumbs()}
             {$error}
             {$formContent}
         </div>
@@ -438,7 +440,7 @@ HTML;
     {
         $notification = new Notification();
         if (empty($items)) {
-            $content = $notification->info( $notification->nothingToDelete( Model::getTypeFormated($categorie) ) );
+            $content = $notification->info( $notification->nothingToDelete( Model::getCategorieFormated($categorie) ) );
         } else {
             $content = "Vous verez s'afficher un tableau avec les items à supprimer";
         }
@@ -465,27 +467,22 @@ HTML;
     {
         if (empty($items)) {
             $notification = new Notification();
-            $notification = $notification->info( $notification->noItems( $class_name ) );
-    
-            return <<<HTML
-            <div class="mb-3">
-                {$notification}
-            </div>
-HTML;
+            $to_show = $notification->info( $notification->noItems( $class_name ) );
         } else {
             $list = "";
             foreach ($items as $item) {
                 $object = Model::returnObject($class_name, $item["code"]);
                 $list .= $this->rowOfListingItems($object);
             }
-
-            return <<<HTML
-            <div class="mb-3">
-                {$this->crumbs()}
-                {$list}
-            </div>
-HTML;
+            $to_show = $list;
         }
+
+        return <<<HTML
+        <div class="mb-3">
+            {$this->crumbs()}
+            {$to_show}
+        </div>
+HTML;
     }
 
     /**
@@ -585,7 +582,7 @@ HTML;
      */
     public function crumbs()
     {
-        $title = ucfirst(Model::getTypeFormated(Utils::slicedUrl()[1], "pluriel"));
+        $title = ucfirst(Model::getCategorieFormated(Url::slicedUrl()[0], "pluriel"));
         return <<<HTML
         <div class="d-flex justify-content-between align-items-center mb-3">
             <span class="h1">{$title}</span>
@@ -601,12 +598,10 @@ HTML;
      */
     public function menu()
     {
-        global $url;
-        
         return <<<HTML
         <div>
-            {$this->menuLink($url."/create", "Ajouter", "btn btn-primary mr-2",  "fas fa-plus")}
-            {$this->menuLink($url."/delete", "Supprimer", "text-danger", "fas fa-trash-alt")}
+            {$this->menuLink(Model::getCategorieUrl(Url::slicedUrl()[1], ADMIN_URL)."/create", "Ajouter", "btn btn-primary mr-2",  "fas fa-plus")}
+            {$this->menuLink(Model::getCategorieUrl(Url::slicedUrl()[1], ADMIN_URL)."/delete", "Supprimer", "text-danger", "fas fa-trash-alt")}
         </div>
 HTML;
     }
@@ -635,7 +630,7 @@ HTML;
                 </div>
                 <div>
                     <a href="{$item->get('url')}" class="text-success">Détails</a>
-                    <a href="{$item->get('editer')}" class="text-blue">Editer</a>
+                    <a href="{$item->get('edit_url')}" class="text-blue">Editer</a>
                     <a href="{$item->get('delete_url')}" class="text-danger">Supprimer</a>
                 </div>
             </div>

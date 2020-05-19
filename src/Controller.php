@@ -71,38 +71,13 @@ class Controller
     }
       
     /**
-     * Controlleur de création d'un nouvel élément.
-     * 
-     * @return array
-     */
-    function createItem()
-    {
-        $errors = null;
-        $meta_title = Model::getCreateItemPageTitle($this->url[0]);
-        $view = new View();
-
-        if (isset($_POST['enregistrement'])) {
-            $validator = new Validator($_POST);
-            $errors = $validator->getErrors();
-            if (empty($errors)) {
-              Model::create($this->url[0], $_POST);
-            }
-        }
-
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->createItem($this->url[0], $errors)
-        ];
-    }
-
-    /**
-     * Controlleur de listing d'items.
+     * Controlleur pour lister les items d'une catégorie.
      * 
      * @return string
      */
     public function listCategorieItems()
     {
-        $meta_title = "Mes " . Model::getTypeFormated($this->url[0], "pluriel");
+        $meta_title = "Mes " . Model::getCategorieFormated($this->url[0], "pluriel");
         $view = new View();
 
         if ($this->url[0] == "motivation-plus") { $items = Bdd::getchildrenOf("-1", "videos"); }
@@ -115,7 +90,7 @@ class Controller
     }
 
     /**
-     * Controlleur pour l'url : administrateur.
+     * Controlleur pour lister les comptes administrateurs.
      * 
      * @return array
      */
@@ -128,6 +103,34 @@ class Controller
         return [
             "meta_title" => $meta_title,
             "content" => $view->listAccounts($accounts)
+        ];
+    }
+
+    /**
+     * Controlleur de création d'un nouvel élément.
+     * 
+     * @return array
+     */
+    function createItem()
+    {
+        $errors = null;
+        $meta_title = Model::getCreateItemPageTitle($this->url[0]);
+        $view = new View();
+
+        if (isset($_POST['enregistrement'])) {
+            dump($_POST);
+            dump($_FILES);
+            die();
+            $validator = new Validator($_POST);
+            $errors = $validator->getErrors();
+            if (empty($errors)) {
+              Model::create($this->url[0], $_POST);
+            }
+        }
+
+        return [
+            "meta_title" => $meta_title,
+            "content" => $view->createItem($this->url[0], $errors)
         ];
     }
 
@@ -193,7 +196,7 @@ class Controller
     public function deleteManyItems()
     {
         $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
-        $meta_title = "Supprimer des " . Model::getTypeFormated($this->url[0], "pluriel");
+        $meta_title = "Supprimer des " . Model::getCategorieFormated($this->url[0], "pluriel");
         $view = new View();
 
         if (isset($_POST["suppression"])) {

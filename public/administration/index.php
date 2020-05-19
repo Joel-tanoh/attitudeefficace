@@ -25,7 +25,7 @@ use App\FrontEnd\Page;
 use App\BackEnd\Utils\Notification;
 
 try {
-
+    
     if (!someoneIsConnected()) { Utils::header(ADMIN_URL . "/connexion"); }
     $url = isset($_GET['url']) ? $_GET['url'] : "";
     $router = new Router($url);

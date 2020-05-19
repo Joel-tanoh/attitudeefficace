@@ -407,12 +407,8 @@ class Model
      * 
      * @return $object
      */
-    public static function getObjectBy(
-        string $col = null,
-        string $col_value = null,
-        string $table = null,
-        string $keyword = null
-    ) {
+    public static function getObjectBy(string $col = null, string $col_value = null, string $table = null, string $keyword = null)
+    {
         $code = Bdd::getItemBy($col, $col_value, $table);
         return self::returnObject($keyword, $code);
     }
@@ -459,6 +455,19 @@ class Model
     }
 
     /**
+     * Retourne l'url de la catégorie passée en paramètre.
+     * 
+     * @param string $categorie
+     * @param string $app_part_url
+     * 
+     * @return string
+     */
+    public static function getCategorieUrl(string $categorie, string $app_part_url = PUBLIC_URL)
+    {
+        return $app_part_url . "/" . $categorie;
+    }
+
+    /**
      * Retourne les catégories en minisucule avec les accents et sans et au singulier
      * 
      * @param string $categorie La catégorie à transformer
@@ -467,7 +476,7 @@ class Model
      * 
      * @return string La catégorie bien formaté.
      */
-    public static function getTypeFormated(string $categorie, string $nombre = "singulier")
+    public static function getCategorieFormated(string $categorie, string $nombre = "singulier")
     {
         if ($categorie == "themes") { $categorie = "thème"; }
         if ($categorie == "videos") { $categorie = "vidéo"; }
@@ -504,11 +513,11 @@ class Model
         if ($categorie == Administrateur::TABLE_NAME) {
             $page_title = "Nouveau compte";
         } elseif (in_array($categorie, $femininCategorie)) {
-            $page_title = "Nouvelle " . self::getTypeFormated($categorie);
+            $page_title = "Nouvelle " . self::getCategorieFormated($categorie);
         } elseif (in_array($categorie, $voyelleCategorie)) {
-            $page_title = "Nouvel " . self::getTypeFormated($categorie);
+            $page_title = "Nouvel " . self::getCategorieFormated($categorie);
         } else {
-            $page_title = "Nouveau " . self::getTypeFormated($categorie);
+            $page_title = "Nouveau " . self::getCategorieFormated($categorie);
         }
 
         return $page_title;
