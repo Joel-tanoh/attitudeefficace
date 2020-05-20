@@ -14,12 +14,10 @@ require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 use App\BackEnd\Utils\Notification;
 use App\Router;
 use App\FrontEnd\Page;
-use App\BackEnd\Utils\Utils;
 
 try {
 
-    $url = isset($_GET['url']) ? $_GET['url'] : "";
-    $router = new Router($url);
+    $router = new Router(Router::getUri());
     $page = $router->publicRouter();
     $view = new Page($page["meta_title"], $page["content"]);
     echo $view->publicPage();

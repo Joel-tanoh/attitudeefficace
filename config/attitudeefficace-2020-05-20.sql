@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  ven. 24 avr. 2020 à 22:40
+-- Généré le :  mer. 20 mai 2020 à 17:42
 -- Version du serveur :  5.7.19
 -- Version de PHP :  7.1.9
 
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `administrateurs` (
   `slug` varchar(1) COLLATE utf8_bin DEFAULT NULL,
   `password` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `email` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `type` varchar(255) COLLATE utf8_bin DEFAULT 'utilisateur',
+  `categorie` varchar(255) COLLATE utf8_bin DEFAULT 'utilisateur',
   `statut` varchar(255) COLLATE utf8_bin DEFAULT 'activé',
   `date_creation` datetime DEFAULT CURRENT_TIMESTAMP,
   `date_modification` datetime DEFAULT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `administrateurs` (
 -- Déchargement des données de la table `administrateurs`
 --
 
-INSERT INTO `administrateurs` (`id`, `code`, `login`, `slug`, `password`, `email`, `type`, `statut`, `date_creation`, `date_modification`) VALUES
+INSERT INTO `administrateurs` (`id`, `code`, `login`, `slug`, `password`, `email`, `categorie`, `statut`, `date_creation`, `date_modification`) VALUES
 (1, 'u1s73YMd1rToMd', 'joel', NULL, '$2y$10$NlCt2e.XtG8DmZFYiSB0suGNVX6G0ZeNLny6mdLAriyTUnxXgMQge', 'tanohbassapatrick@gmail.com', 'administrateur', 'activé', '2019-10-01 08:22:06', NULL),
 (7, 'ITyPZnLwd', 'benoit', NULL, '$2y$10$XxpT8MxPW4VUFFtNuWWwS.diIqFvN1bnUUx9Sw4/J3CwNXvvrJA22', 'abc@gmail.com', 'utilisateur', 'activé', '2020-04-14 11:04:26', '2020-04-14 11:04:26');
 
@@ -151,16 +151,6 @@ CREATE TABLE IF NOT EXISTS `item_parents` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=76 DEFAULT CHARSET=utf8;
 
---
--- Déchargement des données de la table `item_parents`
---
-
-INSERT INTO `item_parents` (`id`, `code`, `categorie`, `title`, `description`, `slug`, `price`, `rang`, `date_creation`, `date_modification`, `date_post`, `views`, `video_link`) VALUES
-(75, 'iQYtB0D', 'formations', 'Lorem ipsum', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum perspiciatis accusantium, molestias dolores rerum ea repudiandae voluptatibus, esse nostrum quidem perferendis est architecto. Magni veniam consequuntur alias tempora dolorem accusantium.', 'lorem-ipsum-75', 0, 2, '2020-04-24 16:53:07', '2020-04-24 16:53:07', NULL, 0, NULL),
-(52, 'VhKUTvK', 'formations', 'Lorem ipsum', 'Description de lorem ipsum', 'lorem-ipsum-52', 0, 1, '2020-04-22 17:51:50', '2020-04-23 00:46:28', NULL, 0, ''),
-(51, 'Rz7iTx', 'themes', 'test', 'test', 'test-51', 0, 0, '2020-04-22 00:44:41', '2020-04-22 00:44:41', NULL, 0, NULL),
-(73, '6l5dv9eLq', 'etapes', 'vivre', 'azeaeaz', 'vivre-73', 0, 1, '2020-04-22 18:39:56', '2020-04-22 18:39:56', NULL, 0, NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -234,6 +224,18 @@ CREATE TABLE IF NOT EXISTS `newsletters` (
 INSERT INTO `newsletters` (`id`, `adresse_email`, `date_abonnement`) VALUES
 (1, 'tanohbassapatrick@gmail.com', '2020-04-24 14:51:52'),
 (2, 'joel.developpeur@gmail.com', '2020-04-24 14:52:15');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `options`
+--
+
+DROP TABLE IF EXISTS `options`;
+CREATE TABLE IF NOT EXISTS `options` (
+  `intitule` text,
+  `valeur` varchar(255) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 

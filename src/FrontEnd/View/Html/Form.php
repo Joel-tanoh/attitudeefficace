@@ -15,9 +15,9 @@
 namespace App\FrontEnd\View\Html;
 
 use App\BackEnd\APIs\Bdd;
-use App\BackEnd\APIs\Url;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Utils;
+use App\Router;
 
 /**
  * Classe qui gère les formulaires.
@@ -324,8 +324,8 @@ HTML;
      */
     public function selectParent(bool $choose_parent = null)
     {
-        $choose_parent = Url::slicedUrl()[1] !== "minis-services"
-         && Model::isChildCategorie(Url::slicedUrl()[1]) 
+        $choose_parent = Router::slicedUrl()[1] !== "minis-services"
+         && Model::isChildCategorie(Router::slicedUrl()[1]) 
           ? true : false;
 
         if ($choose_parent) {
@@ -392,7 +392,7 @@ HTML;
     public function articleContentTextarea($item = null)
     {
         global $url;
-        $article_content = !is_null($item) ? $item->get("article_content") : Url::slicedUrl()[1] == "articles" ? "" : null;
+        $article_content = !is_null($item) ? $item->get("article_content") : Router::slicedUrl()[1] == "articles" ? "" : null;
 
         if (!is_null($article_content)) {
             return <<<HTML
@@ -441,10 +441,10 @@ HTML;
 HTML;
         } else {
             $rang = Bdd::getMaxValueOf( "rang",
-                Model::getTableNameFrom( Url::slicedUrl()[1] ),
+                Model::getTableNameFrom( Router::slicedUrl()[1] ),
                 "categorie",
                 "categorie",
-                Url::slicedUrl()[1]
+                Router::slicedUrl()[1]
             ) + 1;
             $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
             $label = <<<HTML

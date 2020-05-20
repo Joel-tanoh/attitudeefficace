@@ -9,7 +9,6 @@
 namespace App\FrontEnd\View;
 
 use App\BackEnd\APIs\Bdd;
-use App\BackEnd\APIs\Url;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Notification;
 use App\BackEnd\Utils\Utils;
@@ -18,6 +17,7 @@ use App\FrontEnd\View\Layout;
 use App\FrontEnd\View\ModelsView\AdministrateurView;
 use App\FrontEnd\View\ModelsView\ParentView;
 use App\FrontEnd\View\ModelsView\ChildView;
+use App\Router;
 
 /**
  * Une vue est un bloc ou un ensemble de bloc de code HTML qui a une fonctionnalité
@@ -605,7 +605,7 @@ HTML;
      */
     public function crumbs()
     {
-        $title = ucfirst(Model::getCategorieFormated(Url::slicedUrl()[1], "pluriel"));
+        $title = ucfirst(Model::getCategorieFormated(Router::slicedUrl()[1], "pluriel"));
         return <<<HTML
         <div class="d-flex justify-content-between align-items-center mb-3">
             <span class="h1">{$title}</span>
@@ -623,8 +623,8 @@ HTML;
     {
         return <<<HTML
         <div>
-            {$this->menuLink(Model::getCategorieUrl(Url::slicedUrl()[1], ADMIN_URL)."/create", "Ajouter", "btn btn-primary mr-2",  "fas fa-plus")}
-            {$this->menuLink(Model::getCategorieUrl(Url::slicedUrl()[1], ADMIN_URL)."/delete", "Supprimer", "text-danger", "fas fa-trash-alt")}
+            {$this->menuLink(Model::getCategorieUrl(Router::slicedUrl()[1], ADMIN_URL)."/create", "Ajouter", "btn btn-primary mr-2",  "fas fa-plus")}
+            {$this->menuLink(Model::getCategorieUrl(Router::slicedUrl()[1], ADMIN_URL)."/delete", "Supprimer", "text-danger", "fas fa-trash-alt")}
         </div>
 HTML;
     }

@@ -27,8 +27,7 @@ use App\BackEnd\Utils\Notification;
 try {
     
     if (!someoneIsConnected()) { Utils::header(ADMIN_URL . "/connexion"); }
-    $url = isset($_GET['url']) ? $_GET['url'] : "";
-    $router = new Router($url);
+    $router = new Router(Router::getUri());
     $route = $router->adminRouter();
     $page = new Page($route["meta_title"], $route["content"]);
     echo $page->adminPage();

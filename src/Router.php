@@ -58,24 +58,19 @@ class Router
     {
         $controller = new Controller($this->url);
 
-        // Home
-        if ($this->url == "")
+        if ($this->match("administration/"))
             $route = $controller->dashboard();
 
-        // administrateurs
-        elseif ($this->url[0] == 'administrateurs' && empty($this->url[1])) 
+        elseif ($this->match("administration/administrateurs"))
             $route = $controller->listAdminUsersAccounts();
 
-        // motivation-plus
-        elseif ($this->url[0] == 'motivation-plus' && empty($this->url[1]))
+        elseif ($this->match("administration/motivation-plus"))
             $route = $controller->listMotivationPlusVideo();
 
-        // motivation-plus/create
-        elseif ($this->url[0] == 'motivation-plus' && $this->url[1] == "create")
+        elseif ($this->match("administration/motivation-plus/create"))
             $route = $controller->createMotivationPlusVideo();
 
-        // motivation-plus/delete
-        elseif ($this->url[0] == 'motivation-plus' && $this->url[1] == "delete")
+        elseif ($this->match("administration/motivation-plus/delete"))
             $route = $controller->deleteMotivationPlusVideo();
 
         // categorie
@@ -118,7 +113,7 @@ class Router
         $controller = new Controller($this->url);
 
         // Accueil
-        if ($this->url == "")
+        if ($this->match(""))
             $route = $controller->publicAccueilPage();
 
         // Error 404
@@ -128,16 +123,44 @@ class Router
     }
 
     /**
+     * Permet de découper l'url en plusieurs parties.
+     * 
+     * @return array
+     */
+    static function slicedUrl()
+    {
+        return explode("/", substr($_SERVER["QUERY_STRING"], 4));
+    }
+
+    /**
      * Permet de vérifier la concordance en une chaine de caractère passé en
      * paramètre et l'url.
      * 
-     * @param string $string
+     * @param string $route
      * 
      * @return bool
      */
-    private function match(string $string)
+    public function match(string $route)
     {
+        dump($_SERVER);
+        die();
+        return self::getUri() == $route;
+    }
 
+    /**
+     * Retourne l'url de la page courante grâce au fichier .htacces qui
+     * permet de ramener toutes les urls vers l'index du dossier où le
+     * fichier il se trouve en générant une variable global $_GET["url"] et
+     * une variable serveur $_SERVER["QUERY_STRING"].
+     * 
+     * @return string
+     */
+    static function getUri()
+    {
+        if ($_SERVER["QUERY_STRING"] === "") {
+            return "";
+        }
+        return substr($_SERVER["QUERY_STRING"], 4);
     }
 
 }
