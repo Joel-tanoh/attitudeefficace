@@ -47,7 +47,7 @@ class Administrateur extends Personne
         $sql_query = new SqlQuery();
 
         $query = $sql_query
-            ->select("id, code, login, password, email, type, statut")
+            ->select("id, code, login, password, email, categorie, statut")
             ->select("date_format(date_creation, '%d/%m/%Y') AS day_creation")
             ->select("date_format(date_creation, '%H:%i') AS hour_creation")
             ->select("date_format(date_modification, '%d/%m/%Y') AS day_modification")
@@ -64,7 +64,7 @@ class Administrateur extends Personne
         $this->code = $result['code'];
         $this->login = $result['login'];
         $this->password = $result['password'];
-        $this->type = $result['type'];
+        $this->categorie = $result['categorie'];
         $this->statut = $result['statut'];
         $this->email = $result['email'];
         $this->day_creation = $result["day_creation"];
@@ -72,8 +72,7 @@ class Administrateur extends Personne
         $this->day_modification = $result["day_modification"];
         $this->hour_modification = $result["hour_modification"];
         $this->url = ADMIN_URL . '/' . self::TABLE_NAME . "/" . $this->code;
-        $this->avatar_name = Utils::slugify($this->login)
-            . "-" . $this->id . IMAGES_EXTENSION;
+        $this->avatar_name = Utils::slugify($this->login) . "-" . $this->id . IMAGES_EXTENSION;
         $this->avatar_path = AVATARS_PATH . $this->avatar_name;
         $this->avatar_src = AVATARS_DIR . "/" . $this->avatar_name;
         $this->table = self::TABLE_NAME;
@@ -91,25 +90,22 @@ class Administrateur extends Personne
     public static function save(string $code, array $data)
     {
         extract($data);
-        $login = mb_strtolower(htmlspecialchars($login));
-        $password_hashed = password_hash(
-            htmlspecialchars($password),
-            PASSWORD_DEFAULT
-        );
-        if (self::_insertData($code, $login, $password_hashed)) {
-            $new_account = new Administrateur($code);
+        $login = mb_strtolower( htmlspecialchars( $login ) );
+        $password_hashed = password_hash( htmlspecialchars( $password ), PASSWORD_DEFAULT );
+        if (self::insertPrincipalData( $code, $login, $password_hashed )) {
+            $new_account = new self($code);
             if (!empty($email)) {
                 $new_account->set("email", $email, self::TABLE_NAME);
             }
-            if (!empty($account_type)) {
-                $new_account->set("type", $account_type, self::TABLE_NAME);
+            if (!empty($account_categorie)) {
+                $new_account->set("categorie", $account_type, self::TABLE_NAME);
             }
             if (!empty($_FILES["avatar_uploaded"]["name"])) {
                 $new_account->saveAvatar();
             }
             return true;
         } else {
-            throw new Exception("Echec de l'enregistrement, veuillez réessayer ou contacter l'administrateur");
+            throw new Exception("Echec de l'enregistrement, veuillez réessayer ou si cela persiste, veuillez contacter l'administrateur");
         }
     }
 
@@ -205,7 +201,7 @@ class Administrateur extends Personne
     }
 
     /**
-     * Insère le code, le login, le mot de passe, et le type dans la base de données.
+     * Insère le code, le login, le mot de passe, et le categorie dans la base de données.
      * 
      * @param string $code     Code.
      * @param string $login    Login.
@@ -213,7 +209,7 @@ class Administrateur extends Personne
      * 
      * @return bool
      */
-    private static function _insertData($code, $login, $password)
+    private static function insertPrincipalData($code, $login, $password)
     {
         $bdd = Bdd::connectToDb();
         $query = "INSERT INTO " . self::TABLE_NAME

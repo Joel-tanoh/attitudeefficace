@@ -46,8 +46,8 @@ class Image extends File
      */
     public function saveImages(string $image_name)
     {
-        $this->_save($image_name, COVERS_PATH, 1280, 720);
-        $this->_save($image_name, THUMBS_PATH, 320, 180);
+        $this->save($image_name, THUMBS_PATH, 1280, 720);
+        $this->save($image_name, ORIGINALS_IMAGES_PATH);
         return true;
     }
 
@@ -60,7 +60,7 @@ class Image extends File
      */
     public function saveAvatar($avatar_name)
     {
-        $this->_save($avatar_name, AVATARS_PATH, 150, 150);
+        $this->save($avatar_name, AVATARS_PATH, 150, 150);
     }
 
     /**
@@ -74,15 +74,17 @@ class Image extends File
      * 
      * @return bool
      */
-    private function _save(string $image_name, string $dir_path, int $image_width, int $image_height)
+    private function save(string $image_name, string $dir_path, int $image_width = null, int $image_height = null)
     {
         if (!file_exists($dir_path)) {
             mkdir($dir_path);
         }
         $manager = new ImageManager();
-        $manager->make($_FILES['image_uploaded']['tmp_name'])
-            ->fit($image_width, $image_height)
-            ->save($dir_path . $image_name . IMAGES_EXTENSION);
+        $manager = $manager->make($_FILES['image_uploaded']['tmp_name']);
+        if (null !== $image_width && null !== $image_height){
+            $manager->fit($image_width, $image_height);
+        }
+        $manager->save($dir_path . $image_name . IMAGES_EXTENSION);
         return true;
     }
 
@@ -96,23 +98,13 @@ class Image extends File
      */
     public function renameImages($old_name, $new_name)
     {
-        $old_cover = COVERS_PATH . $old_name;
+        $old_thumbs = THUMBS_PATH . $old_name;
+        $new_thumbs = THUMBS_PATH . $new_name . IMAGES_EXTENSION;
 
-        if (file_exists($old_cover)) {
-            $new_cover = COVERS_PATH . $new_name . IMAGES_EXTENSION;
-
-            if (rename($old_cover, $new_cover)) {
-                $old_thumbs = THUMBS_PATH . $old_name;
-                $new_thumbs = THUMBS_PATH . $new_name . IMAGES_EXTENSION;
-
-                if (rename($old_thumbs, $new_thumbs)) {
-                    return true;
-                } else {
-                    throw new Exception("Echec du renommage de l'image miniature.");
-                }
-            } else {
-                throw new Exception("Echec du renommage de l'image de couverture.");
-            }
+        if (rename($old_thumbs, $new_thumbs)) {
+            return true;
+        } else {
+            throw new Exception("Echec du renommage de l'image de couverture.");
         }
     }
 
@@ -125,11 +117,13 @@ class Image extends File
      */
     public function deleteImages($image_name)
     {
-        $old_covers_path = COVERS_PATH . $image_name;
-        if (file_exists($old_covers_path)) {
-            unlink($old_covers_path);
-            $old_thumbs_path = THUMBS_PATH . $image_name;
+        $old_thumbs_path = THUMBS_PATH . $image_name;
+        if (file_exists($old_thumbs_path)) {
             unlink($old_thumbs_path);
+        }
+        $old_original_image_path = ORIGINALS_IMAGES_PATH . $image_name;
+        if (file_exists($old_original_image_path)) {
+            unlink($old_original_image_path);
         }
     }
 

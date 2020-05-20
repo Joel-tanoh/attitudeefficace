@@ -47,6 +47,10 @@ class Form
             $form = $this->adminForm($item);
             break;
 
+        case "motivation-plus" :
+            $form = $this->motivationPlusForm($item);
+            break;
+
         case Model::isParentCategorie($categorie) :
             $form = $this->parentForm($item);
             break;
@@ -100,6 +104,24 @@ HTML;
     }
 
     /**
+     * Retourne le formulaire pour ajouter une vidéo de motivation plus.
+     * 
+     * @return string
+     */
+    function motivationPlusForm()
+    {
+        $prix_label = <<<HTML
+        Prix :
+        <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
+        avoir accès à cet élément</p>
+HTML;
+
+        $formContent = $this->commonItemsInformations(null, $prix_label);
+
+        return $this->returnForm($formContent);
+    }
+
+    /**
      * Formulaire d'un item parent.
      * 
      * @param mixed $item 
@@ -113,7 +135,7 @@ HTML;
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         accéder à cet élément</p>
 HTML;
-        $form_content = $this->firstBox($item, $prix_label);
+        $form_content = $this->commonItemsInformations($item, $prix_label);
         return $this->returnForm($form_content);
     }
  
@@ -121,7 +143,7 @@ HTML;
      * Formulaire d'un item enfant.
      * 
      * @param mixed  $item 
-     * @param string $categorie 
+     * @param string $categorie
      * 
      * @return string Le formulaire.
      */
@@ -134,7 +156,7 @@ HTML;
         avoir accès à cet élément</p>
 HTML;
 
-        $formContent = $this->firstBox($item, $prix_label);
+        $formContent = $this->commonItemsInformations($item, $prix_label);
         $formContent .= $this->articleContentTextarea($item);
         $formContent .= $this->pdfFileInput($uploadPdf);
 
@@ -156,7 +178,7 @@ HTML;
             Cette somme sera affichée aux utilisateurs qui voudront ce service.
         </p>
 HTML;
-        $form_content = $this->firstBox($item, $mini_service_label);
+        $form_content = $this->commonItemsInformations($item, $mini_service_label);
 
         return $this->returnForm($form_content);
     }
@@ -171,7 +193,7 @@ HTML;
      * 
      * @return string
      */
-    public function firstBox($item = null, $prix_label = null)
+    public function commonItemsInformations($item = null, $prix_label = null)
     {
         return <<<HTML
         <div class="row mb-3">
@@ -302,8 +324,9 @@ HTML;
      */
     public function selectParent(bool $choose_parent = null)
     {
-        global $url;
-        $choose_parent = Url::slicedUrl()[1] !== "minis-services" && Model::isChildCategorie(Url::slicedUrl()[1]) ? true : false;
+        $choose_parent = Url::slicedUrl()[1] !== "minis-services"
+         && Model::isChildCategorie(Url::slicedUrl()[1]) 
+          ? true : false;
 
         if ($choose_parent) {
             return <<<HTML
@@ -409,21 +432,28 @@ HTML;
      */
     public function rangInput($item = null)
     {
-        global $url;
-        $rang = !is_null($item) ? $item->get("rang") : Bdd::getMaxValueOf( "rang",
+        if (!is_null($item)) {
+            $rang = $item->get("rang");
+            $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
+            $label = <<<HTML
+            Donnez un rang à cet élément :
+            <p class="notice"> Cet élément apparaîtra : {$rang_actuel}</p>
+HTML;
+        } else {
+            $rang = Bdd::getMaxValueOf( "rang",
                 Model::getTableNameFrom( Url::slicedUrl()[1] ),
                 "categorie",
                 "categorie",
                 Url::slicedUrl()[1]
             ) + 1;
-        $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
+            $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
+            $label = <<<HTML
+            Donnez un rang à cet élément :
+            <p class="notice"> Cet élément apparaîtra : {$rang_actuel} par défaut</p>
+HTML;
+        }
 
         extract($_POST);
-
-        $label = <<<HTML
-        Donnez un rang à cet élément :
-        <p class="notice"> Cet élément apparaîtra : {$rang_actuel}</p>
-HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("rang", $label)}
@@ -443,9 +473,10 @@ HTML;
     {
         $video_link = !is_null($item) ? $item->get("video_link") : "";
         $label = <<<HTML
-        Coller l'id de la vidéo de Youtube :
+        Coller l'id de la vidéo de Youtube (facultatif) :
         <p class="notice">Cette vidéo peut être une vidéo de description</p>
 HTML;
+        extract($_POST);
         return <<<HTML
         <div class="form-group">
             {$this->label("videoLink", $label)}
@@ -608,7 +639,7 @@ HTML;
         foreach ($items as $i) {
             $item = Model::returnObject($categorie, $i["code"]);
             $options .= '<option value="'. $item->get("id") . '">';
-            $options .= '<span>'. ucfirst($item->get('categorie')) . '</span>';
+            $options .= '<span class="text-small">'. ucfirst($item->get('categorie')) . '</span>';
             $options .= ' - ';
             $options .= ucfirst($item->get("title"));
             $options .= '</option>';

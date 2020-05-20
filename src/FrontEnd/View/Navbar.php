@@ -107,7 +107,7 @@ HTML;
     {
         $admin_url = ADMIN_URL;
         $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
-        $private_buttons = $admin_user->get("type") == "administrateur" ? $this->adminReservedAcrions() : null;
+        $private_buttons = $admin_user->get("categorie") == "administrateur" ? $this->adminReservedAcrions() : null;
 
         return <<<HTML
         <li class="btn-administrateur">

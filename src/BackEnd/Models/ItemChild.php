@@ -85,9 +85,9 @@ class ItemChild extends Model
 
         $this->slug = $result["slug"];
         $this->image_name = $this->categorie . "-" . $this->slug . IMAGES_EXTENSION;
-        $this->covers_path = COVERS_PATH . $this->image_name;
+        $this->original_image_path = ORIGINALS_IMAGES_PATH . $this->image_name;
         $this->thumbs_path = THUMBS_PATH . $this->image_name;
-        $this->cover_src = COVERS_DIR . "/" . $this->image_name;
+        $this->original_image_src = ORIGINALS_IMAGES_DIR . "/" . $this->image_name;
         $this->thumbs_src = THUMBS_DIR . "/" . $this->image_name;
 
         $this->url = ADMIN_URL . "/" . $this->categorie . "/" . $this->slug;

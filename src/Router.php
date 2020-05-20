@@ -66,6 +66,18 @@ class Router
         elseif ($this->url[0] == 'administrateurs' && empty($this->url[1])) 
             $route = $controller->listAdminUsersAccounts();
 
+        // motivation-plus
+        elseif ($this->url[0] == 'motivation-plus' && empty($this->url[1]))
+            $route = $controller->listMotivationPlusVideo();
+
+        // motivation-plus/create
+        elseif ($this->url[0] == 'motivation-plus' && $this->url[1] == "create")
+            $route = $controller->createMotivationPlusVideo();
+
+        // motivation-plus/delete
+        elseif ($this->url[0] == 'motivation-plus' && $this->url[1] == "delete")
+            $route = $controller->deleteMotivationPlusVideo();
+
         // categorie
         elseif (Model::isCategorie($this->url[0]) && empty($this->url[1]))
             $route = $controller->listCategorieItems();

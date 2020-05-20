@@ -383,6 +383,29 @@ HTML;
     }
 
     /**
+     * Retourne la vue pour ajouter une vidéo de motivation plus.
+     * 
+     * @param string $errors S'il y'a des erreurs à afficher.
+     * 
+     * @return string
+     */
+    public function createMotivationPlusVideo($errors = null)
+    {
+        $form = new Form();
+        $notification = new Notification();
+        $formContent = $form->getForm("motivation-plus");
+        $error = !empty($errors) ? $notification->errors($errors) : null;
+
+        return <<<HTML
+        <div class="mb-3">
+            {$this->crumbs()}
+            {$error}
+            {$formContent}
+        </div>
+HTML;
+    }
+
+    /**
      * Retourne la vue pour lire un item.
      * 
      * @param $item Objet
@@ -582,7 +605,7 @@ HTML;
      */
     public function crumbs()
     {
-        $title = ucfirst(Model::getCategorieFormated(Url::slicedUrl()[0], "pluriel"));
+        $title = ucfirst(Model::getCategorieFormated(Url::slicedUrl()[1], "pluriel"));
         return <<<HTML
         <div class="d-flex justify-content-between align-items-center mb-3">
             <span class="h1">{$title}</span>
@@ -741,7 +764,7 @@ HTML;
      */
     private function showThumbs($item)
     {
-        $boxContent = null !== $item->get("cover_src")
+        $boxContent = null !== $item->get("original_image_src")
             ? $this->thumbs($item)
             : $this->noThumbsBox();
 
@@ -765,7 +788,7 @@ HTML;
     private function thumbs($item)
     {
         return <<<HTML
-        <img src="{$item->get('cover_src')}" alt="{$item->get('image_name')}" class="img-fluid"/>
+        <img src="{$item->get('original_image_src')}" alt="{$item->get('image_name')}" class="img-fluid"/>
 HTML;
     }
 

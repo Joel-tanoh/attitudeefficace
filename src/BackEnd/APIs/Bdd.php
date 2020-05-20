@@ -97,18 +97,19 @@ class Bdd
      *                          occurences.
      * @param string $categorie Une clause de spécification de la catégorie des
      *                          données à renvoyer.
+     * @param string $order_by  Le nom de la colonne par rapport à laquelle ordonner
+     *                          les résultats de la requette.
      * 
      * @return array Tableau qui contient les occurences de la table passée en param.
      */
     public static function getAllFrom(string $table, string $categorie = null)
     {
         $query = "SELECT code, slug FROM $table";
-        if (!is_null($categorie)) {
-            $query .= " WHERE categorie = ? ORDER BY rang";
+        if (null !== $categorie) {
+            $query .= " WHERE categorie = ?";
             $rep = self::connectToDb()->prepare($query);
             $rep->execute([$categorie]);
         } else {
-            $query .= " ORDER BY rang";
             $rep = self::connectToDb()->query($query);
         }
         return $rep->fetchAll();
@@ -222,11 +223,8 @@ class Bdd
      * 
      * @return array
      */
-    public static function getAllFromTableWithout(
-        string $table,
-        $exclu_id,
-        string $categorie = null
-    ) {
+    public static function getAllFromTableWithout(string $table, $exclu_id, string $categorie = null)
+    {
         $bdd = self::connectToDb();
         $query = "SELECT code FROM $table WHERE id !== ?";
         if (!is_null($categorie)) {
@@ -282,12 +280,7 @@ class Bdd
      * 
      * @return array
      */
-    public static function getItemsOfColValueMoreOrEqualTo(
-        string $table,
-        string $col,
-        int $col_value,
-        string $categorie
-    ) {
+    public static function getItemsOfColValueMoreOrEqualTo(string $table, string $col, int $col_value, string $categorie) {
         $query = "SELECT code FROM $table WHERE $col >= ? AND categorie = ?";
         $rep = self::connectToDb()->prepare($query);
         $rep->execute([$col_value, $categorie,]);
@@ -305,17 +298,16 @@ class Bdd
      * 
      * @return bool True si les données ont été bien insérées.
      */
-    public static function insertPrincData(
+    public static function insertPincipalsData(
         string $table,
         string $code,
         string $title,
         string $description,
         string $categorie
     ) {
-        $query = "INSERT INTO $table(code, title, description, categorie)
-            VALUES(?, ?, ?, ?)";
+        $query = "INSERT INTO $table(code, title, description, categorie) VALUES(?, ?, ?, ?)";
         $rep = self::connectToDb()->prepare($query);
-        $rep->execute([$code, $title, $description, $categorie, ]);
+        $rep->execute([$code, $title, $description, $categorie]);
         return true;
     }
 
@@ -329,15 +321,11 @@ class Bdd
      * 
      * @return bool
      */
-    public static function incOrDecColValue(
-        string $action,
-        string $col,
-        string $table,
-        $id
-    ) {
+    public static function incOrDecColValue(string $action, string $col, string $table, $id)
+    {
         $query = "UPDATE $table SET $col = ";
         $query .= $action == "increment" ? "$col+1" : "$col-1";
-        $query .= " WHERE id = $id";
+        $query .= " WHERE id = " . $id;
         self::connectToDb()->query($query);
         return true;
     }

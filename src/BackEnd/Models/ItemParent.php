@@ -35,7 +35,6 @@ class ItemParent extends Model
         "formation","formations",
         "theme","themes",
         "etape","etapes",
-        "motivation-plus"
     ];
 
     /**
@@ -91,16 +90,17 @@ class ItemParent extends Model
         
         $this->slug = $result["slug"];
         $this->image_name = $this->categorie . "-" . $this->slug . IMAGES_EXTENSION;
-        $this->cover_src =  COVERS_DIR . "/" . $this->image_name;
+        $this->original_image_src =  ORIGINALS_IMAGES_DIR . "/" . $this->image_name;
         $this->thumbs_src = THUMBS_DIR . "/" . $this->image_name;
-        $this->covers_path = COVERS_PATH . $this->image_name;
+        $this->original_image_path = ORIGINALS_IMAGES_PATH . $this->image_name;
         $this->thumbs_path = THUMBS_PATH . $this->image_name;
 
-        $this->url = ADMIN_URL . "/" . $this->categorie . "/" . $this->slug;
-        $this->edit_url = $this->url . "/edit";
-        $this->delete_url = $this->url . "/delete";
-        $this->post_url = $this->url . "/post";
-        $this->share_url = $this->url . "/share";
+        $this->admin_url = ADMIN_URL . "/" . $this->categorie . "/" . $this->slug;
+        $this->public_url = PUBLIC_URL . "/" . $this->categorie . "/" . $this->slug;
+        $this->edit_url = $this->admin_url . "/edit";
+        $this->delete_url = $this->admin_url . "/delete";
+        $this->post_url = $this->admin_url . "/post";
+        $this->share_url = $this->admin_url . "/share";
 
         // Children
         $query = "SELECT code FROM " . ItemChild::TABLE_NAME . " WHERE parent_id = ?";

@@ -114,13 +114,6 @@ class Model
     protected $image_name;
 
     /**
-     * Chemin total de l'image de couverture.
-     * 
-     * @var string
-     */
-    protected $covers_path;
-
-    /**
      * Chemin total de l'image miniature.
      * 
      * @var string
@@ -128,11 +121,25 @@ class Model
     protected $thumbs_path;
 
     /**
+     * Source de l'image miniature
+     * 
+     * @var string
+     */
+    protected $thumbs_src;
+
+    /**
+     * Chemin total de l'image de couverture.
+     * 
+     * @var string
+     */
+    protected $original_image_path;
+
+    /**
      * Source de l'image de couverture.
      * 
      * @var string
      */
-    protected $cover_src;
+    protected $original_image_src;
 
     /**
      * La table où est stocké l'item.
@@ -140,13 +147,6 @@ class Model
      * @var string
      */
     protected $table;
-
-    /**
-     * Source de l'image miniature
-     * 
-     * @var string
-     */
-    protected $thumbs_src;
 
     /**
      * Retourne une propriéte en fonction de son nom passé en paramètre.
@@ -164,8 +164,6 @@ class Model
         if ($property == "password") return $this->password;
 
         if ($property == "statut") return $this->statut;
-
-        if ($property == "type") return $this->type;
 
         if ($property == "categorie") return $this->categorie;
 
@@ -188,8 +186,6 @@ class Model
         if ($property == "delete_url") return $this->delete_url;
 
         if ($property == "image_name") return $this->image_name;
-
-        if ($property == "covers_path") return $this->covers_path;
 
         if ($property == "login") return ucfirst($this->login);
 
@@ -231,31 +227,30 @@ class Model
             if ($this->rang == 0 || $this->rang == null) {
                 return "Non classé";
             } else {
-                return $this->rang == 1
-                    ? "Ordre : " . $this->rang . " er"
-                    : "Ordre : " . $this->rang . " eme";
+                return $this->rang == 1 ? "Ordre : " . $this->rang . " er" : "Ordre : " . $this->rang . " eme";
             }
-        }
-
-        if ($property == "cover_src") {
-            if (file_exists($this->covers_path)) {
-                return $this->cover_src;
-            }
-            return null;
         }
 
         if ($property == "thumbs_src") {
             return file_exists($this->thumbs_path) ? $this->thumbs_src : null;
         }
 
-        if ($property == "article_content") {
-            if ($this->isChild()) {
-                return ucfirst(nl2br(trim(htmlspecialchars_decode($this->article_content))));
-            }
+        if ($property == "thumbs_path") return $this->thumbs_path;
+
+        if ($property == "original_image_path") return $this->original_image_path;
+
+        if ($property == "original_image_src") {
+            return file_exists($this->original_image_path) ? $this->original_image_src : null;
         }
 
         if ($property == "avatar_src") {
             return file_exists($this->avatar_path) ? $this->avatar_src : DEFAULT_AVATAR;
+        }
+
+        if ($property == "article_content") {
+            if ($this->isChild()) {
+                return ucfirst(nl2br(trim(htmlspecialchars_decode($this->article_content))));
+            }
         }
 
         if ($property == "date_creation") {
@@ -449,7 +444,7 @@ class Model
     public static function getTableNameFrom(string $keyword = null)
     {
         if ($keyword == "administrateurs") { $table = Administrateur::TABLE_NAME; }
-        if (self::isParentCategorie($keyword)) { $table = ItemParent::TABLE_NAME; }
+        if (self::isParentCategorie($keyword) || $keyword == "motivation-plus") { $table = ItemParent::TABLE_NAME; }
         if (self::isChildCategorie($keyword)) { $table = ItemChild::TABLE_NAME; }
         return $table;
     }
@@ -537,50 +532,7 @@ class Model
     public function set(string $col, $value, $table)
     {
         Bdd::set($col, $value, $table, $this->id);
-        $this->_modified($table);
-        return true;
-    }
-
-    /**
-     * Enregistre le rang d'un item.
-     * 
-     * @param int $rang 
-     * 
-     * @return bool
-     */
-    public function setRang(int $rang)
-    {
-        $table = $this->table;
-        if ($rang !== 0 && Bdd::dataIsset($table, "rang", $rang)) {
-            $items = Bdd::getItemsOfColValueMoreOrEqualTo(
-                $table, "rang", $rang, $this->categorie
-            );
-            foreach ($items as $item) {
-                $obj = self::returnObject($this->categorie, $item["code"]);
-                Bdd::incOrDecColValue("increment", "rang", $table, $obj->id);
-            }
-        }
-        $this->set("rang", (int)$rang, $table);
-    }
-
-    /**
-     * Enlève le rang d'un item.
-     * 
-     * @return bool
-     */
-    public function unsetRang()
-    {
-        $table = $this->table;
-        $items = Bdd::getItemsOfColValueMoreOrEqualTo(
-            $table,
-            "rang",
-            $this->rang,
-            $this->categorie
-        );
-        foreach ($items as $item) {
-            $obj = self::returnObject($this->categorie, $item["code"]);
-            Bdd::incOrDecColValue("decrement", "rang", $table, $obj->id);
-        }
+        $this->modified($table);
         return true;
     }
 
@@ -593,27 +545,29 @@ class Model
      * 
      * @return void
      */
-    public static function create(string $categorie, array $data)
+    public static function createItem(string $categorie, array $data)
     {
         $email_sender = new Email();
         $code = Utils::generateCode();
+
         if ($categorie == "administrateurs") {
             Administrateur::save($code, $data);
-        }
-        if (self::isParentCategorie($categorie) || self::isChildCategorie($categorie)) {
-            self::_insertPostData($code, $data, $categorie);
+        } elseif (self::isParentCategorie($categorie) || self::isChildCategorie($categorie)) {
+            self::insertPostData($code, $data, $categorie);
         }
 
         $new_item = self::returnObject($categorie, $code);
         if (!empty($_FILES["image_uploaded"]["name"])) {
             if (self::isParentCategorie($categorie) || self::isChildCategorie($categorie)) {
-                $new_item->_saveImages();
+                $image = new Image();
+                $image->saveImages($new_item->get("categorie") . "-" . $new_item->get("slug"));
+                return true;
             }
         }  
         if (!empty($_FILES["pdf_uploaded"]["name"])) {
             $pdf = new Pdf();
-            $pdf_name = $new_item->get("title") . "-" . $new_item->get("id");
-            $pdf->savePdfFile($pdf_name);
+            $pdf_file_name = $new_item->get("title") . "-" . $new_item->get("id");
+            $pdf->savePdfFile($pdf_file_name);
         }
         $email_sender->notifyUsers();
         Utils::header($new_item->get("url"));
@@ -627,7 +581,7 @@ class Model
      * 
      * @return void
      */
-    public function edit($categorie = null, array $data = null)
+    public function editItem($categorie = null, array $data = null)
     {
         extract($data);
         $table = self::getTableNameFrom($this->categorie);
@@ -703,7 +657,7 @@ class Model
     {
         $this->unsetRang();
         $this->deleteImage();
-        $bdd = Bdd::delete($this->table, $this->id);
+        Bdd::delete($this->table, $this->id);
         return true;
     }
 
@@ -719,6 +673,42 @@ class Model
     }
 
     /**
+     * Enregistre le rang d'un item.
+     * 
+     * @param int $rang 
+     * 
+     * @return bool
+     */
+    public function setRang(int $rang)
+    {
+        $table = $this->table;
+        if ($rang !== 0 && Bdd::dataIsset($table, "rang", $rang)) {
+            $items = Bdd::getItemsOfColValueMoreOrEqualTo( $table, "rang", $rang, $this->categorie );
+            foreach ($items as $item) {
+                $obj = self::returnObject($this->categorie, $item["code"]);
+                Bdd::incOrDecColValue("increment", "rang", $table, $obj->id);
+            }
+        }
+        $this->set("rang", (int)$rang, $table);
+    }
+
+    /**
+     * Enlève le rang d'un item.
+     * 
+     * @return bool
+     */
+    public function unsetRang()
+    {
+        $table = $this->table;
+        $items = Bdd::getItemsOfColValueMoreOrEqualTo( $table, "rang", $this->rang, $this->categorie );
+        foreach ($items as $item) {
+            $obj = self::returnObject($this->categorie, $item["code"]);
+            Bdd::incOrDecColValue("decrement", "rang", $table, $obj->id);
+        }
+        return true;
+    }
+
+    /**
      * Permet de sauvegarder les données de création d'un item en base de données.
      * 
      * @param string $code      Le code de l'item qu'on veut enregistrer.
@@ -727,19 +717,12 @@ class Model
      * 
      * @return void
      */
-    private static function _insertPostData(string $code, array $data, $categorie = null)
+    private static function insertPostData(string $code, array $data, $categorie = null)
     {
         extract($data);
         $table = self::getTableNameFrom($categorie);
 
-        if (Bdd::insertPrincData(
-            $table,
-            $code,
-            $title,
-            $description,
-            $categorie
-        )
-        ) {
+        if (Bdd::insertPincipalsData($table, $code, $title, $description, $categorie)) {
             $new_item = self::returnObject($categorie, $code);
             
             $slug = Utils::slugify($new_item->get("title")) . '-' . $new_item->get("id");
@@ -792,24 +775,11 @@ class Model
     }
 
     /**
-     * Permet de sauvegarder l'image uploadée sur le serveur et d'enregistrer le nom
-     * de l'image dans la base de données.
-     * 
-     * @return bool
-     */
-    private function _saveImages()
-    {
-        $image = new Image();
-        $image->saveImages($this->get("categorie") . "-" . $this->get("slug"));
-        return true;
-    }
-
-    /**
      * Mets à jour la date de modification de la catégorie.
      * 
      * @return bool
      */
-    private function _modified() : bool
+    private function modified() : bool
     {
         Bdd::set("date_modification", date("Y-m-d H:i:s"), $this->table, $this->id);
         return true;

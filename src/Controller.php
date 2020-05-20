@@ -39,7 +39,7 @@ class Controller
     }
 
     /**
-     * Controlleur de la page d'accueil de la partie publique du site.
+     * Controlleur appelé pour la page d'accueil de la partie publique.
      * 
      * @return array
      */
@@ -55,7 +55,7 @@ class Controller
     }
 
     /**
-     * Controlleur du dashboard (Tableau de bord).
+     * Controlleur appelé pour le dashboard de l'administration dashboard (Tableau de bord).
      * 
      * @return array
      */
@@ -71,7 +71,7 @@ class Controller
     }
       
     /**
-     * Controlleur pour lister les items d'une catégorie.
+     * Controlleur appelé lorsque url = categorie
      * 
      * @return string
      */
@@ -90,7 +90,7 @@ class Controller
     }
 
     /**
-     * Controlleur pour lister les comptes administrateurs.
+     * Controlleur appele lorque url = administrateurs
      * 
      * @return array
      */
@@ -107,7 +107,20 @@ class Controller
     }
 
     /**
-     * Controlleur de création d'un nouvel élément.
+     * Controller appelé lorsque url = motivation-plus
+     * 
+     * @return array
+     */
+    public function listMotivationPlusVideo()
+    {
+        return [
+            "meta_title" => "Motivation plus",
+            "content" => "Vous êtes sur la page qu s'affiche lorsque vous demandez motivation plus"
+        ];
+    }
+
+    /**
+     * Controlleur appelé lorsque url = categorie/create.
      * 
      * @return array
      */
@@ -118,13 +131,10 @@ class Controller
         $view = new View();
 
         if (isset($_POST['enregistrement'])) {
-            dump($_POST);
-            dump($_FILES);
-            die();
             $validator = new Validator($_POST);
             $errors = $validator->getErrors();
             if (empty($errors)) {
-              Model::create($this->url[0], $_POST);
+              Model::createItem($this->url[0], $_POST);
             }
         }
 
@@ -135,7 +145,25 @@ class Controller
     }
 
     /**
-     * Controlleur pour lire un item.
+     * Controlleur appelé lorsque url = motivation-plus/create.
+     * 
+     * @return array
+     */
+    function createMotivationPlusVideo()
+    {
+        $errors = null;
+        $view = new View();
+
+        return [
+            "meta_title" => "Motivation plus - ajouter une vidéo",
+            "content" => $view->createMotivationPlusVideo($errors)
+        ];
+    }
+
+    /**
+     * Controlleur appelé lorque url = categorie/slug.
+     * 
+     * @return array
      */
     public function readItem()
     {
@@ -150,7 +178,7 @@ class Controller
     }
 
     /**
-     * Controlleur d'édition d'un item.
+     * Controlleur appelé lorque url = categorie/slug/edit.
      * 
      * @return array
      */
@@ -176,7 +204,20 @@ class Controller
     }
 
     /**
-     * Contrilolleur de suppression d'un item.
+     * Controlleur appelé lorsque url = motivation-plus/delete
+     * 
+     * @return array
+     */
+    public function deleteMotivationPlusVideo()
+    {
+        return [
+            "meta_title" => "Motivation plus",
+            "content" => "Vous ête sur la page qui s'affiche lorsque vous voulez supprimer des vidéos de motivation plus"
+        ];
+    }
+
+    /**
+     * Contrilolleur appelé lorque url = categorie/slug/delete.
      * 
      * @return void
      */
@@ -189,7 +230,7 @@ class Controller
     }
 
     /**
-     * Controlleur de suppression d'un item ou de plusieurs items.
+     * Controlleur appelé lorque url = categorie/delete.
      * 
      * @return array
      */
@@ -216,7 +257,8 @@ class Controller
     }
 
     /**
-     * Controlleur de page d'erreur 404 sur la partie administration.
+     * Controlleur appelé sur la partie admin lorsque l'url n'est pas encore géré par 
+     * le système.
      * 
      * @return array
      */
@@ -233,7 +275,8 @@ class Controller
     }
 
     /**
-     * Controlleur de page d'erreur 404 sur la partie publique.
+     * Controlleur appelé sur la partie publique lorsque l'url n'est pas encore géré par 
+     * le système.
      * 
      * @return array
      */
