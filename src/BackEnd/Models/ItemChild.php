@@ -90,16 +90,18 @@ class ItemChild extends Model
         $this->original_image_src = ORIGINALS_IMAGES_DIR . "/" . $this->image_name;
         $this->thumbs_src = THUMBS_DIR . "/" . $this->image_name;
 
-        $this->url = ADMIN_URL . "/" . $this->categorie . "/" . $this->slug;
-        $this->edit_url = $this->url . "/edit";
-        $this->delete_url = $this->url . "/delete";
-        $this->post_url = $this->url . "/post";
+        // Les urls de l'objet pour le localiser
+        $this->url = $this->categorie . "/" . $this->slug;
+        $this->admin_url = ADMIN_URL . "/" . $this->url;
+        $this->edit_url = $this->admin_url . "/edit";
+        $this->delete_url = $this->admin_url . "/delete";
+        $this->post_url = $this->admin_url . "/post";
         $this->share_url = $this->url . "/share";
 
         $this->parent_id = $result["parent_id"];
         if ($this->parent_id) {
             if ($this->parent_id == "-1") {
-                $this->parent = "Motivation plus";
+                $this->parent = "motivation plus";
             } else {
                 $sql_query = new SqlQuery();
                 $query = $sql_query->

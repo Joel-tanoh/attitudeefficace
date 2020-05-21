@@ -11,7 +11,6 @@ namespace App\FrontEnd\View;
 use App\BackEnd\APIs\Bdd;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Notification;
-use App\BackEnd\Utils\Utils;
 use App\FrontEnd\View\Html\Form;
 use App\FrontEnd\View\Layout;
 use App\FrontEnd\View\ModelsView\AdministrateurView;
@@ -110,6 +109,195 @@ HTML;
     }
 
     /**
+     * Methode qui permet de lister les items.
+     * 
+     * @param array $items      La liste des items à lister.
+     * @param array $class_name La classe PHP ou la catégorie des items qu'on veut
+     *                          lister qui permettrat d'instancier des objets.
+     * 
+     * @return string Code HTML de la page qui liste les items.
+     */
+    public function listItems(array $items, string $class_name)
+    {
+        $title = ucfirst(Model::getCategorieFormated(Router::urlAsArray()[0], "pluriel"));
+        if (empty($items)) {
+            $notification = new Notification();
+            $to_show = $notification->info( $notification->noItems( $class_name ) );
+        } else {
+            $list = "";
+            foreach ($items as $item) {
+                $object = Model::returnObject($class_name, $item["code"]);
+                $list .= $this->rowOfListingItems($object);
+            }
+            $to_show = $list;
+        }
+
+        return <<<HTML
+        <div class="mb-3">
+            {$this->crumbs($title)}
+            {$to_show}
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne une vue qui affiche les utilisateurs qui suivent l'item
+     * passé en paramètre.
+     * 
+     * @param $item 
+     * 
+     * @return string
+     */
+    public function listItemlearners($item)
+    {
+
+    }
+
+    /**
+     * Page de listing des comptes administrateurs et utilisateurs.
+     * 
+     * @param $accounts Un tableau qui contient les variables qui viennent de la base
+     *                  de données.
+     * 
+     * @return string
+     */
+    public function listAccounts($accounts)
+    {
+        if (empty($accounts)) {
+            $notification = new Notification();
+            $to_return = $notification->info( $notification->noAccounts() );
+        } else {
+            $admin_layout = new AdministrateurView();
+            $to_return = $admin_layout->listAccounts($accounts);
+        }
+
+        return $to_return;
+    }
+
+    /**
+     * Retourne la page pour ajouter un nouvel item.
+     * 
+     * @param string $categorie La catégorie de l'item qu'on veut créer.      
+     * @param string $errors    Les erreurs à afficher s'il en existe après le
+     *                          traitement du formulaire.
+     * 
+     * @return string
+     */
+    public function createItem(string $categorie = null, $errors = null)
+    {
+        $form = new Form();
+        $notification = new Notification();
+        $formContent = $form->getForm($categorie);
+        $error = !empty($errors) ? $notification->errors($errors) : null;
+        $title = ucfirst(Model::getCategorieFormated(Router::urlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
+
+        return <<<HTML
+        <div class="mb-3">
+            {$this->crumbs($title)}
+            {$error}
+            {$formContent}
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne la vue pour ajouter une vidéo de motivation plus.
+     * 
+     * @param string $errors S'il y'a des erreurs à afficher.
+     * 
+     * @return string
+     */
+    public function createMotivationPlusVideo($errors = null)
+    {
+        $form = new Form();
+        $notification = new Notification();
+        $formContent = $form->getForm("motivation-plus");
+        $error = !empty($errors) ? $notification->errors($errors) : null;
+        $title = ucfirst(Model::getCategorieFormated(Router::urlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
+
+        return <<<HTML
+        <div class="mb-3">
+            {$this->crumbs($title)}
+            {$error}
+            {$formContent}
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne la vue pour lire un item.
+     * 
+     * @param $item Objet
+     * 
+     * @return string
+     */
+    public function readItem($item)
+    {
+        if ($item->isParent()) {
+            $parent_view = new ParentView();
+            return $parent_view->readParent($item);
+        } elseif ($item->isChild()) { 
+            $child_view = new ChildView();
+            return $child_view->readChild($item);
+        }
+    }
+
+    /**
+     * Retourne la page de modification d'un item.
+     * 
+     * @param string $item      L'item qu'on veut modifier.
+     * @param string $categorie La catégorie ou la table de l'item qu'on veut00
+     *                          modifier.
+     * @param array  $errors    Les erreurs à afficher dans le cas où la validation
+     *                          des données retourne des erreurs.
+     * 
+     * @return string
+     */
+    public function editItem($item, $categorie, $errors = null)
+    {
+        $form = new Form();
+        $notification = new Notification();
+        $form = $form->getForm($categorie, $item);
+        $error = !empty($errors) ? $notification->errors($errors) : null;
+        $title = $item->get('title') . " &#8250 éditer";
+
+        return <<<HTML
+        <div class="mb-3">
+            {$this->crumbs($title)}
+            {$error}
+            {$form}
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne la page de suppression de plusieurs items selon la catégorie.
+     * 
+     * @param Model   $items     La liste des items qu'on veut supprimer.
+     * @param string $categorie La catégorie des items à supprimer.
+     * @param string $error     Au cas où il y'a une erreur à afficher.
+     * 
+     * @return string Code de la page.
+     */
+    public function deleteItems($items, $categorie, $error = null)
+    {
+        $notification = new Notification();
+        if (empty($items)) {
+            $content = $notification->info( $notification->nothingToDelete( Model::getCategorieFormated($categorie) ) );
+        } else {
+            $content = "Vous verez s'afficher un tableau avec les items à supprimer";
+        }
+        $error = !empty($error) ? $notification->error($error) : null;
+
+        return <<<HTML
+        <div class="mb-3">
+            {$error}
+            {$content}
+        </div>
+HTML;
+    }
+
+    /**
      * Retourne une barre de navigation en fonction de la partie passée en
      * paramètre.
      * 
@@ -189,326 +377,6 @@ HTML;
     }
 
     /**
-     * Retourne les boutons pour publier, supprimer ou modifier l'instance.
-     * 
-     * @param $item          L'objet pour lequel on doit afficher le bouton.
-     * @param bool $edit_button   
-     * @param bool $post_button   
-     * @param bool $share_button  
-     * @param bool $delete_button 
-     * 
-     * @return string
-     */
-    public function manageButtons($item)
-    {
-        $buttons = '';
-        $buttons .= $this->button($item, "edit_url", "bg-blue mr-1", "far fa-edit fa-lg", "Editer");
-        $buttons .= $this->button($item, "post_url", "bg-success mr-1", "fas fa-reply fa-lg", "Poster");
-        $buttons .= $this->button($item, "share_url", "bg-success mr-1", "fas fa-share fa-lg", "Partager");
-        $buttons .= $this->button($item, "delete_url", "bg-danger mr-1", "far fa-trash-alt fa-lg", "Supprimer");
-        
-        return <<<HTML
-        <div class="mb-4">
-            {$buttons}
-        </div>
-HTML;
-    }
-
-    /**
-     * Retourne une petite carte pour afficher un item.
-     * 
-     * @param $item 
-     * 
-     * @return string
-     */
-    public function smallCard($item)
-    {
-        $title = ucfirst($item->get("title"));
-        
-        return <<<HTML
-        <div class="col-12 col-sm-6 col-md-4 mb-3">
-            <a href="{$item->get('url')}">
-                <h5>{$title}</h4>
-                <div class="mb-3">
-                    <div>Crée le {$item->get("date_creation")}</div>
-                    <div>Mis à jour {$item->get("date_modification")}</div>
-                    <div>Posté : {$item->get("posted")}</div>
-                </div>
-            </a>
-        </div>
-HTML;
-    }
-
-    /**
-     * Affiche la vidéo de description de l'instance passé en paramètre.
-     * 
-     * @param $item L'objet dont on affiche les données.
-     * 
-     * @return string
-     */
-    public function showVideo($item)
-    {
-        if (null === $item->get("video_link")) {
-            $result = $this->noVideoBox();
-        } else {
-            $result = <<<HTML
-            <iframe src="https://www.youtube.com/embed/{$item->get('video_link')}"
-                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen class="w-100 h-100 video"></iframe>
-HTML;
-        }
-
-        return <<<HTML
-        <div class="app-card mb-3">
-            <div class="app-card-header">Vidéo</div>
-            <div class="app-card-body">
-                {$result}
-            </div>
-        </div>
-HTML;
-    }
-
-    /**
-     * Retourne une liste "voir aussi" pour afficher les autres items de la même
-     * catégorie que l'item courant en excluant l'item courant.
-     * 
-     * @param string $exclu Le titre de la méthode qu'on ne veut pas
-     *                      afficher. 
-     * 
-     * @return $array
-     */
-    public function voirAussi($exclu)
-    {
-        $table = Model::getTableNameFrom($exclu->get("categorie"));
-        $items = Bdd::getAllFromTableWithout($table, $exclu->get("id"), $exclu->get("categorie"));
-        $list = '';
-        foreach ($items as $item) {
-            $item = Model::returnObject($exclu->get("categorie"), $item["code"]);
-            $list .= $this->voirAussiRow($item);
-        }
-        if (empty($list)) $list = '<div>Vide</div>';
-
-        return <<<HTML
-        <div class="col-md-3 mb-3">
-            <div class="card">
-                <h6 class="card-header bg-white">Voir aussi</h6>
-                <div class="card-body">
-                    {$list}
-                </div>
-            </div>
-        </div>
-HTML;
-    }
-
-    /**
-     * Affiche les données.
-     * 
-     * @param $item L'item dont on affiche les données.
-     * 
-     * @return string
-     */
-    public function showData($item)
-    {
-        return <<<HTML
-        <div class="row mb-3">
-            <div class="col-12 col-md-6 mb-3">
-                {$this->data($item)}
-            </div>
-            <div class="col-12 col-md-6">
-                {$this->showThumbs($item)}
-            </div>
-        </div>
-        {$this->showVideo($item)}
-HTML;
-    }
-
-    /**
-     * Retourne une vue qui affiche les utilisateurs qui suivent l'item
-     * passé en paramètre.
-     * 
-     * @param $item 
-     * 
-     * @return string
-     */
-    public function listItemlearners($item)
-    {
-
-    }
-
-    /**
-     * Page de listing des comptes administrateurs et utilisateurs.
-     * 
-     * @param $accounts Un tableau qui contient les variables qui viennent de la base
-     *                  de données.
-     * 
-     * @return string
-     */
-    public function listAccounts($accounts)
-    {
-        $to_return = "";
-        if (empty($accounts)) {
-            $notification = new Notification();
-            $to_return .= $notification->info( $notification->noAccounts() );
-        } else {
-            $admin_layout = new AdministrateurView();
-            $to_return = $admin_layout->listAccounts($accounts);
-        }
-
-        return $to_return;
-    }
-
-    /**
-     * Retourne la page pour ajouter un nouvel item.
-     * 
-     * @param string $categorie La catégorie de l'item qu'on veut créer.      
-     * @param string $errors    Les erreurs à afficher s'il en existe après le
-     *                          traitement du formulaire.
-     * 
-     * @return string
-     */
-    public function createItem(string $categorie = null, $errors = null)
-    {
-        $form = new Form();
-        $notification = new Notification();
-        $formContent = $form->getForm($categorie);
-        $error = !empty($errors) ? $notification->errors($errors) : null;
-
-        return <<<HTML
-        <div class="mb-3">
-            {$this->crumbs()}
-            {$error}
-            {$formContent}
-        </div>
-HTML;
-    }
-
-    /**
-     * Retourne la vue pour ajouter une vidéo de motivation plus.
-     * 
-     * @param string $errors S'il y'a des erreurs à afficher.
-     * 
-     * @return string
-     */
-    public function createMotivationPlusVideo($errors = null)
-    {
-        $form = new Form();
-        $notification = new Notification();
-        $formContent = $form->getForm("motivation-plus");
-        $error = !empty($errors) ? $notification->errors($errors) : null;
-
-        return <<<HTML
-        <div class="mb-3">
-            {$this->crumbs()}
-            {$error}
-            {$formContent}
-        </div>
-HTML;
-    }
-
-    /**
-     * Retourne la vue pour lire un item.
-     * 
-     * @param $item Objet
-     * 
-     * @return string
-     */
-    public function readItem($item)
-    {
-        if ($item->isParent()) {
-            $parent_view = new ParentView();
-            return $parent_view->readItem($item);
-        } elseif ($item->isChild()) { 
-            $child_view = new ChildView();
-            return $child_view->readItem($item);
-        }
-    }
-
-    /**
-     * Retourne la page de modification d'un item.
-     * 
-     * @param string $item      L'item qu'on veut modifier.
-     * @param string $categorie La catégorie ou la table de l'item qu'on veut00
-     *                          modifier.
-     * @param array  $errors    Les erreurs à afficher dans le cas où la validation
-     *                          des données retourne des erreurs.
-     * 
-     * @return string
-     */
-    public function editItem($item, $categorie, $errors = null)
-    {
-        $layout = new Layout();
-        $form = new Form();
-        $notification = new Notification();
-        $form = $form->getForm($categorie, $item);
-        $error = !empty($errors) ? $notification->errors($errors) : null;
-
-        return <<<HTML
-        <div class="mb-3">
-            {$error}
-            {$form}
-        </div>
-HTML;
-    }
-
-    /**
-     * Retourne la page de suppression de plusieurs items selon la catégorie.
-     * 
-     * @param Model   $items     La liste des items qu'on veut supprimer.
-     * @param string $categorie La catégorie des items à supprimer.
-     * @param string $error     Au cas où il y'a une erreur à afficher.
-     * 
-     * @return string Code de la page.
-     */
-    public function deleteItems($items, $categorie, $error = null)
-    {
-        $notification = new Notification();
-        if (empty($items)) {
-            $content = $notification->info( $notification->nothingToDelete( Model::getCategorieFormated($categorie) ) );
-        } else {
-            $content = "Vous verez s'afficher un tableau avec les items à supprimer";
-        }
-        $error = !empty($error) ? $notification->error($error) : null;
-
-        return <<<HTML
-        <div class="mb-3">
-            {$error}
-            {$content}
-        </div>
-HTML;
-    }
-
-    /**
-     * Methode qui permet de lister les items.
-     * 
-     * @param array $items      La liste des items à lister.
-     * @param array $class_name La classe PHP ou la catégorie des items qu'on veut
-     *                          lister qui permettrat d'instancier des objets.
-     * 
-     * @return string Code HTML de la page qui liste les items.
-     */
-    public function listItems(array $items, string $class_name)
-    {
-        if (empty($items)) {
-            $notification = new Notification();
-            $to_show = $notification->info( $notification->noItems( $class_name ) );
-        } else {
-            $list = "";
-            foreach ($items as $item) {
-                $object = Model::returnObject($class_name, $item["code"]);
-                $list .= $this->rowOfListingItems($object);
-            }
-            $to_show = $list;
-        }
-
-        return <<<HTML
-        <div class="mb-3">
-            {$this->crumbs()}
-            {$to_show}
-        </div>
-HTML;
-    }
-
-    /**
      * Page 404 de la partie publique.
      * 
      * @return string
@@ -523,7 +391,7 @@ HTML;
             <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page non trouvée.</h3>
             <p>
                 Nous n'avons pas retrouvé la page que vous cherchez.
-                Retour au <a href="{$public_url}">tableau de bord</a>.
+                Retour à la <a href="{$public_url}">page d'acceuil</a>.
             </p>
         </section>
 HTML;
@@ -599,32 +467,168 @@ HTML;
     }
 
     /**
-     * Retourne un crumbs.
+     * Retourne les boutons pour publier, supprimer ou modifier l'instance.
+     * 
+     * @param $item          L'objet pour lequel on doit afficher le bouton.
+     * @param bool $edit_button   
+     * @param bool $post_button   
+     * @param bool $share_button  
+     * @param bool $delete_button 
      * 
      * @return string
      */
-    public function crumbs()
+    public function manageButtons($item)
     {
-        $title = ucfirst(Model::getCategorieFormated(Router::slicedUrl()[1], "pluriel"));
+        $buttons = '';
+        $buttons .= $this->manageButton($item, "edit_url", "bg-blue mr-1", "far fa-edit fa-lg", "Editer");
+        $buttons .= $this->manageButton($item, "post_url", "bg-success mr-1", "fas fa-reply fa-lg", "Poster");
+        $buttons .= $this->manageButton($item, "share_url", "bg-success mr-1", "fas fa-share fa-lg", "Partager");
+        $buttons .= $this->manageButton($item, "delete_url", "bg-danger mr-1", "far fa-trash-alt fa-lg", "Supprimer");
+        
         return <<<HTML
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="h1">{$title}</span>
-            {$this->menu()}
+        <div class="mb-4">
+            {$buttons}
         </div>
 HTML;
     }
 
     /**
-     * Retourne le menu.
+     * Retourne une petite carte pour afficher un item.
+     * 
+     * @param $item 
      * 
      * @return string
      */
-    public function menu()
+    public function smallCard($item)
+    {
+        $title = ucfirst($item->get("title"));
+        
+        return <<<HTML
+        <div class="col-12 col-sm-6 col-md-4 mb-3">
+            <a href="{$item->get('url')}">
+                <h5>{$title}</h4>
+                <div class="mb-3">
+                    <div>Crée le {$item->get("date_creation")}</div>
+                    <div>Mis à jour {$item->get("date_modification")}</div>
+                    <div>Posté : {$item->get("posted")}</div>
+                </div>
+            </a>
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche la vidéo de description de l'instance passé en paramètre.
+     * 
+     * @param $item L'objet dont on affiche les données.
+     * 
+     * @return string
+     */
+    public function showYoutubeVideo($item)
+    {
+        if (null === $item->get("video_link")) {
+            $result = $this->noVideoBox();
+        } else {
+            $result = <<<HTML
+            <iframe src="https://www.youtube.com/embed/{$item->get('video_link')}"
+                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen class="w-100 h-100 video"></iframe>
+HTML;
+        }
+
+        return <<<HTML
+        <div class="app-card mb-3">
+            <div class="app-card-header">Vidéo</div>
+            <div class="app-card-body">
+                {$result}
+            </div>
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne une liste "voir aussi" pour afficher les autres items de la même
+     * catégorie que l'item courant en excluant l'item courant.
+     * 
+     * @param string $exclu Le titre de la méthode qu'on ne veut pas
+     *                      afficher. 
+     * 
+     * @return $array
+     */
+    public function voirAussi($exclu)
+    {
+        $table = Model::getTableNameFrom($exclu->get("categorie"));
+        $items = Bdd::getAllFromTableWithout($table, $exclu->get("id"), $exclu->get("categorie"));
+        $list = '';
+        foreach ($items as $item) {
+            $item = Model::returnObject($exclu->get("categorie"), $item["code"]);
+            $list .= $this->voirAussiRow($item);
+        }
+        if (empty($list)) $list = '<div>Vide</div>';
+
+        return <<<HTML
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <h6 class="card-header bg-white">Voir aussi</h6>
+                <div class="card-body">
+                    {$list}
+                </div>
+            </div>
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche les données.
+     * 
+     * @param $item L'item dont on affiche les données.
+     * 
+     * @return string
+     */
+    public function showData($item)
+    {
+        return <<<HTML
+        <div class="row mb-3">
+            <div class="col-12 col-md-6 mb-3">
+                {$this->data($item)}
+            </div>
+            <div class="col-12 col-md-6">
+                {$this->showThumbs($item)}
+            </div>
+        </div>
+        {$this->showYoutubeVideo($item)}
+HTML;
+    }
+
+    /**
+     * Retourne un crumbs.
+     * 
+     * @param string $title
+     * 
+     * @return string
+     */
+    public function crumbs(string $title = null)
+    {
+        return <<<HTML
+        <div class="d-flex align-items-center mb-3">
+            <div class="h4 mr-3">{$title}</div>
+            {$this->contextMenu()}
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne le contextMenu.
+     * 
+     * @return string
+     */
+    public function contextMenu()
     {
         return <<<HTML
         <div>
-            {$this->menuLink(Model::getCategorieUrl(Router::slicedUrl()[1], ADMIN_URL)."/create", "Ajouter", "btn btn-primary mr-2",  "fas fa-plus")}
-            {$this->menuLink(Model::getCategorieUrl(Router::slicedUrl()[1], ADMIN_URL)."/delete", "Supprimer", "text-danger", "fas fa-trash-alt")}
+            {$this->button(Model::getCategorieUrl(Router::urlAsArray()[0], ADMIN_URL)."/create", "Ajouter", "btn text-primary",  "fas fa-plus")}
+            /
+            {$this->button(Model::getCategorieUrl(Router::urlAsArray()[0], ADMIN_URL)."/delete", "Supprimer", "btn text-danger", "fas fa-trash-alt")}
         </div>
 HTML;
     }
@@ -733,7 +737,7 @@ HTML;
     }
 
     /**
-     * Retourne un lien du menu.
+     * Retourne un lien du contextMenu.
      * 
      * @param string $href 
      * @param string $text 
@@ -742,10 +746,10 @@ HTML;
      *
      * @return string
      */
-    private function menuLink(string $href, string $text, string $btn_class = null, string $fa_icon_class = null)
+    private function button(string $href, string $text, string $btn_class = null, string $fa_icon_class = null)
     {
         if (null !== $fa_icon_class) {
-            $fa_icon_class = '<i class="{$fa_icon_class}"></i>';
+            $fa_icon_class = '<i class="' . $fa_icon_class. '"></i>';
         }
         return <<<HTML
         <a class="{$btn_class}" href="{$href}">
@@ -764,7 +768,7 @@ HTML;
      */
     private function showThumbs($item)
     {
-        $boxContent = null !== $item->get("original_image_src")
+        $boxContent = null !== $item->get("thumbs_src")
             ? $this->thumbs($item)
             : $this->noThumbsBox();
 
@@ -788,7 +792,7 @@ HTML;
     private function thumbs($item)
     {
         return <<<HTML
-        <img src="{$item->get('original_image_src')}" alt="{$item->get('image_name')}" class="img-fluid"/>
+        <img src="{$item->get('thumbs_src')}" alt="{$item->get('image_name')}" class="img-fluid"/>
 HTML;
     }
 
@@ -855,7 +859,7 @@ HTML;
      * 
      * @return string
      */
-    private function button($item = null, string $link = null, string $class = null, string $fa_class = null, string $text = null)
+    private function manageButton($item = null, string $link = null, string $class = null, string $fa_class = null, string $text = null)
     {
         return <<<HTML
         <a class="app-btn {$class} pb-2" href="{$item->get($link)}">

@@ -70,15 +70,11 @@ class Bdd
      * 
      * @return array Un tableau qui contient les données retournées.
      */
-    public static function select(
-        string $to_select,
-        string $table,
-        string $clause = null,
-        string $clause_value = null
-    ) {
+    public static function select(string $to_select, string $table, string $clause = null, string $clause_value = null) 
+    {
         $bdd = self::connectToDb();
         $query = "SELECT $to_select FROM $table";
-        if (!is_null($clause)) {
+        if (null !== $clause) {
             $query .= " WHERE $clause = ?";
             $rep = $bdd->prepare($query);
             $rep->execute([$clause_value]);
@@ -181,14 +177,11 @@ class Bdd
      * 
      * @return string|int
      */
-    public static function countTableItems(
-        string $table = null,
-        string $col = null,
-        $col_value = null
-    ) {
-        if (!is_null($table)) {
+    public static function countTableItems(string $table = null, string $col = null, $col_value = null)
+    {
+        if (null !== $table) {
             $query = "SELECT COUNT(id) AS item_number FROM $table";
-            if (!is_null($col)) {
+            if (null !== $col) {
                 $query .= " WHERE $col = ?";
                 $rep = self::connectToDb()->prepare($query);
                 $rep->execute([$col_value]);
@@ -227,7 +220,7 @@ class Bdd
     {
         $bdd = self::connectToDb();
         $query = "SELECT code FROM $table WHERE id !== ?";
-        if (!is_null($categorie)) {
+        if (null !== $categorie) {
             $query .= " AND categorie = ?";
             $rep = $bdd->prepare($query);
             $rep->execute([(int)$exclu_id, $categorie]);
@@ -258,10 +251,10 @@ class Bdd
     ) {
         $alias = $col."_max";
         $query = "SELECT MAX($col) as $alias FROM $table";
-        if (!is_null($group_by)) {
+        if (null !== $group_by) {
             $query .= " GROUP BY $group_by";
         }
-        if (!is_null($having)) {
+        if (null !== $having) {
             $query .= " HAVING $having = '$having_value'";
         }
         $rep = self::connectToDb()->query($query);
@@ -356,7 +349,7 @@ class Bdd
      * 
      * @return bool
      */
-    public static function delete(string $table, $id)
+    public static function deleteById(string $table, $id)
     {
         $query = "DELETE FROM $table WHERE id = ?";
         $rep = self::connectToDb()->prepare($query);
@@ -373,6 +366,7 @@ class Bdd
     {
         $newsletter_mails = self::select("adresse_email", "newsletters");
         $learners_mails = self::select("adresse_email", Learner::TABLE_NAME);
+        return array_merge($newsletter_mails, $learners_mails);
     }
 
 }

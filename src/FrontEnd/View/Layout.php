@@ -30,26 +30,6 @@ namespace App\FrontEnd\View;
 class Layout
 {
     /**
-     * Une dispostion de page avec une navbar et une sidebar fixe.
-     * 
-     * @param mixed $navbar
-     * @param mixed $sidebar
-     * @param mixed $container_content
-     * 
-     * @return string
-     */
-    public function navbarAndFixedSidebar($navbar = null, $sidebar = null, $container_content = null)
-    {
-        return <<<HTML
-        {$navbar}
-        {$sidebar}
-        <div class="container">
-            {$container_content}
-        </div>
-HTML;
-    }
-
-    /**
      * Layout avec une navbar fixe et une sidebar fixe.
      * 
      * @param mixed $navbar
@@ -58,7 +38,7 @@ HTML;
      * 
      * @return string
      */
-    public function fixedNavbarAndFixedSidebarAndContainer($navbar = null, $sidebar = null, $container_content = null)
+    public function navbarAndSidebarAndContainer($navbar = null, $sidebar = null, $container_content = null)
     {
         return <<<HTML
         {$navbar}

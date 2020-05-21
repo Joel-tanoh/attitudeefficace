@@ -87,7 +87,7 @@ HTML;
             {$this->adminCss()}
         </head>
         <body id="adminPart" class="bg-cloud">
-            {$layout->fixedNavbarAndFixedSidebarAndContainer( $view->navbar("admin"), $view->adminSidebar(), $this->view ) }
+            {$layout->navbarAndSidebarAndContainer( $view->navbar("admin"), $view->adminSidebar(), $this->view ) }
             {$this->adminJs()}
         </body>
         </html>

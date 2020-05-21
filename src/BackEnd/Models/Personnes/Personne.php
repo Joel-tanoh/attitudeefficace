@@ -34,98 +34,98 @@ class Personne extends Model
      * 
      * @var int
      */
-    protected $id;
+    public $id;
 
     /**
      * Code unique qui identifie une personne.
      * 
      * @var string
      */
-    protected $code;
+    public $code;
     
     /**
      * Login
      * 
      * @var string
      */
-    protected $login;
+    public $login;
  
     /**
      * Password
      * 
      * @var string
      */
-    protected $password;
+    public $password;
   
     /**
      * Statut autorisé ou bloqué
      * 
      * @var string
      */
-    protected $statut;
+    public $statut;
        
     /**
      * Nom
      * 
      * @var string
      */
-    protected $name;
+    public $name;
 
     /**
      * Prénom
      * 
      * @var string
      */
-    protected $first_name;
+    public $first_name;
     
     /**
      * Date de naissance
      * 
      * @var string
      */
-    protected $date_naissance;
+    public $date_naissance;
     
     /**
      * Date de création
      * 
      * @var string
      */
-    protected $date_creation;
+    public $date_creation;
     
     /**
      * Date de modication
      * 
      * @var string
      */
-    protected $date_modification;
+    public $date_modification;
 
     /**
      * Age
      * 
      * @var string
      */
-    protected $age;
+    public $age;
     
     /**
      * Numéro de téléphone
      * 
      * @var string
      */
-    protected $contact_1;
+    public $contact_1;
     
     /**
      * Numéro de téléphone
      * 
      * @var string
      */
-    protected $contact_2;
+    public $contact_2;
     
     /**
      * Adresse mail
      * 
      * @var string
      */
-    protected $email;
+    public $email;
 
     /**
      * Vérifie si une personne est authentifiée.

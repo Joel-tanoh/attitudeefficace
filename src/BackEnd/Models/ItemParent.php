@@ -42,7 +42,7 @@ class ItemParent extends Model
      * 
      * @var array
      */
-    protected $children = [];
+    public $children = [];
 
     /**
      * Constructeur d'une catégorie. Prend en paramètre le code
@@ -77,7 +77,7 @@ class ItemParent extends Model
         $this->title = $result['title'];
         $this->description = $result['description'];
         $this->video_link = $result['video_link'];
-        $this->prix = $result['price'];
+        $this->price = $result['price'];
         $this->rang = $result['rang'];
         $this->day_creation = $result["day_creation"];
         $this->hour_creation = $result["hour_creation"];
@@ -87,16 +87,19 @@ class ItemParent extends Model
         $this->hour_post = $result["hour_post"];
         $this->views = $result["views"];
         $this->table = self::TABLE_NAME;
-        
         $this->slug = $result["slug"];
+        
+        // variables relatives à l'image
         $this->image_name = $this->categorie . "-" . $this->slug . IMAGES_EXTENSION;
-        $this->original_image_src =  ORIGINALS_IMAGES_DIR . "/" . $this->image_name;
+        $this->thumbs_path = THUMBS_PATH . $this->image_name;
         $this->thumbs_src = THUMBS_DIR . "/" . $this->image_name;
         $this->original_image_path = ORIGINALS_IMAGES_PATH . $this->image_name;
-        $this->thumbs_path = THUMBS_PATH . $this->image_name;
+        $this->original_image_src =  ORIGINALS_IMAGES_DIR . "/" . $this->image_name;
 
-        $this->admin_url = ADMIN_URL . "/" . $this->categorie . "/" . $this->slug;
-        $this->public_url = PUBLIC_URL . "/" . $this->categorie . "/" . $this->slug;
+        // Les urls de l'objet pour le localiser
+        $this->url = $this->categorie . "/" . $this->slug;
+        $this->public_url = PUBLIC_URL . "/" . $this->url;
+        $this->admin_url = ADMIN_URL . "/" . $this->url;
         $this->edit_url = $this->admin_url . "/edit";
         $this->delete_url = $this->admin_url . "/delete";
         $this->post_url = $this->admin_url . "/post";

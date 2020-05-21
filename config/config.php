@@ -46,7 +46,7 @@ define("ASSETS_DIR", PUBLIC_URL . "/assets");
 define("FILES_DIR", PUBLIC_URL . "/files");
 define("PDF_DIR", FILES_DIR . "/pdf");
 define("IMAGES_DIR", FILES_DIR . "/images");
-define("ORIGINALS_IMAGES_DIR", FILES_DIR . "/orgininals");
+define("ORIGINALS_IMAGES_DIR", IMAGES_DIR . "/orgininals");
 define("THUMBS_DIR", IMAGES_DIR . "/thumbs");
 define("AVATARS_DIR", IMAGES_DIR . "/avatars");
 define("LOGOS_DIR", IMAGES_DIR . "/logos");

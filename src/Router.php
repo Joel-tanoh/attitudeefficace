@@ -41,11 +41,7 @@ class Router
      */
     public function __construct($url)
     {
-        if ($url == "") {
-            $this->url = "";
-        } else {
-            $this->url = explode('/', $url);
-        }
+        $this->url = $url === "" ? "" : explode('/', $url);
     }
 
     /**
@@ -58,19 +54,19 @@ class Router
     {
         $controller = new Controller($this->url);
 
-        if ($this->match("administration/"))
+        if ($this->match(""))
             $route = $controller->dashboard();
 
-        elseif ($this->match("administration/administrateurs"))
+        elseif ($this->match("administrateurs"))
             $route = $controller->listAdminUsersAccounts();
 
-        elseif ($this->match("administration/motivation-plus"))
+        elseif ($this->match("motivation-plus"))
             $route = $controller->listMotivationPlusVideo();
 
-        elseif ($this->match("administration/motivation-plus/create"))
+        elseif ($this->match("motivation-plus/create"))
             $route = $controller->createMotivationPlusVideo();
 
-        elseif ($this->match("administration/motivation-plus/delete"))
+        elseif ($this->match("motivation-plus/delete"))
             $route = $controller->deleteMotivationPlusVideo();
 
         // categorie
@@ -123,16 +119,6 @@ class Router
     }
 
     /**
-     * Permet de découper l'url en plusieurs parties.
-     * 
-     * @return array
-     */
-    static function slicedUrl()
-    {
-        return explode("/", substr($_SERVER["QUERY_STRING"], 4));
-    }
-
-    /**
      * Permet de vérifier la concordance en une chaine de caractère passé en
      * paramètre et l'url.
      * 
@@ -142,25 +128,39 @@ class Router
      */
     public function match(string $route)
     {
-        dump($_SERVER);
-        die();
         return self::getUri() == $route;
     }
 
     /**
      * Retourne l'url de la page courante grâce au fichier .htacces qui
      * permet de ramener toutes les urls vers l'index du dossier où le
-     * fichier il se trouve en générant une variable global $_GET["url"] et
-     * une variable serveur $_SERVER["QUERY_STRING"].
+     * fichier il se trouve en générant une variable global $_GET["url"].
      * 
      * @return string
      */
-    static function getUri()
+    public static function getUri()
     {
-        if ($_SERVER["QUERY_STRING"] === "") {
-            return "";
-        }
-        return substr($_SERVER["QUERY_STRING"], 4);
+        return isset($_GET["url"]) ? $_GET["url"] : "";
+    }
+
+    /**
+     * Permet de découper l'url en plusieurs parties.
+     * 
+     * @return array
+     */
+    public static function urlAsArray()
+    {
+        return explode("/", self::getUri());
+    }
+
+    /**
+     * Retourne les variables passées par url.
+     * 
+     * @return array
+     */
+    public static function getUrlVars()
+    {
+        
     }
 
 }

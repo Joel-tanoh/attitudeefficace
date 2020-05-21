@@ -43,110 +43,110 @@ class Model
      * 
      * @var int
      */
-    protected $id;
+    public $id;
     
     /**
      * Code de l'instance
      * 
      * @var string
      */
-    protected $code;
+    public $code;
 
     /**
      * Catégorie de l'instance
      * 
      * @var string
      */
-    protected $categorie;
+    public $categorie;
     
     /**
      * Nom/titre de l'instance
      * 
      * @var string
      */
-    protected $title;
+    public $title;
 
     /**
      * Nom/titre de l'instance
      * 
      * @var string
      */
-    protected $name;
+    public $name;
 
     /**
      * Slug de l'instance  
      * 
      * @var string
      */
-    protected $slug;
+    public $slug;
     
     /**
      * Description de l'instance  
      * 
      * @var string
      */
-    protected $description;
+    public $description;
   
     /**
      * Lien de la vidéo de description de l'instance  
      * 
      * @var string
      */
-    protected $video_link;
+    public $video_link;
 
     /**
      * Prix de l'instance.  
      * 
      * @var int
      */
-    protected $prix;
+    public $prix;
 
     /**
      * Rang de l'item.
      */
-    protected $rang;
+    public $rang;
     
     /**
      * Nom de l'image de couverture de l'instance  
      * 
      * @var string
      */
-    protected $image_name;
+    public $image_name;
 
     /**
      * Chemin total de l'image miniature.
      * 
      * @var string
      */
-    protected $thumbs_path;
+    public $thumbs_path;
 
     /**
      * Source de l'image miniature
      * 
      * @var string
      */
-    protected $thumbs_src;
+    public $thumbs_src;
 
     /**
      * Chemin total de l'image de couverture.
      * 
      * @var string
      */
-    protected $original_image_path;
+    public $original_image_path;
 
     /**
      * Source de l'image de couverture.
      * 
      * @var string
      */
-    protected $original_image_src;
+    public $original_image_src;
 
     /**
      * La table où est stocké l'item.
      * 
      * @var string
      */
-    protected $table;
+    public $table;
 
     /**
      * Retourne une propriéte en fonction de son nom passé en paramètre.
@@ -158,71 +158,24 @@ class Model
     public function get(string $property)
     {
         if ($property == "id") return (int)$this->id;
-
         if ($property == "code") return $this->code;
 
+        if ($property == "title") return $this->title;
+        if ($property == "name") return ucfirst($this->name);
+        if ($property == "categorie") return $this->categorie;
+        if ($property == "slug") return $this->slug;
+        if ($property == "login") return ucfirst($this->login);
         if ($property == "password") return $this->password;
 
-        if ($property == "statut") return $this->statut;
-
-        if ($property == "categorie") return $this->categorie;
-
-        if ($property == "title") return $this->title;
-
-        if ($property == "slug") return $this->slug;
-
         if ($property == "parent") return $this->parent;
-
-        if ($property == "url") return $this->url;
-
         if ($property == "video_link") return $this->video_link;
-
-        if ($property == "edit_url") return $this->edit_url;
-
-        if ($property == "post_url") return $this->post_url;
-
-        if ($property == "share_url") return $this->share_url;
-
-        if ($property == "delete_url") return $this->delete_url;
-
-        if ($property == "image_name") return $this->image_name;
-
-        if ($property == "login") return ucfirst($this->login);
-
         if ($property == "statut") return $this->statut;
-
-        if ($property == "name") return ucfirst($this->name);
-
-        if ($property == "avatar_name") return $this->avatar_name;
-
-        if ($property == "avatar_path") return $this->avatar_path;
-
         if ($property == "email") return $this->email;
-
-        if ($property == "day_creation") return $this->day_creation;
-
-        if ($property == "hour_creation") return $this->hour_creation;
-
-        if ($property == "day_modification") return $this->day_modification;
-
-        if ($property == "hour_modification") return $this->hour_modification;
-
-        if ($property == "day_post") return $this->day_post;
-
-        if ($property == "hour_post") return $this->hour_post;
-
+        if ($property == "price" || $property == "prix")  return $this->price;
         if ($property == 'views') return $this->views;
-
         if ($property == "rang") return $this->rang;
-        
-        if ($property == "prix") {
-            return $this->prix . " F CFA";
-        }
-            
-        if ($property == "description") {
-            return nl2br(ucfirst(trim($this->description)));
-        }
-
+        if ($property == 'posted') return $this->day_post ? "Oui" : "Non";
+        if ($property == "description") return nl2br(ucfirst(trim($this->description)));
         if ($property == "classement") {
             if ($this->rang == 0 || $this->rang == null) {
                 return "Non classé";
@@ -230,40 +183,37 @@ class Model
                 return $this->rang == 1 ? "Ordre : " . $this->rang . " er" : "Ordre : " . $this->rang . " eme";
             }
         }
-
-        if ($property == "thumbs_src") {
-            return file_exists($this->thumbs_path) ? $this->thumbs_src : null;
-        }
-
-        if ($property == "thumbs_path") return $this->thumbs_path;
-
-        if ($property == "original_image_path") return $this->original_image_path;
-
-        if ($property == "original_image_src") {
-            return file_exists($this->original_image_path) ? $this->original_image_src : null;
-        }
-
-        if ($property == "avatar_src") {
-            return file_exists($this->avatar_path) ? $this->avatar_src : DEFAULT_AVATAR;
-        }
-
         if ($property == "article_content") {
             if ($this->isChild()) {
                 return ucfirst(nl2br(trim(htmlspecialchars_decode($this->article_content))));
             }
         }
 
-        if ($property == "date_creation") {
-            return $this->day_creation . " à " . $this->hour_creation;
-        }
+        if ($property == "url") return $this->url;
+        if ($property == "admin_url") return $this->admin_url;
+        if ($property == "edit_url") return $this->edit_url;
+        if ($property == "post_url") return $this->post_url;
+        if ($property == "share_url") return $this->share_url;
+        if ($property == "delete_url") return $this->delete_url;
 
-        if ($property == "date_modification") {
-            return $this->day_modification . " à " . $this->hour_modification;
-        }
+        if ($property == "day_creation") return $this->day_creation;
+        if ($property == "hour_creation") return $this->hour_creation;
+        if ($property == "date_creation") return $this->day_creation . " à " . $this->hour_creation;
+        if ($property == "day_modification") return $this->day_modification;
+        if ($property == "hour_modification") return $this->hour_modification;
+        if ($property == "date_modification") return $this->day_modification . " à " . $this->hour_modification;
+        if ($property == "day_post") return $this->day_post;
+        if ($property == "hour_post") return $this->hour_post;
+        if ($property == "date_post") return $this->day_post . " à " . $this->hour_post;
 
-        if ($property == 'posted') {
-            return $this->day_post ? "Oui" : "Non";
-        }
+        if ($property == "image_name") return $this->image_name;
+        if ($property == "avatar_name") return $this->avatar_name;
+        if ($property == "avatar_path") return $this->avatar_path;
+        if ($property == "thumbs_src") return file_exists($this->thumbs_path) ? $this->thumbs_src : null;
+        if ($property == "thumbs_path") return $this->thumbs_path;
+        if ($property == "original_image_path") return $this->original_image_path;
+        if ($property == "original_image_src")  return file_exists($this->original_image_path) ? $this->original_image_src : null;
+        if ($property == "avatar_src") return file_exists($this->avatar_path) ? $this->avatar_src : DEFAULT_AVATAR;
 
     }
 
@@ -563,14 +513,14 @@ class Model
                 $image->saveImages($new_item->get("categorie") . "-" . $new_item->get("slug"));
                 return true;
             }
-        }  
+        }
         if (!empty($_FILES["pdf_uploaded"]["name"])) {
             $pdf = new Pdf();
             $pdf_file_name = $new_item->get("title") . "-" . $new_item->get("id");
             $pdf->savePdfFile($pdf_file_name);
         }
         $email_sender->notifyUsers();
-        Utils::header($new_item->get("url"));
+        Utils::header($new_item->get("admin_url"));
     }
         
     /**
@@ -627,7 +577,7 @@ class Model
         }
 
         $item = self::returnObject($categorie, $this->code);
-        Utils::header($item->get("url"));
+        Utils::header($item->get("admin_url"));
     }
 
     /**
@@ -657,7 +607,7 @@ class Model
     {
         $this->unsetRang();
         $this->deleteImage();
-        Bdd::delete($this->table, $this->id);
+        Bdd::deleteById($this->table, $this->id);
         return true;
     }
 
@@ -741,7 +691,7 @@ class Model
             }
 
             if (!empty($article_content)) {
-                $new_item->set("content", htmlspecialchars($article_content), $table);
+                $new_item->set("article_content", htmlspecialchars($article_content), $table);
             }
 
             if (!empty($autheur_livre)) {

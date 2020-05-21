@@ -134,7 +134,7 @@ class Controller
             $validator = new Validator($_POST);
             $errors = $validator->getErrors();
             if (empty($errors)) {
-              Model::createItem($this->url[0], $_POST);
+                Model::createItem($this->url[0], $_POST);
             }
         }
 
@@ -168,7 +168,7 @@ class Controller
     public function readItem()
     {
         $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
-        $meta_title = ucfirst($item->get("categorie")) . ' &#8250; ' . ucfirst($item->get("meta_title"));
+        $meta_title = ucfirst($item->get("categorie")) . ' &#8250; ' . ucfirst($item->get("title"));
         $view = new View();
 
         return [
@@ -186,14 +186,14 @@ class Controller
     {
         $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
         $errors = null;
-        $meta_title = ucfirst($item->get("categorie")) . " &#8250 " . ucfirst($item->get("meta_title")) . " &#8250 Editer";
+        $meta_title = ucfirst($item->get("categorie")) . " &#8250 " . ucfirst($item->get("title")) . " &#8250 Editer";
         $view = new View();
 
         if (isset($_POST["enregistrement"])) {
             $validator = new Validator($_POST);
             $errors = $validator->getErrors();
             if (empty($errors)) {
-                $item->edit($this->url[0], $_POST);
+                $item->editItem($this->url[0], $_POST);
             }
         }
 

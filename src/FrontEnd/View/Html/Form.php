@@ -324,8 +324,8 @@ HTML;
      */
     public function selectParent(bool $choose_parent = null)
     {
-        $choose_parent = Router::slicedUrl()[1] !== "minis-services"
-         && Model::isChildCategorie(Router::slicedUrl()[1]) 
+        $choose_parent = Router::urlAsArray()[0] !== "minis-services"
+         && Model::isChildCategorie(Router::urlAsArray()[0]) 
           ? true : false;
 
         if ($choose_parent) {
@@ -392,7 +392,7 @@ HTML;
     public function articleContentTextarea($item = null)
     {
         global $url;
-        $article_content = !is_null($item) ? $item->get("article_content") : Router::slicedUrl()[1] == "articles" ? "" : null;
+        $article_content = !is_null($item) ? $item->get("article_content") : Router::urlAsArray()[0] == "articles" ? "" : null;
 
         if (!is_null($article_content)) {
             return <<<HTML
@@ -413,7 +413,7 @@ HTML;
      */
     public function prixInput($item = null, $label = null)
     {
-        $prix =  !is_null($item) ? $item->get("prix") : "";
+        $prix =  !is_null($item) ? $item->get("price") : "";
 
         return <<<HTML
         <div class="form-group">
@@ -441,10 +441,10 @@ HTML;
 HTML;
         } else {
             $rang = Bdd::getMaxValueOf( "rang",
-                Model::getTableNameFrom( Router::slicedUrl()[1] ),
+                Model::getTableNameFrom( Router::urlAsArray()[0] ),
                 "categorie",
                 "categorie",
-                Router::slicedUrl()[1]
+                Router::urlAsArray()[0]
             ) + 1;
             $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
             $label = <<<HTML

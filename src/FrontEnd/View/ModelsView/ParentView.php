@@ -46,6 +46,7 @@ class ParentView extends \App\FrontEnd\View\View
         $self_layout = new self;
         return <<<HTML
         <div class="mb-3">
+            {$this->crumbs($parent->get("title"))}
             {$view->manageButtons($parent)}
             {$view->showData($parent)}
             {$self_layout->showChildren($parent)}
@@ -65,7 +66,7 @@ HTML;
     {
         return <<<HTML
         <div class="app-card">
-            <div class="app-card-body">
+            <div class="card-body">
                 {$this->showChildrenItemsByType($parent, 'articles')}
                 {$this->showChildrenItemsByType($parent, 'videos')}
                 {$this->showChildrenItemsByType($parent, 'ebooks')}
@@ -91,7 +92,7 @@ HTML;
         $children_list = '';
 
         if (empty($children)) {
-            $children_list = '<div class="col-12 text-italic">Vide</div>';
+            $children_list = '<div class="col-12 text-italic text-muted">Vide</div>';
         } else {
             foreach ($children as $child) {
                 $child = Model::returnObject($children_type, $child["code"]);
@@ -100,8 +101,8 @@ HTML;
         }
 
         return <<<HTML
-        <div class="mb-3">
-            <h5>
+        <div class="mb-2">
+            <h5 class="m-0">
                 {$children_type}
                 <span class="badge bg-primary text-white">{$children_number}</span>
             </h5>
