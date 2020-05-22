@@ -79,12 +79,10 @@ class Router
         elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs()] ) ) return $controller->readItem();
 
         // categorie/slug/edit
-        elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs(), "edit"] ) )
-            return $controller->editItem();
+        elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs(), "edit"] ) ) return $controller->editItem();
         
         // categorie/slug/delete
-        elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs(), "delete"] ) )
-            return $controller->deleteItem();
+        elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs(), "delete"] ) ) return $controller->deleteItem();
 
         // Page 404
         else return $controller->adminError404();
