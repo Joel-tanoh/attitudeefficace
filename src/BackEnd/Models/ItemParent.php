@@ -32,9 +32,9 @@ class ItemParent extends Model
 {
     const TABLE_NAME = "item_parents";
     const CATEGORIES = [
-        "formation","formations",
-        "theme","themes",
-        "etape","etapes",
+        "formations",
+        "themes",
+        "etapes",
     ];
 
     /**
@@ -110,6 +110,16 @@ class ItemParent extends Model
         $rep = $bdd->prepare($query);
         $rep->execute([$this->id]);
         $this->children = $rep->fetchAll();
+    }
+
+    /**
+     * Retourne tous les slugs des items parents.
+     * 
+     * @return array
+     */
+    public static function getSlugs()
+    {
+        return Bdd::getSlugsFrom(self::TABLE_NAME);
     }
 
 }

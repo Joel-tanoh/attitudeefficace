@@ -318,6 +318,26 @@ class Model
     }
 
     /**
+     * Retourne toutes les catégories.
+     * 
+     * @return array
+     */
+    public static function getAllCategories()
+    {
+        return array_merge(ItemParent::CATEGORIES, ItemChild::CATEGORIES);
+    }
+
+    /**
+     * Retourne tous les slugs.
+     * 
+     * @return array
+     */
+    public static function getAllSlugs()
+    {
+        return array_merge(ItemParent::getSlugs(), ItemChild::getSlugs());
+    }
+
+    /**
      * Retourne true si la chaine passée en paramètre est une catégorie.
      * 
      * @param string $slug 

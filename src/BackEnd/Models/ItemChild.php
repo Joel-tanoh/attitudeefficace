@@ -33,11 +33,11 @@ class ItemChild extends Model
 {
     const TABLE_NAME = "item_childs";
     const CATEGORIES = [
-        "article","articles",
-        "video","videos",
-        "ebook","ebooks",
-        "livre","livres",
-        "mini-service","mini-services","minis-service","minis-services",
+        "articles",
+        "videos",
+        "ebooks",
+        "livres",
+        "minis-services",
     ];
 
     /**
@@ -121,5 +121,14 @@ class ItemChild extends Model
         }
     }
 
+    /**
+     * Retourne tous les slugs des items enfants.
+     * 
+     * @return array
+     */
+    public static function getSlugs()
+    {
+        return Bdd::getSlugsFrom(self::TABLE_NAME);
+    }
 }
 

@@ -19,6 +19,7 @@ session_start();
 require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
+use App\BackEnd\Models\Model;
 use App\Router;
 use App\BackEnd\Utils\Utils;
 use App\FrontEnd\Page;

@@ -31,6 +31,7 @@ use App\Controller;
 class Router
 {
     private $url;
+    private $url_array;
 
     /**
      * Constructeur du routeur, prend en paramètre l'url.
@@ -41,7 +42,8 @@ class Router
      */
     public function __construct($url)
     {
-        $this->url = $url === "" ? "" : explode('/', $url);
+        $this->url = $url;
+        $this->url_array = explode('/', $url);
     }
 
     /**
@@ -52,51 +54,40 @@ class Router
      **/
     public function adminRouter()
     {
-        $controller = new Controller($this->url);
+        $controller = new Controller($this->url_array);
 
-        if ($this->match(""))
-            $route = $controller->dashboard();
+        if ($this->match("")) return $controller->dashboard();
 
-        elseif ($this->match("administrateurs"))
-            $route = $controller->listAdminUsersAccounts();
+        elseif ($this->match("administrateurs")) return $controller->listAdminUsersAccounts();
 
-        elseif ($this->match("motivation-plus"))
-            $route = $controller->listMotivationPlusVideo();
+        elseif ($this->match("motivation-plus")) return $controller->listMotivationPlusVideo();
 
-        elseif ($this->match("motivation-plus/create"))
-            $route = $controller->createMotivationPlusVideo();
+        elseif ($this->match("motivation-plus/create")) return $controller->createMotivationPlusVideo();
 
-        elseif ($this->match("motivation-plus/delete"))
-            $route = $controller->deleteMotivationPlusVideo();
+        elseif ($this->match("motivation-plus/delete")) return $controller->deleteMotivationPlusVideo();
 
         // categorie
-        elseif (Model::isCategorie($this->url[0]) && empty($this->url[1]))
-            $route = $controller->listCategorieItems();
+        elseif ( $this->match( [Model::getAllCategories()] ) ) return $controller->listCategorieItems();
 
         // categorie/create
-        elseif (Model::isCategorie($this->url[0]) && $this->url[1] == "create" && empty($this->url[2]))
-            $route = $controller->createItem();
+        elseif ( $this->match( [Model::getAllCategories(), "create"] ) ) return $controller->createItem();
         
         // categorie/delete
-        elseif (Model::isCategorie($this->url[0]) && $this->url[1] == "delete" && empty($this->url[2]))
-            $route = $controller->deleteManyItems();
+        elseif ( $this->match( [Model::getAllCategories(), "delete"] ) ) return $controller->deleteManyItems();
         
         // categorie/slug
-        elseif (Model::isCategorie($this->url[0]) && Model::isSlug($this->url[1]) && empty($this->url[2]))
-            $route = $controller->readItem();
+        elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs()] ) ) return $controller->readItem();
 
         // categorie/slug/edit
-        elseif (Model::isCategorie($this->url[0]) && Model::isSlug($this->url[1]) && $this->url[2] == "edit")
-            $route = $controller->editItem();
+        elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs(), "edit"] ) )
+            return $controller->editItem();
         
         // categorie/slug/delete
-        elseif (Model::isCategorie($this->url[0]) && Model::isSlug($this->url[1]) && $this->url[2] == "delete")
-            $route = $controller->deleteItem();
+        elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs(), "delete"] ) )
+            return $controller->deleteItem();
 
         // Page 404
-        else $route = $controller->adminError404();
-
-        return $route;
+        else return $controller->adminError404();
     }
 
     /**
@@ -110,25 +101,44 @@ class Router
 
         // Accueil
         if ($this->match(""))
-            $route = $controller->publicAccueilPage();
+            return $controller->publicAccueilPage();
 
         // Error 404
-        else $route = $controller->publicError404();
-
-        return $route;
+        else return $controller->publicError404();
     }
 
     /**
-     * Permet de vérifier la concordance en une chaine de caractère passé en
-     * paramètre et l'url.
+     * Vérifie la concordance de l'url et la variable passée en paramètre.
      * 
-     * @param string $route
+     * @param mixed $route
      * 
      * @return bool
      */
-    public function match(string $route)
+    public function match($route)
     {
-        return self::getUri() == $route;
+        if (is_string($route)) {
+            return self::getUri() == $route;
+        } elseif (is_array($route)) {
+            $url_offsets = count(self::urlAsArray());
+            $route_offsets = count($route);
+
+            if ($url_offsets === $route_offsets) {
+                $counter = 0;
+                for ($i = 0; $i <= $route_offsets - 1; $i++) {
+                    if (is_string($route[$i])) {
+                        if (self::urlAsArray()[$i] === $route[$i]) $counter++;
+                    } elseif (is_array($route[$i])) {
+                        if (in_array(self::urlAsArray()[$i], $route[$i])) $counter++;
+                    }
+                }
+
+                if ($counter === $route_offsets) return true;
+                else return false;
+
+            } else {
+                return false;
+            }
+        }
     }
 
     /**
@@ -150,7 +160,11 @@ class Router
      */
     public static function urlAsArray()
     {
-        return explode("/", self::getUri());
+        $url_as_array = explode("/", self::getUri());
+        if ( empty( $url_as_array[ array_key_last($url_as_array) ]) ) {
+            array_pop($url_as_array);
+        }
+        return $url_as_array;
     }
 
     /**
