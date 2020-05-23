@@ -41,19 +41,15 @@ class Email
      * 
      * @return bool
      */
-    public function sendMail(
-        array $destinataires,
-        string $subject,
-        string $message,
-        bool $join_file = null
-    ) {
+    public function sendMail(array $destinataires, string $subject, string $message, bool $join_file = null)
+    {
         if (!empty($destinataires)) {
-            $email_counter = 0;
+            $send_mail_counter = 0;
             foreach ($destinataires as $destinataire) {
-                mail($destinataire, $subject, $message, $this->_headers($join_file));
-                $email_counter++;
+                mail($destinataire["adresse_email"], $subject, $message, $this->headers($join_file));
+                $send_mail_counter++;
             }
-            if ($email_counter) return true;
+            if ($send_mail_counter) return true;
         }
     }
 
@@ -64,12 +60,12 @@ class Email
      */
     public function notifyUsers()
     {
-        if (null !== $_POST["notify_users"]) {
-            if ($_POST["notify_users"] == "all") {
+        if (isset($_POST["notify_users"])) {
+            if ($_POST["notify_users"] === "all") {
                 $this->notifyAllUsers();
-            } elseif ($_POST["notify_users"] == "newsletter") {
+            } elseif ($_POST["notify_users"] === "newsletter") {
                 $this->notifyNewsletter();
-            } elseif ($_POST["notify_users"] == "learners") {
+            } elseif ($_POST["notify_users"] === "learners") {
                 $this->notifyLearners();
             }
         }
@@ -85,8 +81,8 @@ class Email
         if (!empty($this->getAllEmails())) {
             $this->sendMail(
                 $this->getAllEmails(),
-                $this->_notificationSubject(),
-                $this->_notificationMessage()
+                $this->notificationSubject(),
+                $this->notificationMessage()
             );
         }
         return true;
@@ -106,8 +102,8 @@ class Email
         if (!empty($newsletters_mails)) {
             $this->sendMail(
                 $newsletters_mails,
-                $this->_notificationSubject(),
-                $this->_notificationMessage()
+                $this->notificationSubject(),
+                $this->notificationMessage()
             );
         }
     }
@@ -123,8 +119,8 @@ class Email
         if (!empty($learners_mails)) {
             $this->sendMail(
                 $learners_mails,
-                $this->_notificationSubject(),
-                $this->_notificationMessage()
+                $this->notificationSubject(),
+                $this->notificationMessage()
             );
         }
         return true;
@@ -149,7 +145,7 @@ class Email
      * 
      * @return string
      */
-    private function _headers(bool $join_file = null)
+    private function headers(bool $join_file = null)
     {
         $separator = "\r\n";
         $headers = "MIME-Version: 1.0" . $separator;
@@ -167,7 +163,7 @@ class Email
      * 
      * @return string
      */
-    private function _notificationSubject()
+    private function notificationSubject()
     {
         $subject = "Du nouveau sur votre plateforme " . APP_NAME;
         return $subject;
@@ -179,7 +175,7 @@ class Email
      * 
      * @return string Le code HTML du message.
      */
-    private function _notificationMessage()
+    private function notificationMessage()
     {
         return <<<HTML
         <p>Un nouvel element vient d'être créé sur votre plateforme. Cet email

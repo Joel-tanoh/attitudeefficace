@@ -144,15 +144,15 @@ HTML;
     private function setLink(string $href, string $fontawesome_class, string $text, bool $badge = null)
     {
         $badge_box = null;
-        $item_type = "";
+        $categorie = "";
 
         if ($badge) {
             if ( strchr("motivation-plus", $href) ) {
-                $item_type = "-1";
+                $categorie = "-1";
             } else {
-                $item_type = explode("/", $href)[array_key_last(explode("/", $href))];
+                $categorie = explode("/", $href)[array_key_last(explode("/", $href))];
             }
-            $count = Bdd::countTableItems(Model::getTableNameFrom($item_type), "categorie", $item_type);
+            $count = Bdd::countTableItems(Model::getTableNameFrom($categorie), "categorie", $categorie);
             if (!empty($count) || $count == 0) {
                 $badge_box = '<span class="float-right badge bg-orange">' . $count . '</span>';
             }

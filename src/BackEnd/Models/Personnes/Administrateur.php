@@ -90,20 +90,27 @@ class Administrateur extends Personne
     public static function save(string $code, array $data)
     {
         extract($data);
+
         $login = mb_strtolower( htmlspecialchars( $login ) );
         $password_hashed = password_hash( htmlspecialchars( $password ), PASSWORD_DEFAULT );
+
         if (self::insertPrincipalData( $code, $login, $password_hashed )) {
             $new_account = new self($code);
+            
             if (!empty($email)) {
                 $new_account->set("email", $email, self::TABLE_NAME);
             }
+
             if (!empty($account_categorie)) {
                 $new_account->set("categorie", $account_type, self::TABLE_NAME);
             }
+
             if (!empty($_FILES["avatar_uploaded"]["name"])) {
                 $new_account->saveAvatar();
             }
-            return true;
+
+            return new self($code);
+
         } else {
             throw new Exception("Echec de l'enregistrement, veuillez réessayer ou si cela persiste, veuillez contacter l'administrateur");
         }

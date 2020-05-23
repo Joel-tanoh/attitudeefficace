@@ -368,54 +368,55 @@ class Model
      *                          l'objet.
      * @param string $col_value La valeur que doit avoir cette colonne.
      * @param string $table     La table de laquelle récupérer les données.
-     * @param string $keyword   La classe ou la categorie de l'objet.
+     * @param string $categorie La classe ou la categorie de l'objet.
      * 
      * @return $object
      */
-    public static function getObjectBy(string $col = null, string $col_value = null, string $table = null, string $keyword = null)
+    public static function getObjectBy(string $col = null, string $col_value = null, string $table = null, string $categorie = null)
     {
         $code = Bdd::getItemBy($col, $col_value, $table);
-        return self::returnObject($keyword, $code);
+        return self::returnObject($categorie, $code);
     }
 
     /**
      * Retourne un objet en fonction du nom de la classe et du code pour
      * l'instanciation.
      * 
-     * @param string $keyword La catégorie ou la classe de l'objet.
-     * @param string $code    Le code pour instancier l'objet.
+     * @param string $categorie La catégorie ou la classe de l'objet.
+     * @param string $code      Le code pour instancier l'objet.
      * 
      * @return $object
      */
-    public static function returnObject(string $keyword, string $code)
+    public static function returnObject(string $categorie, string $code)
     {
-        if (self::isParentCategorie($keyword)) {
+        if (self::isParentCategorie($categorie)) {
             return new ItemParent($code);
-        } elseif (self::isChildCategorie($keyword)) {
+        } elseif (self::isChildCategorie($categorie)) {
             return new ItemChild($code);
-        } elseif ($keyword == "administrateurs") {
+        } elseif ($categorie == "administrateurs") {
             return new Administrateur($code);
         } else {
             throw new Exception(
-                "La classe $keyword n'existe pas encore ou n'est pas bien géré."
+                "La classe $categorie n'existe pas encore ou n'est pas bien géré."
             );
         }
     }
      
     /**
      * Retourne le nom d'une table de la base de données en fonction d'une chaîne
-     * de caractère passée en paramètre. Cette chaîne de caractère peut être le
-     * nom de la table ou un nom de colonne de la table.
+     * de caractère passée en paramètre. Cette chaîne de caractère peut est la catégorie
+     * d'un élément.
      * 
-     * @param string $keyword Le nom de la table ou un nom de champ dans la table.
+     * @param string $categorie La categorie
      * 
      * @return string Le nom de la table.
      */
-    public static function getTableNameFrom(string $keyword = null)
+    public static function getTableNameFrom(string $categorie = null)
     {
-        if ($keyword == "administrateurs") { $table = Administrateur::TABLE_NAME; }
-        if (self::isParentCategorie($keyword) || $keyword == "motivation-plus") { $table = ItemParent::TABLE_NAME; }
-        if (self::isChildCategorie($keyword)) { $table = ItemChild::TABLE_NAME; }
+        if ($categorie == "administrateurs") $table = Administrateur::TABLE_NAME;
+        elseif (self::isParentCategorie($categorie)) $table = ItemParent::TABLE_NAME;
+        elseif (self::isChildCategorie($categorie) || $categorie == "motivation-plus") $table = ItemChild::TABLE_NAME;
+        else throw new Exception("La table $categorie n'existe pas");
         return $table;
     }
 
@@ -520,13 +521,12 @@ class Model
         $email_sender = new Email();
         $code = Utils::generateCode();
 
-        if ($categorie == "administrateurs") {
-            Administrateur::save($code, $data);
+        if ($categorie === "administrateurs") {
+           $new_item = Administrateur::save($code, $data);
         } elseif (self::isParentCategorie($categorie) || self::isChildCategorie($categorie)) {
-            self::insertPostData($code, $data, $categorie);
+           $new_item = self::insertPostData($code, $data, $categorie);
         }
 
-        $new_item = self::returnObject($categorie, $code);
         if (!empty($_FILES["image_uploaded"]["name"])) {
             if (self::isParentCategorie($categorie) || self::isChildCategorie($categorie)) {
                 $image = new Image();
@@ -534,12 +534,18 @@ class Model
                 return true;
             }
         }
+
         if (!empty($_FILES["pdf_uploaded"]["name"])) {
             $pdf = new Pdf();
             $pdf_file_name = $new_item->get("title") . "-" . $new_item->get("id");
             $pdf->savePdfFile($pdf_file_name);
         }
+
         $email_sender->notifyUsers();
+
+        $new_item = self::returnObject($categorie, $new_item->get("code"));
+        // dump($new_item);
+        // die();
         Utils::header($new_item->get("admin_url"));
     }
         
@@ -577,21 +583,27 @@ class Model
         if (isset($title)) {
             $this->set("title", $title, $table);
         }
+
         if (isset($description)) {
             $this->set("description", $description, $table);
         }
+
         if (isset($article_content)) {
-            $this->set("content", $article_content, $table);
+            $this->set("article_content", $article_content, $table);
         }
+
         if (isset($prix)) {
             $this->set("price", (int)$prix, $table);
         }
+
         if (isset($rang)) {
             $this->setRang((int)$rang);
         }
-        if (isset($video_link)) {
+
+        if (isset($video_link)){
             $this->set("video_link", $video_link, $table);
         }
+
         if (isset($slug)) {
             $this->set("slug", $slug, $table);
         }
@@ -738,7 +750,9 @@ class Model
                 $new_item->set("video_link", $video_link, $table);
             }
 
-            return true;
+            $new_item = self::returnObject($categorie, $code);
+            return $new_item;
+
         } else {
             throw new Exception("Echec de l'enregistrement des données");
         }

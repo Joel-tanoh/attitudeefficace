@@ -230,9 +230,9 @@ HTML;
     {
         $form = new Form();
         $notification = new Notification();
-        $formContent = $form->getForm("motivation-plus");
+        $formContent = $form->getForm("videos");
         $error = !empty($errors) ? $notification->errors($errors) : null;
-        $title = ucfirst(Model::getCategorieFormated(Router::urlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
+        $title = ucfirst(Model::getCategorieFormated("motivation-plus", "pluriel")) . " &#8250 nouvelle vidéo";
 
         return <<<HTML
         <div class="mb-3">

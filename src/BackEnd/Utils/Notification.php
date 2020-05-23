@@ -406,18 +406,10 @@ HTML;
      */
     public function noItems(string $categorie) : string
     {
-        if ($categorie == "themes") {
-            $categorie = "thèmes";
-        }
-        if ($categorie == "motivation-plus") {
-            $categorie = "vidéos de motivation +";
-        }
-        if ($categorie == "etapes") {
-            $categorie = "étapes";
-        }
-        if ($categorie == "videos") {
-            $categorie = "vidéos";
-        }
+        if ($categorie == "themes")  $categorie = "thèmes";
+        if ($categorie == "motivation-plus") $categorie = "vidéos de motivation +";
+        if ($categorie == "etapes")  $categorie = "étapes";
+        if ($categorie == "videos") $categorie = "vidéos";
 
         return "Les " . $categorie . " que vous créerez seront affiché(e)s ici.";
     }

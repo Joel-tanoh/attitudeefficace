@@ -41,31 +41,11 @@ class Form
      */
     public function getForm($categorie, $item = null)
     {
-        switch ($categorie) {
-        
-        case "administrateurs" :
-            $form = $this->adminForm($item);
-            break;
-
-        case "motivation-plus" :
-            $form = $this->motivationPlusForm($item);
-            break;
-
-        case Model::isParentCategorie($categorie) :
-            $form = $this->parentForm($item);
-            break;
-
-        case Model::isChildCategorie($categorie) :
-            $form = $this->childForm($item, $categorie);
-            break;
-
-        case "minis-services" :
-            $form = $this->miniServiceForm($item);
-            break;
-
-        default :
-            Utils::header(ADMIN_URL);
-        }
+        if ($categorie === "administrateurs") $form = $this->adminForm($item);
+        elseif ($categorie === "minis-services") $form = $this->miniServiceForm($item, $categorie);
+        elseif (Model::isParentCategorie($categorie)) $form = $this->parentForm($item, $categorie);
+        elseif (Model::isChildCategorie($categorie)) $form = $this->childForm($item, $categorie);
+        else Utils::header(ADMIN_URL);
 
         return $form;
     }
@@ -91,8 +71,7 @@ class Form
             <div class="col-12 col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <form id="myForm" method="post" enctype="multipart/form-data"
-                        action="{$_SERVER['REQUEST_URI']}">
+                        <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
                             {$form_content}
                             {$this->submitButton('enregistrement', 'Enregistrer')}
                         </form>
@@ -104,38 +83,21 @@ HTML;
     }
 
     /**
-     * Retourne le formulaire pour ajouter une vidéo de motivation plus.
-     * 
-     * @return string
-     */
-    function motivationPlusForm()
-    {
-        $prix_label = <<<HTML
-        Prix :
-        <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
-        avoir accès à cet élément</p>
-HTML;
-
-        $formContent = $this->commonItemsInformations(null, $prix_label);
-
-        return $this->returnForm($formContent);
-    }
-
-    /**
      * Formulaire d'un item parent.
      * 
      * @param mixed $item 
+     * @param string $categorie
      * 
      * @return string Le formulaire.
      */
-    public function parentForm($item = null)
+    public function parentForm($item = null, string $categorie)
     {
         $prix_label = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         accéder à cet élément</p>
 HTML;
-        $form_content = $this->commonItemsInformations($item, $prix_label);
+        $form_content = $this->commonItemsInformations($item, $prix_label, $categorie);
         return $this->returnForm($form_content);
     }
  
@@ -149,15 +111,16 @@ HTML;
      */
     public function childForm($item = null, string $categorie = null)
     {
-        $uploadPdf = $categorie == "ebooks" ? true : false;
+        $uploadPdf = $categorie === "ebooks" ? true : false;
+
         $prix_label = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         avoir accès à cet élément</p>
 HTML;
 
-        $formContent = $this->commonItemsInformations($item, $prix_label);
-        $formContent .= $this->articleContentTextarea($item);
+        $formContent = $this->commonItemsInformations($item, $prix_label, $categorie);
+        $formContent .= $this->articleContentTextarea($item, $categorie);
         $formContent .= $this->pdfFileInput($uploadPdf);
 
         return $this->returnForm($formContent);
@@ -166,11 +129,12 @@ HTML;
     /**
      * Formulaire pour ajouter un mini service.
      * 
-     * @param $item A passer dans le cas ou on veut modifier un miniservice.
+     * @param $item      A passer dans le cas ou on veut modifier un miniservice.
+     * @param $categorie 
      * 
      * @return string
      */
-    public function miniServiceForm($item = null)
+    public function miniServiceForm($item = null, string $categorie = null)
     {
         $mini_service_label = <<<HTML
         Prix :
@@ -178,7 +142,7 @@ HTML;
             Cette somme sera affichée aux utilisateurs qui voudront ce service.
         </p>
 HTML;
-        $form_content = $this->commonItemsInformations($item, $mini_service_label);
+        $form_content = $this->commonItemsInformations($item, $mini_service_label, $categorie);
 
         return $this->returnForm($form_content);
     }
@@ -190,15 +154,16 @@ HTML;
      * @param mixed  $item       L'item à passer en paramètre si c'est dans le
      *                           cas de la modification d'un item.
      * @param string $prix_label 
+     * @param string $categorie  
      * 
      * @return string
      */
-    public function commonItemsInformations($item = null, $prix_label = null)
+    public function commonItemsInformations($item = null, $prix_label = null, $categorie = null)
     {
         return <<<HTML
-        <div class="row mb-3">
+        <div class="row mb-2">
             <div class="col-md-6">
-                {$this->selectParent()}
+                {$this->selectParent($categorie)}
                 {$this->titleInput($item)}
                 {$this->descriptionTextarea($item)}
                 {$this->videoInput($item)}
@@ -206,7 +171,7 @@ HTML;
             </div>
             <div class="col-md-6">
                 {$this->prixInput($item, $prix_label)}
-                {$this->rangInput($item)}
+                {$this->rangInput($item, $categorie)}
                 {$this->notifyUsersBox()}
             </div>
         </div>
@@ -318,17 +283,13 @@ HTML;
      * et une liste dans laquelle sera affiché les items dont le type a été choisi
      * dans la liste.
      * 
-     * @param bool $choose_parent 
+     * @param string $categorie
      * 
      * @return string
      */
-    public function selectParent(bool $choose_parent = null)
+    public function selectParent(string $categorie = null)
     {
-        $choose_parent = Router::urlAsArray()[0] !== "minis-services"
-         && Model::isChildCategorie(Router::urlAsArray()[0]) 
-          ? true : false;
-
-        if ($choose_parent) {
+        if (null !== $categorie && Model::isChildCategorie($categorie)) {
             return <<<HTML
             <div id="chooseParentBox" class="mb-3">
                 {$this->label("selectParentList", "Choisir le parent :")}
@@ -354,6 +315,7 @@ HTML;
     public function titleInput($item = null)
     {
         $title = !is_null($item) ? $item->get("title") : "";
+        extract($_POST);
         return <<<HTML
         <div class="form-group">
             {$this->label("title", "Titre")}
@@ -373,7 +335,7 @@ HTML;
     public function descriptionTextarea($item)
     {
         $description = !is_null($item) ? $item->get("description") : "";
-
+        extract($_POST);
         return <<<HTML
         <div class="form-group">
             {$this->label("descriptionTextarea", "Description")}
@@ -385,16 +347,19 @@ HTML;
     /**
      * Retourne un champ de type textarea pour écrire le contenu d'un article.
      * 
-     * @param string $item A passer dans le cas ou on veut modifier un item.
+     * @param string $item      A passer dans le cas ou on veut modifier un item.
+     * @param string $categorie 
      * 
      * @return string Le code HTML pour le champ du contenu de l'article.
      */
-    public function articleContentTextarea($item = null)
+    public function articleContentTextarea($item = null, string $categorie = null)
     {
-        global $url;
-        $article_content = !is_null($item) ? $item->get("article_content") : Router::urlAsArray()[0] == "articles" ? "" : null;
+        $article_content = null !== $item ? $item->get("article_content")
+            : $categorie === "articles" ? "" : null;
 
-        if (!is_null($article_content)) {
+        extract($_POST);
+
+        if (null !== $article_content) {
             return <<<HTML
             <div class="form-group mt-2">
                 {$this->inputTextarea('article_content', "summernote", null, $article_content, null)}
@@ -414,6 +379,7 @@ HTML;
     public function prixInput($item = null, $label = null)
     {
         $prix =  !is_null($item) ? $item->get("price") : "";
+        extract($_POST);
 
         return <<<HTML
         <div class="form-group">
@@ -427,12 +393,13 @@ HTML;
      * Retourne un champ dans le formulaire pour le rang.
      * 
      * @param mixed $item 
+     * @param string $categorie 
      * 
      * @return string Le code HTML pour le champ.
      */
-    public function rangInput($item = null)
+    public function rangInput($item = null, string $categorie = null)
     {
-        if (!is_null($item)) {
+        if (null !== $item) {
             $rang = $item->get("rang");
             $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
             $label = <<<HTML
@@ -441,10 +408,10 @@ HTML;
 HTML;
         } else {
             $rang = Bdd::getMaxValueOf( "rang",
-                Model::getTableNameFrom( Router::urlAsArray()[0] ),
+                Model::getTableNameFrom( $categorie ),
                 "categorie",
                 "categorie",
-                Router::urlAsArray()[0]
+                $categorie
             ) + 1;
             $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
             $label = <<<HTML
@@ -454,6 +421,7 @@ HTML;
         }
 
         extract($_POST);
+
         return <<<HTML
         <div class="form-group">
             {$this->label("rang", $label)}
@@ -477,6 +445,7 @@ HTML;
         <p class="notice">Cette vidéo peut être une vidéo de description</p>
 HTML;
         extract($_POST);
+        
         return <<<HTML
         <div class="form-group">
             {$this->label("videoLink", $label)}

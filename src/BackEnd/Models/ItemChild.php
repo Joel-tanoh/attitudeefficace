@@ -92,6 +92,7 @@ class ItemChild extends Model
 
         // Les urls de l'objet pour le localiser
         $this->url = $this->categorie . "/" . $this->slug;
+        $this->public_url = PUBLIC_URL . "/" . $this->categorie . "/" . $this->slug;
         $this->admin_url = ADMIN_URL . "/" . $this->url;
         $this->edit_url = $this->admin_url . "/edit";
         $this->delete_url = $this->admin_url . "/delete";

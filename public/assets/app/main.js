@@ -22,7 +22,7 @@ $(document).ready(function(){
   $('#summernote').summernote({
     placeholder: 'Commencez à écrire...',
     tabsize: 2,
-    height: 300,
+    height: 600,
     lang: 'fr-FR'
   });
 

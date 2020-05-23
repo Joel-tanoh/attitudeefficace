@@ -73,10 +73,7 @@ class Controller
     {
         $meta_title = "Mes " . Model::getCategorieFormated($this->url[0], "pluriel");
         $view = new View();
-
-        if ($this->url[0] == "motivation-plus") { $items = Bdd::getchildrenOf("-1", "videos"); }
-        else { $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]); }
-
+        $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
         $page = new Page($meta_title, $view->listItems($items, $this->url[0]));
         echo $page->adminPage();
     }
@@ -104,7 +101,7 @@ class Controller
     {
         $meta_title = "Motivation plus";
         $view = new View();
-        $videos = [];
+        $videos = Bdd::getchildrenOf("-1", "videos");
         $page = new Page($meta_title, $view->listMotivationPlusVideos($videos));
         echo $page->adminPage();
     }
@@ -141,7 +138,15 @@ class Controller
     {
         $errors = null;
         $view = new View();
-        $meta_title = "Motivation plus &#8250 ajouter une vidéo";
+        $meta_title = "Motivation plus &#8250 nouvelle vidéo";
+        if (isset($_POST["enregistrement"])) {
+            $validator = new Validator($_POST);
+            $errors = $validator->getErrors();
+            if (empty($errors)) {
+                Model::createItem("videos", $_POST);
+            }
+
+        }
         $page = new Page($meta_title, $view->createMotivationPlusVideo($errors));
         echo $page->adminPage();
     }
