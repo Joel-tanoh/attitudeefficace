@@ -16,17 +16,10 @@ use App\Router;
 use App\FrontEnd\Page;
 
 try {
-
     $router = new Router(Router::getUri());
     $page = $router->publicRouter();
-    $view = new Page($page["meta_title"], $page["content"]);
-    echo $view->publicPage();
-
 } catch(Error|TypeError|Exception|PDOException $e) {
-    $exception = 'Erreur : ' . $e->getMessage()
-        . ', Fichier : ' . $e->getFile()
-        . ', Ligne : ' . $e->getLine();
-    
+    $exception = 'Erreur : ' . $e->getMessage() . ', Fichier : ' . $e->getFile() . ', Ligne : ' . $e->getLine();
     $notification = new Notification;
     echo $notification->exception($exception);
 }

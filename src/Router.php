@@ -56,36 +56,18 @@ class Router
     {
         $controller = new Controller($this->url_array);
 
-        if ($this->match("")) return $controller->dashboard();
-
-        elseif ($this->match("administrateurs")) return $controller->listAdminUsersAccounts();
-
-        elseif ($this->match("motivation-plus")) return $controller->listMotivationPlusVideo();
-
-        elseif ($this->match("motivation-plus/create")) return $controller->createMotivationPlusVideo();
-
-        elseif ($this->match("motivation-plus/delete")) return $controller->deleteMotivationPlusVideo();
-
-        // categorie
-        elseif ( $this->match( [Model::getAllCategories()] ) ) return $controller->listCategorieItems();
-
-        // categorie/create
-        elseif ( $this->match( [Model::getAllCategories(), "create"] ) ) return $controller->createItem();
-        
-        // categorie/delete
-        elseif ( $this->match( [Model::getAllCategories(), "delete"] ) ) return $controller->deleteManyItems();
-        
-        // categorie/slug
-        elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs()] ) ) return $controller->readItem();
-
-        // categorie/slug/edit
-        elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs(), "edit"] ) ) return $controller->editItem();
-        
-        // categorie/slug/delete
-        elseif ( $this->match( [Model::getAllCategories(), Model::getAllSlugs(), "delete"] ) ) return $controller->deleteItem();
-
-        // Page 404
-        else return $controller->adminError404();
+        if ($this->match("")) $controller->dashboard();
+        elseif ($this->match("administrateurs")) $controller->listAdminUsersAccounts();
+        elseif ($this->match("motivation-plus")) $controller->listMotivationPlusVideo();
+        elseif ($this->match("motivation-plus/create")) $controller->createMotivationPlusVideo();
+        elseif ($this->match("motivation-plus/delete")) $controller->deleteMotivationPlusVideo();
+        elseif ($this->match( [Model::getAllCategories()] ) ) $controller->listCategorieItems();
+        elseif ($this->match( [Model::getAllCategories(), "create"] ) ) $controller->createItem();
+        elseif ($this->match( [Model::getAllCategories(), "delete"] ) ) $controller->deleteManyItems();
+        elseif ($this->match( [Model::getAllCategories(), Model::getAllSlugs()] ) ) $controller->readItem();
+        elseif ($this->match( [Model::getAllCategories(), Model::getAllSlugs(), "edit"] ) ) $controller->editItem();
+        elseif ($this->match( [Model::getAllCategories(), Model::getAllSlugs(), "delete"] ) ) $controller->deleteItem();
+        else $controller->adminError404();
     }
 
     /**
@@ -98,11 +80,10 @@ class Router
         $controller = new Controller($this->url);
 
         // Accueil
-        if ($this->match(""))
-            return $controller->publicAccueilPage();
+        if ($this->match("")) $controller->publicAccueilPage();
 
         // Error 404
-        else return $controller->publicError404();
+        else $controller->publicError404();
     }
 
     /**

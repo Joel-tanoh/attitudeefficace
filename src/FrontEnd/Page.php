@@ -50,6 +50,42 @@ class Page
     }
 
     /**
+     * Permet de modifier le meta_title de la page.
+     * 
+     * @param string $meta_title
+     * 
+     * @return void
+     */
+    public function setMetaTitle(string $meta_title)
+    {
+        $this->meta_title = $meta_title;
+    }
+
+    /**
+     * Permet de modifier la meta description de la page.
+     * 
+     * @param string $description
+     * 
+     * @return void
+     */
+    public function setDescription(string $description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * Permet de modifier le contenu de la page.
+     * 
+     * @param string $view
+     * 
+     * @return void
+     */
+    public function setView(string $view)
+    {
+        $this->view = $view;
+    }
+
+    /**
      * Affiche le code pour l'index de la partie publique
      * 
      * @return string

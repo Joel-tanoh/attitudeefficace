@@ -28,27 +28,28 @@ class View
     /**
      * Retourne la vue formulaire de connexion.
      * 
-     * @param string $adminLogin    Variable login qui contient le login de la
-     *                              la personne qui veut se connecter.
-     * @param string $adminPassword Mot de passe de la personne qui veut se
-     *                              se connecter.
+     * @param string $admin_login    Variable login qui contient le login de la
+     *                               la personne qui veut se connecter.
+     * @param string $admin_password Mot de passe de la personne qui veut se
+     *                               se connecter.
      * @param string $error          
      * 
      * @return string
      */
-    public function connexionFormView($adminLogin, $adminPassword, $error = null)
+    public function connexionFormView($admin_login, $admin_password, $error = null)
     {
         $form = new Form();
-        $logoDir = LOGOS_DIR;
-        $adminUrl = ADMIN_URL;
-        $error = null !== $error ? $this->notificateur->error($error) : null;
+        $logo_dir = LOGOS_DIR;
+        $admin_url = ADMIN_URL;
+        $notificateur = new Notification();
+        $error = null !== $error ? $notificateur->error($error) : null;
         
         return <<<HTML
         <div id="connexion">
             <div id="container" class="container-fluid">
                 <div class="mb-2 d-flex flex-column align-items-center">
-                    <img class="img-fluid rounded mb-3" src="{$logoDir}/logo_1.png" alt="Attitude efficace" width="100rem">
-                    <div class="h3">Attitude efficace</div>
+                    <img class="img-fluid rounded mb-3" src="{$logo_dir}/logo_1.png" alt="Attitude efficace" width="60rem">
+                    <div class="h5">Attitude efficace</div>
                 </div>
                 <div class="error-box">
                     {$error}
@@ -58,11 +59,11 @@ class View
                     <div class="content">
                         <div>
                             <input placeholder="Login" type="text" name="admin_login"
-                                id="adminLogin" value="{$adminLogin}" autofocus/>
+                                id="adminLogin" value="{$admin_login}" autofocus/>
                         </div>
                         <div>
                             <input placeholder="Mot de passe" type="password"
-                                name="admin_password" id="adminPassword" value="{$adminPassword}"/>
+                                name="admin_password" id="adminPassword" value="{$admin_password}"/>
                         </div>
                         <div>
                         <div class="d-flex justify-content-between mb-2">     
@@ -76,7 +77,7 @@ class View
                         </div>
                     </div>
                     <footer>
-                        <a href="{$adminUrl}/password-forgotten">Mot de passe oublié ?</a>
+                        <a href="{$admin_url}/password-forgotten">Mot de passe oublié ?</a>
                     </footer>
                 </form>
             </div>
@@ -136,6 +137,24 @@ HTML;
         <div class="mb-3">
             {$this->crumbs($title)}
             {$to_show}
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche la vue qui permet de lister les vidéos de motivation plus.
+     * 
+     * @param array $videos
+     * 
+     * @return string
+     */
+    public function listMotivationPlusVideos(array $videos)
+    {
+        $title = "Motivation plus";
+        return <<<HTML
+        <div class="mb-3">
+            {$this->crumbs($title)}
+            Vous êtes sur la page qu s'affiche lorsque vous demandez motivation plus
         </div>
 HTML;
     }
@@ -390,7 +409,7 @@ HTML;
             <h2 class="text-warning">404</h2>
             <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page non trouvée.</h3>
             <p>
-                Nous n'avons pas retrouvé la page que vous cherchez.
+                Nous n'avons pas retrouvé la page que vous cherchez. Elle n'a peut être pas encore été développée.
                 Retour à la <a href="{$public_url}">page d'acceuil</a>.
             </p>
         </section>
@@ -404,15 +423,15 @@ HTML;
      */
     public function adminError404()
     {
-        $adminUrl = ADMIN_URL;
+        $admin_url = ADMIN_URL;
 
         return <<<HTML
         <section class="text-center">
             <h2 class="text-warning"> 404</h2>
             <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page non trouvée.</h3>
             <p>
-                Nous n'avons pas retrouvé la page que vous cherchez.
-                Retour au <a href="{$adminUrl}">Tableau de bord</a>.
+                Nous n'avons pas retrouvé la page que vous cherchez. Elle n'a peut être pas encore été développée.
+                Retour au <a href="{$admin_url}">Tableau de bord</a>.
             </p>
         </section>
 HTML;

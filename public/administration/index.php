@@ -30,8 +30,6 @@ try {
     if (!someoneIsConnected()) { Utils::header(ADMIN_URL . "/connexion"); }
     $router = new Router(Router::getUri());
     $route = $router->adminRouter();
-    $page = new Page($route["meta_title"], $route["content"]);
-    echo $page->adminPage();
 
 } catch(Error|TypeError|Exception|PDOException $e) {
     $exception = 'Erreur : ' . $e->getMessage() . ', Fichier : ' . $e->getFile() . ', Ligne : ' . $e->getLine();

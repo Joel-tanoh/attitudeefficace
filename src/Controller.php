@@ -41,33 +41,27 @@ class Controller
     /**
      * Controlleur appelé pour la page d'accueil de la partie publique.
      * 
-     * @return array
+     * @return void
      */
     public function publicAccueilPage()
     {
         $meta_title = "Bienvenu sur " . APP_NAME;
         $view = new View();
-
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->publicAccueil()
-        ];
+        $page = new Page($meta_title, $view->publicAccueil());
+        echo $page->publicPage();
     }
 
     /**
      * Controlleur appelé pour le dashboard de l'administration dashboard (Tableau de bord).
      * 
-     * @return array
+     * @return void
      */
     function dashboard()
     {
         $meta_title = "Tableau de bord";
         $view = new View();
-
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->adminDashboard()
-        ];
+        $page = new Page($meta_title, $view->adminDashboard());
+        echo $page->adminPage();
     }
       
     /**
@@ -83,46 +77,42 @@ class Controller
         if ($this->url[0] == "motivation-plus") { $items = Bdd::getchildrenOf("-1", "videos"); }
         else { $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]); }
 
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->listItems($items, $this->url[0]),
-        ];
+        $page = new Page($meta_title, $view->listItems($items, $this->url[0]));
+        echo $page->adminPage();
     }
 
     /**
      * Controlleur appele lorque url = administrateurs
      * 
-     * @return array
+     * @return void
      */
     public function listAdminUsersAccounts()
     {
-        $meta_title = "Comptes";
-        $accounts = Bdd::getAllFrom( Model::getTableNameFrom( $this->url[0] ), "utilisateur" );
         $view = new View();
-
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->listAccounts($accounts)
-        ];
+        $meta_title = "Utilisateurs";
+        $accounts = Bdd::getAllFrom( Model::getTableNameFrom( $this->url[0] ), "utilisateur" );
+        $page = new Page($meta_title, $view->listAccounts($accounts));
+        echo $page->adminPage();
     }
 
     /**
      * Controller appelé lorsque url = motivation-plus
      * 
-     * @return array
+     * @return void
      */
     public function listMotivationPlusVideo()
     {
-        return [
-            "meta_title" => "Motivation plus",
-            "content" => "Vous êtes sur la page qu s'affiche lorsque vous demandez motivation plus"
-        ];
+        $meta_title = "Motivation plus";
+        $view = new View();
+        $videos = [];
+        $page = new Page($meta_title, $view->listMotivationPlusVideos($videos));
+        echo $page->adminPage();
     }
 
     /**
      * Controlleur appelé lorsque url = categorie/create.
      * 
-     * @return array
+     * @return void
      */
     function createItem()
     {
@@ -138,49 +128,42 @@ class Controller
             }
         }
 
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->createItem($this->url[0], $errors)
-        ];
+        $page = new Page($meta_title, $view->createItem($this->url[0], $errors));
+        echo $page->adminPage();
     }
 
     /**
      * Controlleur appelé lorsque url = motivation-plus/create.
      * 
-     * @return array
+     * @return void
      */
     function createMotivationPlusVideo()
     {
         $errors = null;
         $view = new View();
-
-        return [
-            "meta_title" => "Motivation plus - ajouter une vidéo",
-            "content" => $view->createMotivationPlusVideo($errors)
-        ];
+        $meta_title = "Motivation plus &#8250 ajouter une vidéo";
+        $page = new Page($meta_title, $view->createMotivationPlusVideo($errors));
+        echo $page->adminPage();
     }
 
     /**
      * Controlleur appelé lorque url = categorie/slug.
      * 
-     * @return array
+     * @return void
      */
     public function readItem()
     {
         $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
         $meta_title = ucfirst($item->get("categorie")) . ' &#8250; ' . ucfirst($item->get("title"));
         $view = new View();
-
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->readItem($item)
-        ];
+        $page = new Page($meta_title, $view->readItem($item));
+        echo $page->adminPage();
     }
 
     /**
      * Controlleur appelé lorque url = categorie/slug/edit.
      * 
-     * @return array
+     * @return void
      */
     function editItem()
     {
@@ -197,23 +180,22 @@ class Controller
             }
         }
 
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->editItem($item, $this->url[0], $errors)
-        ];
+        $page = new Page($meta_title, $view->editItem($item, $this->url[0], $errors));
+        echo $page->adminPage();
     }
 
     /**
      * Controlleur appelé lorsque url = motivation-plus/delete
      * 
-     * @return array
+     * @return void
      */
     public function deleteMotivationPlusVideo()
     {
-        return [
-            "meta_title" => "Motivation plus",
-            "content" => "Vous ête sur la page qui s'affiche lorsque vous voulez supprimer des vidéos de motivation plus"
-        ];
+        $view = new View();
+        $meta_title = "Motivation plus &#8250 supprimer";
+        $to_delete = [];
+        $page = new Page($meta_title, $view->deleteItems($to_delete, "motivation-plus"));
+        echo $page->adminPage();
     }
 
     /**
@@ -232,7 +214,7 @@ class Controller
     /**
      * Controlleur appelé lorque url = categorie/delete.
      * 
-     * @return array
+     * @return void
      */
     public function deleteManyItems()
     {
@@ -250,46 +232,36 @@ class Controller
             }
         }
 
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->deleteItems($items, $this->url[0], $error)
-        ];
+        $page = new Page($meta_title, $view->deleteItems($items, $this->url[0], $error));
+        echo $page->adminPage();
     }
 
     /**
      * Controlleur appelé sur la partie admin lorsque l'url n'est pas encore géré par 
      * le système.
      * 
-     * @return array
+     * @return void
      */
     function adminError404()
     {
         $meta_title = "Page non trouvée";
-        
         $view = new View();
-        
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->adminError404()
-        ];
+        $page = new Page($meta_title, $view->adminError404());
+        echo $page->adminPage();
     }
 
     /**
      * Controlleur appelé sur la partie publique lorsque l'url n'est pas encore géré par 
      * le système.
      * 
-     * @return array
+     * @return void
      */
     function publicError404()
     {
-        $meta_title = "Page non trouvée";
-
         $view = new View();
-
-        return [
-            "meta_title" => $meta_title,
-            "content" => $view->publicError404()
-        ];
+        $meta_title = "Page non trouvée";
+        $view = new Page($meta_title, $view->publicError404());
+        echo $view->publicPage();
     }
 
 }
