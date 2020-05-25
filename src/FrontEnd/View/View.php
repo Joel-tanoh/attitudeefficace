@@ -48,7 +48,7 @@ class View
         <div id="connexion">
             <div id="container" class="container-fluid">
                 <div class="mb-2 d-flex flex-column align-items-center">
-                    <img class="img-fluid rounded mb-3" src="{$logo_dir}/logo_1.png" alt="Attitude efficace" width="60rem">
+                    <img class="img-fluid rounded mb-3" src="{$logo_dir}/logo_1.png" alt="Attitude efficace" width="75rem">
                     <div class="h5">Attitude efficace</div>
                 </div>
                 <div class="error-box">
@@ -66,7 +66,7 @@ class View
                                 name="admin_password" id="adminPassword" value="{$admin_password}"/>
                         </div>
                         <div>
-                        <div class="d-flex justify-content-between mb-2">     
+                        <div class="d-flex justify-content-between mb-2">
                             {$this->activateSessionButton()}
                             {$form->submitButton("connexion", "Connexion")}
                         </div>
@@ -83,6 +83,133 @@ class View
             </div>
         </div>
 HTML;
+    }
+
+    /**
+     * Retourne une barre de navigation en fonction de la partie passée en
+     * paramètre.
+     * 
+     * @param string $appPart 
+     * 
+     * @return Navbar
+     */
+    public function navbar(string $appPart)
+    {
+        $navbar = new Navbar();
+        if ($appPart == "public") return $navbar->publicNavbar();
+        elseif ($appPart == "administration" || $appPart == "admin") return $navbar->adminNavbar();
+    }
+
+    /**
+     * Retourne la sidebar.
+     * 
+     * @return Sidebar.
+     */
+    public function adminSidebar()
+    {
+        $sidebar = new Sidebar();
+        return $sidebar->adminSidebar();
+    }
+       
+    /**
+     * Affiche l'avatar d'un utilisateur.
+     * 
+     * @param string $avatar_src
+     * @param string $alt_information
+     * 
+     * @return string
+     */
+    public function showAvatar(string $avatar_src, string $alt_information = null)
+    {
+        return <<<HTML
+        <div>
+            <img src="{$avatar_src}" alt="{$alt_information}" class="user-avatar img-fluid"/>
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne l'image miniature de l'utilisateur connecté dans la navbar.
+     * 
+     * @param string $avatar_src
+     * @param string $alt_information
+     * 
+     * @param $user 
+     * 
+     * @return string
+     */
+    public function navbarUserAvatar(string $avatar_src, string $alt_information = null)
+    {
+        return <<<HTML
+        <div>
+            <img src="{$avatar_src}" alt="{$alt_information}" class="navbar-user-avatar img-circle shdw mr-2"/>
+        </div>
+HTML;
+    }
+
+    /**
+     * Peremet d'afficher l'avatar de l'utilisateur dans la sidebar.
+     * 
+     * @param string $avatar_src
+     * @param string $alt_information
+     * 
+     * @return string
+     */
+    public function sidebarUserAvatar(string $avatar_src, string $alt_information = null)
+    {
+        return <<<HTML
+        <div class="text-center my-2">
+            <img src="{$avatar_src}" alt="{$alt_information}" class="sidebar-user-avatar img-circle img-fluid"/>
+        </div>
+HTML;
+    }
+
+    /**
+     * Permet d'afficher le logo dans la navbar.
+     * 
+     * @param string $brand_src        Le lien vers l'image.
+     * @param bool   $set_it_clickable Permet de rendre le logo clickable.
+     * @param string $click_direction  L'url exécuté lors du click sur le logo.
+     * 
+     * @return string
+     */
+    public function navbarBrand(string $brand_src, bool $set_it_clickable = false, string $click_direction = null)
+    {
+        if ($set_it_clickable) {
+            return <<<HTML
+            <a class="brand" href="{$click_direction}">
+                <img src="{$brand_src}" alt="Attitude efficace" class="brand navbar-brand mb-2">
+            </a>
+HTML;
+        } else {
+            return <<<HTML
+            <img src="{$brand_src}" alt="Attitude efficace" class="brand navbar-brand mb-2">
+HTML;
+        }
+    }
+
+    /**
+     * Affiche le logo dans la sidebar.
+     *
+     * @param string $brand_src        Le lien vers l'image.
+     * @param bool   $set_it_clickable Permet de rendre le logo clickable.
+     * @param string $click_direction  L'url exécuté lors du click sur le logo.
+     * 
+     * @return string
+     */
+    public function sidebarBrand(string $brand_src, bool $set_it_clickable = false, string $click_direction = null) : string
+    {
+        if ($set_it_clickable) {
+            return <<<HTML
+            <a class="brand" href="{$click_direction}">
+                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand mb-2">
+            </a>
+HTML;
+        } else {
+            return <<<HTML
+            <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand mb-2">
+HTML;
+        }
     }
 
     /**
@@ -167,7 +294,7 @@ HTML;
      * 
      * @return string
      */
-    public function listItemlearners($item)
+    public function listItemsuscribers($item)
     {
 
     }
@@ -300,97 +427,23 @@ HTML;
      */
     public function deleteItems($items, $categorie, $error = null)
     {
-        $notification = new Notification();
+        $notifier = new Notification();
+        $notification = null;
+        $list = "";
+
         if (empty($items)) {
-            $content = $notification->info( $notification->nothingToDelete( Model::getCategorieFormated($categorie) ) );
+            $notification = $notifier->info( $notifier->nothingToDelete( Model::getCategorieFormated($categorie) ) );
         } else {
-            $content = "Vous verez s'afficher un tableau avec les items à supprimer";
+            $list = $this->deleteItemsTable($items, $categorie);
         }
-        $error = !empty($error) ? $notification->error($error) : null;
+
+        $error = null !== $error ? $notifier->error($error) : null;
 
         return <<<HTML
         <div class="mb-3">
             {$error}
-            {$content}
-        </div>
-HTML;
-    }
-
-    /**
-     * Retourne une barre de navigation en fonction de la partie passée en
-     * paramètre.
-     * 
-     * @param string $appPart 
-     * 
-     * @return Navbar
-     */
-    public function navbar(string $appPart)
-    {
-        $navbar = new Navbar();
-        if ($appPart == "public") return $navbar->publicNavbar();
-        elseif ($appPart == "administration" || $appPart == "admin") return $navbar->adminNavbar();
-    }
-
-    /**
-     * Retourne la sidebar.
-     * 
-     * @return Sidebar.
-     */
-    public function adminSidebar()
-    {
-        $sidebar = new Sidebar();
-        return $sidebar->adminSidebar();
-    }
-       
-    /**
-     * Affiche l'avatar d'un utilisateur.
-     * 
-     * @param string $avatar_src
-     * @param string $alt_information
-     * 
-     * @return string
-     */
-    public function showAvatar(string $avatar_src, string $alt_information = null)
-    {
-        return <<<HTML
-        <div>
-            <img src="{$avatar_src}" alt="{$alt_information}" class="user-avatar img-fluid"/>
-        </div>
-HTML;
-    }
-
-    /**
-     * Retourne l'image miniature de l'utilisateur connecté dans la navbar.
-     * 
-     * @param string $avatar_src
-     * @param string $alt_information
-     * 
-     * @param $user 
-     * 
-     * @return string
-     */
-    public function navbarUserAvatar(string $avatar_src, string $alt_information = null)
-    {
-        return <<<HTML
-        <div>
-            <img src="{$avatar_src}" alt="{$alt_information}" class="navbar-user-avatar img-circle shdw mr-2"/>
-        </div>
-HTML;
-    }
-
-    /**
-     * Peremet d'afficher l'avatar de l'utilisateur dans la sidebar.
-     * 
-     * @param string $avatar_src
-     * @param string $alt_information
-     * 
-     * @return string
-     */
-    public function sidebarUserAvatar(string $avatar_src, string $alt_information = null)
-    {
-        return <<<HTML
-        <div class="text-center my-2">
-            <img src="{$avatar_src}" alt="{$alt_information}" class="sidebar-user-avatar img-circle img-fluid"/>
+            {$notification}
+            {$list}
         </div>
 HTML;
     }
@@ -435,54 +488,6 @@ HTML;
             </p>
         </section>
 HTML;
-    }
-
-    /**
-     * Permet d'afficher le logo dans la navbar.
-     * 
-     * @param string $brand_src        Le lien vers l'image.
-     * @param bool   $set_it_clickable Permet de rendre le logo clickable.
-     * @param string $click_direction  L'url exécuté lors du click sur le logo.
-     * 
-     * @return string
-     */
-    public function navbarBrand(string $brand_src, bool $set_it_clickable = false, string $click_direction = null)
-    {
-        if ($set_it_clickable) {
-            return <<<HTML
-            <a class="brand" href="{$click_direction}">
-                <img src="{$brand_src}" alt="Attitude efficace" class="brand navbar-brand mb-2">
-            </a>
-HTML;
-        } else {
-            return <<<HTML
-            <img src="{$brand_src}" alt="Attitude efficace" class="brand navbar-brand mb-2">
-HTML;
-        }
-    }
-
-    /**
-     * Affiche le logo dans la sidebar.
-     *
-     * @param string $brand_src        Le lien vers l'image.
-     * @param bool   $set_it_clickable Permet de rendre le logo clickable.
-     * @param string $click_direction  L'url exécuté lors du click sur le logo.
-     * 
-     * @return string
-     */
-    public function sidebarBrand(string $brand_src, bool $set_it_clickable = false, string $click_direction = null) : string
-    {
-        if ($set_it_clickable) {
-            return <<<HTML
-            <a class="brand" href="{$click_direction}">
-                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand mb-2">
-            </a>
-HTML;
-        } else {
-            return <<<HTML
-            <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand mb-2">
-HTML;
-        }
     }
 
     /**
@@ -556,11 +561,9 @@ HTML;
         }
 
         return <<<HTML
-        <div class="app-card mb-3">
-            <div class="app-card-header">Vidéo</div>
-            <div class="app-card-body">
-                {$result}
-            </div>
+        <div class="card mb-3">
+            <div class="card-header">Vidéo</div>
+            {$result}
         </div>
 HTML;
     }
@@ -662,7 +665,7 @@ HTML;
     private function rowOfListingItems($item)
     {
         $title = ucfirst($item->get("title"));
-        $childrenNumber = $item->isParent() ? ParentView::itemchildrenNumber($item) : null;
+        $childrenNumber = $item->isParent() ? ParentView::itemchildrenNumber($item) . " | " : null;
 
         return <<<HTML
         <div class="card mb-3">
@@ -671,11 +674,11 @@ HTML;
                 <div>
                     Créé le {$item->get("day_creation")} |
                     Visité {$item->get("views")} fois |
-                    {$childrenNumber} |
+                    {$childrenNumber}
                     {$item->get("classement")}
                 </div>
                 <div>
-                    <a href="{$item->get('url')}" class="text-success">Détails</a>
+                    <a href="{$item->get('url')}" class="text-success">Voir plus</a>
                     <a href="{$item->get('edit_url')}" class="text-blue">Editer</a>
                     <a href="{$item->get('delete_url')}" class="text-danger">Supprimer</a>
                 </div>
@@ -695,10 +698,10 @@ HTML;
     private function data($item)
     {
         return <<<HTML
-        <div class="app-card">
-            <div class="app-card-header">Données</div>
-            <div class="app-card-body">
-                <div class="mb-3">Description : {$item->get("description")}</div>
+        <div class="card">
+            <div class="card-header">Données</div>
+            <div class="card-body">
+                <div>Description : {$item->get("description")}</div>
                 <div>Prix : {$item->get("prix")}</div>
                 <div>Date de création : {$item->get("date_creation")}</div>
                 <div>Date de mise à jour : {$item->get("date_modification")}</div>
@@ -716,11 +719,9 @@ HTML;
     private function activateSessionButton()
     {
         return <<<HTML
-        <div class="custom-control custom-checkbox form-group">
+        <div class="custom-control custom-checkbox">
             <input class="custom-control-input" type="checkbox" name="activate_cookie" id="customCheckbox1" value="oui">
-            <label for="customCheckbox1" class="custom-control-label">
-                Se souvenir de moi
-            </label>
+            <label for="customCheckbox1" class="custom-control-label">Se souvenir de moi</label>
         </div>
 HTML;
     }
@@ -787,15 +788,13 @@ HTML;
      */
     private function showThumbs($item)
     {
-        $boxContent = null !== $item->get("thumbs_src")
-            ? $this->thumbs($item)
-            : $this->noThumbsBox();
+        $content = null !== $item->get("thumbs_src") ? $this->thumbs($item) : $this->noThumbsBox();
 
         return <<<HTML
-        <div class="app-card">
-            <div class="app-card-header">Image de couverture</div>
-            <div class="app-card-body">
-                {$boxContent}
+        <div class="card">
+            <div class="card-header">Image de couverture</div>
+            <div class="card-body">
+                {$content}
             </div>
         </div>
 HTML;
@@ -853,15 +852,13 @@ HTML;
         $title = ucfirst($item->get("title"));
         $thumbs_src = $item->get("thumbs_src");
         return <<<HTML
-        <div class="">
-            <div class="d-flex p-2">
-                <div class="mr-2" style="width:5rem">
-                    <img src="{$thumbs_src}" alt="{$item->get('slug')}" class="img-fluid">
-                </div>
-                <div>
-                    <h5><a href="{$item->get('url')}">{$title}</a></h5>
-                    <span class="text-muted float-right text-small">{$item->get("day_creation")}</span>
-                </div>
+        <div class="d-flex p-2">
+            <div class="mr-2" style="width:5rem">
+                <img src="{$thumbs_src}" alt="{$item->get('slug')}" class="img-fluid">
+            </div>
+            <div>
+                <h5><a href="{$item->get('public_url')}">{$title}</a></h5>
+                <span class="text-muted float-right text-small">{$item->get("day_creation")}</span>
             </div>
         </div>
 HTML;
@@ -884,6 +881,53 @@ HTML;
         <a class="app-btn {$class} pb-2" href="{$item->get($link)}">
             <i class="{$fa_class}"></i>{$text}
         </a>
+HTML;
+    }
+
+    /**
+     * Retourne un tableau sur la page de suppression d'items.
+     * 
+     * @param mixed $items
+     * @param string $categorie
+     * 
+     * @return string
+     */
+    private function deleteItemsTable($items, string $categorie)
+    {
+        $rows = '';
+        $form = new Form();
+        foreach($items as $item) {
+            $item = Model::returnObject($categorie, $item["code"]);
+            $rows .= $this->deleteItemsTableRow($item);
+        }
+        return <<<HTML
+        <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
+            <table class='mb-3'>
+                <thead>
+                    <th><input type="checkbox" id="checkAllItemsForDelete"></th>
+                    <th>Titre</th>
+                </thead>
+                {$rows}
+            </table>
+            {$form->submitButton("suppression", "Supprimer")}
+        </form>
+HTML;
+    }
+
+    /**
+     * Retourne une ligne dans le tableau de suppression des éléments.
+     * 
+     * @param $item
+     * 
+     * @return string
+     */
+    private function deleteItemsTableRow($item)
+    {
+        return <<<HTML
+        <tr>
+            <td><input type="checkbox" name="codes[]" id="{$item->get('slug')}" value="{$item->get('code')}"></td>
+            <td><label for="{$item->get('slug')}">{$item->get("title")}</label></td>
+        </tr>
 HTML;
     }
 

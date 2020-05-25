@@ -226,6 +226,7 @@ class Controller
         $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
         $meta_title = "Supprimer des " . Model::getCategorieFormated($this->url[0], "pluriel");
         $view = new View();
+        $error = null;
 
         if (isset($_POST["suppression"])) {
             if (empty($_POST["codes"])) {

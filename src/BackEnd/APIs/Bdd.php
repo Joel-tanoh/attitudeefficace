@@ -16,7 +16,7 @@
 namespace App\BackEnd\APIs;
 
 use App\BackEnd\Models\ItemChild;
-use App\BackEnd\Models\Personnes\Learner;
+use App\BackEnd\Models\Personnes\Suscriber;
 use PDO;
 use PDOException;
 
@@ -335,9 +335,14 @@ class Bdd
      */
     public static function set($col, $value, $table, $id)
     {
-        $query = "UPDATE $table SET $col = ? WHERE id = ?";
+        $query = "UPDATE $table SET $col = :col_value WHERE id = :id";
         $rep = self::connectToDb()->prepare($query);
-        $rep->execute([$value, $id]);
+        $rep->execute(
+            [
+                "col_value" => $value,
+                "id" => $id
+            ]
+        );
         return true;
     }
 
@@ -365,8 +370,8 @@ class Bdd
     public static function getAllEmails()
     {
         $newsletter_mails = self::select("adresse_email", "newsletters");
-        $learners_mails = self::select("adresse_email", Learner::TABLE_NAME);
-        return array_merge($newsletter_mails, $learners_mails);
+        $suscribers_mails = self::select("adresse_email", Suscriber::TABLE_NAME);
+        return array_merge($newsletter_mails, $suscribers_mails);
     }
 
 }

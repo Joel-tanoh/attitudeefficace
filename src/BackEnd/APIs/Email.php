@@ -15,7 +15,7 @@
 
 namespace App\BackEnd\APIs;
 
-use App\BackEnd\Models\Personnes\Learner;
+use App\BackEnd\Models\Personnes\Suscriber;
 
 /**
  * Gère les envois d'email.
@@ -65,8 +65,8 @@ class Email
                 $this->notifyAllUsers();
             } elseif ($_POST["notify_users"] === "newsletter") {
                 $this->notifyNewsletter();
-            } elseif ($_POST["notify_users"] === "learners") {
-                $this->notifyLearners();
+            } elseif ($_POST["notify_users"] === "suscribers") {
+                $this->notifySuscribers();
             }
         }
     }
@@ -113,12 +113,12 @@ class Email
      * 
      * @return bool
      */
-    public function notifyLearners()
+    public function notifySuscribers()
     {
-        $learners_mails = Bdd::select("adresse_email", Learner::TABLE_NAME);
-        if (!empty($learners_mails)) {
+        $suscribers_mails = Bdd::select("adresse_email", Suscriber::TABLE_NAME);
+        if (!empty($suscribers_mails)) {
             $this->sendMail(
-                $learners_mails,
+                $suscribers_mails,
                 $this->notificationSubject(),
                 $this->notificationMessage()
             );

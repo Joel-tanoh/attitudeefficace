@@ -518,7 +518,7 @@ class Model
      */
     public static function createItem(string $categorie, array $data)
     {
-        $email_sender = new Email();
+        // $email_sender = new Email();
         $code = Utils::generateCode();
 
         if ($categorie === "administrateurs") {
@@ -531,7 +531,6 @@ class Model
             if (self::isParentCategorie($categorie) || self::isChildCategorie($categorie)) {
                 $image = new Image();
                 $image->saveImages($new_item->get("categorie") . "-" . $new_item->get("slug"));
-                return true;
             }
         }
 
@@ -541,11 +540,9 @@ class Model
             $pdf->savePdfFile($pdf_file_name);
         }
 
-        $email_sender->notifyUsers();
+        // $email_sender->notifyUsers(new_item);
 
         $new_item = self::returnObject($categorie, $new_item->get("code"));
-        // dump($new_item);
-        // die();
         Utils::header($new_item->get("admin_url"));
     }
         
@@ -682,10 +679,10 @@ class Model
     public function unsetRang()
     {
         $table = $this->table;
-        $items = Bdd::getItemsOfColValueMoreOrEqualTo( $table, "rang", $this->rang, $this->categorie );
+        $items = Bdd::getItemsOfColValueMoreOrEqualTo($table, "rang", $this->rang, $this->categorie);
         foreach ($items as $item) {
-            $obj = self::returnObject($this->categorie, $item["code"]);
-            Bdd::incOrDecColValue("decrement", "rang", $table, $obj->id);
+            $item = self::returnObject($this->categorie, $item["code"]);
+            Bdd::incOrDecColValue("decrement", "rang", $table, $item->get("id"));
         }
         return true;
     }
@@ -750,8 +747,7 @@ class Model
                 $new_item->set("video_link", $video_link, $table);
             }
 
-            $new_item = self::returnObject($categorie, $code);
-            return $new_item;
+            return self::returnObject($categorie, $code);
 
         } else {
             throw new Exception("Echec de l'enregistrement des données");

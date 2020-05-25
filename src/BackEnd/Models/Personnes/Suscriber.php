@@ -16,7 +16,7 @@
  namespace App\BackEnd\Models\Personnes;
 
 /**
- * Un Learner est celui ou celle qui suit(lit) un item.
+ * Un Suscriber est celui ou celle qui suit(lit) un item.
 
  * @category Category
  * @package  Package
@@ -24,16 +24,16 @@
  * @license  url.com license
  * @link     Link
  */
-class Learner
+class Suscriber
 {
-    const TABLE_NAME = "learners";
+    const TABLE_NAME = "suscribers";
 
     /**
      * Retourne la liste de tous ceux qui suivent un item.
      * 
      * @return array
      */
-    public function getLearners()
+    public function getSuscribers()
     {
         
     }

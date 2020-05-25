@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  sam. 23 mai 2020 à 11:52
+-- Généré le :  lun. 25 mai 2020 à 11:19
 -- Version du serveur :  5.7.19
 -- Version de PHP :  7.1.9
 
@@ -125,17 +125,7 @@ CREATE TABLE IF NOT EXISTS `item_childs` (
   `views` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UN_CODE` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
-
---
--- Déchargement des données de la table `item_childs`
---
-
-INSERT INTO `item_childs` (`id`, `code`, `categorie`, `parent_id`, `title`, `description`, `slug`, `article_content`, `author`, `provider`, `pages`, `price`, `rang`, `edition_home`, `annee_parution`, `date_creation`, `date_modification`, `date_post`, `video_link`, `views`) VALUES
-(37, 'e3eDPtaa', 'articles', 0, 'Lorem ipsum', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet voluptatem labore cupiditate molestiae porro velit inventore totam eos? Reiciendis tempore quae odio perferendis pariatur. Placeat aliquid sapiente consequuntur ullam alias vitae rem iure aperiam dolor dolorum culpa sit eius quas fugit blanditiis nisi nemo dolores repellat pariatur, maiores corrupti ipsa commodi enim.', 'lorem-ipsum-37', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-05-21 11:28:59', '2020-05-21 11:28:59', NULL, NULL, 0),
-(38, 'I89M4_D', 'videos', -1, 'Lorem ipsum', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet consectetur adipisicing elit.', 'lorem-ipsum-38', NULL, NULL, NULL, NULL, 1200, 1, NULL, NULL, '2020-05-23 11:32:24', '2020-05-23 11:32:25', NULL, 'rgbAfrCxSD', 0),
-(39, 'Ex7U8X', 'videos', -1, 'Loram dede', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet voluptatem labore cupiditate molestiae porro velit inventore totam eos? Reiciendis tempore quae odio perferendis pariatur. Placeat aliquid sapiente consequuntur ullam alias vitae rem iure aperiam dolor dolorum culpa sit eius.', 'loram-dede-39', NULL, NULL, NULL, NULL, 0, 2, NULL, NULL, '2020-05-23 11:44:08', '2020-05-23 11:44:09', NULL, NULL, 0),
-(40, 'bezYkdVV', 'videos', -1, 'Savoir se défendre', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet voluptatem labore cupiditate molestiae porro velit inventore totam eos? Reiciendis tempore quae odio perferendis pariatur. Placeat aliquid sapiente consequuntur ullam alias vitae rem iure aperiam dolor dolorum culpa sit eius.', 'savoir-se-defendre-40', NULL, NULL, NULL, NULL, 0, 3, NULL, NULL, '2020-05-23 11:51:57', '2020-05-23 11:51:57', NULL, NULL, 0);
+) ENGINE=MyISAM AUTO_INCREMENT=53 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -159,16 +149,7 @@ CREATE TABLE IF NOT EXISTS `item_parents` (
   `views` int(11) DEFAULT '0',
   `video_link` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=82 DEFAULT CHARSET=utf8;
-
---
--- Déchargement des données de la table `item_parents`
---
-
-INSERT INTO `item_parents` (`id`, `code`, `categorie`, `title`, `description`, `slug`, `price`, `rang`, `date_creation`, `date_modification`, `date_post`, `views`, `video_link`) VALUES
-(81, 'Q2FJT9I', 'etapes', 'Lorem ipsum', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet voluptatem labore cupiditate molestiae porro velit inventore totam eos? Reiciendis tempore quae odio perferendis pariatur. Placeat aliquid sapiente consequuntur ullam alias vitae rem iure aperiam dolor dolorum culpa sit eius quas fugit blanditiis nisi nemo dolores repellat pariatur, maiores corrupti ipsa commodi enim.', 'lorem-ipsum-81', 0, 1, '2020-05-21 11:21:54', '2020-05-21 11:21:54', NULL, 0, NULL),
-(80, 'oy0794', 'themes', 'Développement personnel', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet voluptatem labore cupiditate molestiae porro velit inventore totam eos? Reiciendis tempore quae odio perferendis pariatur. Placeat aliquid sapiente consequuntur ullam alias vitae rem iure aperiam dolor dolorum culpa sit eius quas fugit blanditiis nisi nemo dolores repellat pariatur, maiores corrupti ipsa commodi enim.', 'developpement-personnel-80', 0, 1, '2020-05-21 11:20:54', '2020-05-21 11:20:54', NULL, 0, NULL),
-(79, 'a8SQIH', 'formations', 'Penser comme un gagnant', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet voluptatem labore cupiditate molestiae porro velit inventore totam eos? Reiciendis tempore quae odio perferendis pariatur. Placeat aliquid sapiente consequuntur ullam alias vitae rem iure aperiam dolor dolorum culpa sit eius quas fugit blanditiis nisi nemo dolores repellat pariatur, maiores corrupti ipsa commodi enim.', 'penser-comme-un-gagnant-79', 0, 1, '2020-05-21 11:18:11', '2020-05-21 11:18:11', NULL, 0, NULL);
+) ENGINE=MyISAM AUTO_INCREMENT=83 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -195,32 +176,6 @@ CREATE TABLE IF NOT EXISTS `item_parents_suivies` (
 INSERT INTO `item_parents_suivies` (`id`, `item_parent_id`, `learner_id`, `date_debut`, `date_fin`) VALUES
 (1, 51, 1, '2020-04-24 15:16:47', NULL),
 (2, 52, 1, '2020-04-24 15:18:35', NULL);
-
--- --------------------------------------------------------
-
---
--- Structure de la table `learners`
---
-
-DROP TABLE IF EXISTS `learners`;
-CREATE TABLE IF NOT EXISTS `learners` (
-  `id` int(15) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8_bin NOT NULL,
-  `first_names` varchar(255) COLLATE utf8_bin NOT NULL,
-  `password` varchar(255) COLLATE utf8_bin NOT NULL,
-  `contact` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `adresse_email` varchar(255) COLLATE utf8_bin NOT NULL,
-  `date_abonnement` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UN_MAIL` (`adresse_email`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
---
--- Déchargement des données de la table `learners`
---
-
-INSERT INTO `learners` (`id`, `name`, `first_names`, `password`, `contact`, `adresse_email`, `date_abonnement`) VALUES
-(1, 'tanoh', 'bassa patrick joel', '$2y$10$NlCt2e.XtG8DmZFYiSB0suGNVX6G0ZeNLny6mdLAriyTUnxXgMQge', '+22549324696', 'tanohbassapatrick@gmail.com', '2020-04-24 15:13:48');
 
 -- --------------------------------------------------------
 
@@ -259,11 +214,11 @@ CREATE TABLE IF NOT EXISTS `options` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `parent_child`
+-- Structure de la table `parent_and_child`
 --
 
-DROP TABLE IF EXISTS `parent_child`;
-CREATE TABLE IF NOT EXISTS `parent_child` (
+DROP TABLE IF EXISTS `parent_and_child`;
+CREATE TABLE IF NOT EXISTS `parent_and_child` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent_id` int(11) NOT NULL,
   `child_id` int(11) NOT NULL,
@@ -271,6 +226,32 @@ CREATE TABLE IF NOT EXISTS `parent_child` (
   KEY `parent_id` (`parent_id`) USING BTREE,
   KEY `child_id` (`child_id`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `suscribers`
+--
+
+DROP TABLE IF EXISTS `suscribers`;
+CREATE TABLE IF NOT EXISTS `suscribers` (
+  `id` int(15) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_bin NOT NULL,
+  `first_names` varchar(255) COLLATE utf8_bin NOT NULL,
+  `password` varchar(255) COLLATE utf8_bin NOT NULL,
+  `contact` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `adresse_email` varchar(255) COLLATE utf8_bin NOT NULL,
+  `date_abonnement` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UN_MAIL` (`adresse_email`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Déchargement des données de la table `suscribers`
+--
+
+INSERT INTO `suscribers` (`id`, `name`, `first_names`, `password`, `contact`, `adresse_email`, `date_abonnement`) VALUES
+(1, 'tanoh', 'bassa patrick joel', '$2y$10$NlCt2e.XtG8DmZFYiSB0suGNVX6G0ZeNLny6mdLAriyTUnxXgMQge', '+22549324696', 'tanohbassapatrick@gmail.com', '2020-04-24 15:13:48');
 
 --
 -- Index pour les tables déchargées

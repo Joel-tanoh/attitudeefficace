@@ -61,6 +61,7 @@ class Image extends File
     public function saveAvatar($avatar_name)
     {
         $this->save($avatar_name, AVATARS_PATH, 150, 150);
+        return true;
     }
 
     /**

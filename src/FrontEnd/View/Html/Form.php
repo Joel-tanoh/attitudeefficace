@@ -289,7 +289,7 @@ HTML;
      */
     public function selectParent(string $categorie = null)
     {
-        if (null !== $categorie && Model::isChildCategorie($categorie)) {
+        if (null !== $categorie && Model::isChildCategorie($categorie) && $categorie !== "minis-services") {
             return <<<HTML
             <div id="chooseParentBox" class="mb-3">
                 {$this->label("selectParentList", "Choisir le parent :")}
@@ -354,8 +354,7 @@ HTML;
      */
     public function articleContentTextarea($item = null, string $categorie = null)
     {
-        $article_content = null !== $item ? $item->get("article_content")
-            : $categorie === "articles" ? "" : null;
+        $article_content = null !== $item ? $item->get("article_content") : $categorie === "articles" ? "" : null;
 
         extract($_POST);
 
@@ -520,17 +519,17 @@ HTML;
             <div class="mb-2">Envoyer une notification à :</div>
             <div class="custom-control custom-radio">
                 <input class="custom-control-input" type="radio" id="informAll" name="notify_users" value="all">
-                <label for="informAll" class="custom-control-label">Tous les utilisateurs :</label>
+                <label for="informAll" class="custom-control-label">tous les utilisateurs :</label>
                 <p class="notice">Les emails seront envoyés à tous les utilisateurs</p>
             </div>
             <div class="custom-control custom-radio">
                 <input class="custom-control-input" type="radio" id="customRadio2" name="notify_users" value="newsletter">
-                <label for="customRadio2" class="custom-control-label">Que la newsletter :</label>
+                <label for="customRadio2" class="custom-control-label">que la newsletter :</label>
                 <p class="notice">Les emails seront envoyés qu'aux abonnés à la newsletter</p>
             </div>
             <div class="custom-control custom-radio">
-                <input class="custom-control-input" type="radio" id="customRadio3" name="notify_users" value="learners">
-                <label for="customRadio3" class="custom-control-label">Que les étudiants :</label>
+                <input class="custom-control-input" type="radio" id="customRadio3" name="notify_users" value="suscribers">
+                <label for="customRadio3" class="custom-control-label">que les souscrivants :</label>
                 <p class="notice">Les emails seront envoyés qu'à ceux qui sont abonnés à une
                     formation ou à une étape</p>
             </div>
