@@ -247,7 +247,7 @@ HTML;
      */
     public function listItems(array $items, string $class_name)
     {
-        $title = ucfirst(Model::getCategorieFormated(Router::urlAsArray()[0], "pluriel"));
+        $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
         if (empty($items)) {
             $notification = new Notification();
             $to_show = $notification->info( $notification->noItems( $class_name ) );
@@ -335,7 +335,7 @@ HTML;
         $notification = new Notification();
         $formContent = $form->getForm($categorie);
         $error = !empty($errors) ? $notification->errors($errors) : null;
-        $title = ucfirst(Model::getCategorieFormated(Router::urlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
+        $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
 
         return <<<HTML
         <div class="mb-3">
@@ -432,15 +432,17 @@ HTML;
         $list = "";
 
         if (empty($items)) {
-            $notification = $notifier->info( $notifier->nothingToDelete( Model::getCategorieFormated($categorie) ) );
+            $notification = $notifier->info( $notifier->nothingToDelete( Model::getCategorieFormated($categorie, "pluriel") ) );
         } else {
             $list = $this->deleteItemsTable($items, $categorie);
         }
 
         $error = null !== $error ? $notifier->error($error) : null;
+        $title = Model::getCategorieFormated($categorie, "puriel");
 
         return <<<HTML
         <div class="mb-3">
+            {$this->crumbs($title)}
             {$error}
             {$notification}
             {$list}
@@ -504,10 +506,10 @@ HTML;
     public function manageButtons($item)
     {
         $buttons = '';
-        $buttons .= $this->manageButton($item, "edit_url", "bg-blue mr-1", "far fa-edit fa-lg", "Editer");
-        $buttons .= $this->manageButton($item, "post_url", "bg-success mr-1", "fas fa-reply fa-lg", "Poster");
-        $buttons .= $this->manageButton($item, "share_url", "bg-success mr-1", "fas fa-share fa-lg", "Partager");
-        $buttons .= $this->manageButton($item, "delete_url", "bg-danger mr-1", "far fa-trash-alt fa-lg", "Supprimer");
+        $buttons .= $this->button($item->get("edit_url"), "Editer", "btn-primary mr-1", "far fa-edit fa-lg");
+        $buttons .= $this->button($item->get("post_url"), "Poster", "btn-success mr-1", "fas fa-reply fa-lg");
+        $buttons .= $this->button($item->get("share_url"), "Partager", "btn-success mr-1", "fas fa-share fa-lg");
+        $buttons .= $this->button($item->get("delete_url"), "Supprimer", "btn-danger mr-1", "far fa-trash-alt fa-lg");
         
         return <<<HTML
         <div class="mb-4">
@@ -631,6 +633,7 @@ HTML;
      */
     public function crumbs(string $title = null)
     {
+        $title = ucfirst($title);
         return <<<HTML
         <div class="d-flex align-items-center mb-3">
             <div class="h4 mr-3">{$title}</div>
@@ -648,9 +651,8 @@ HTML;
     {
         return <<<HTML
         <div>
-            {$this->button(Model::getCategorieUrl(Router::urlAsArray()[0], ADMIN_URL)."/create", "Ajouter", "btn text-primary",  "fas fa-plus")}
-            /
-            {$this->button(Model::getCategorieUrl(Router::urlAsArray()[0], ADMIN_URL)."/delete", "Supprimer", "btn text-danger", "fas fa-trash-alt")}
+            {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", "Ajouter", "btn-success",  "fas fa-plus")}
+            {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", "Supprimer", "btn-danger", "fas fa-trash-alt")}
         </div>
 HTML;
     }
@@ -772,7 +774,7 @@ HTML;
             $fa_icon_class = '<i class="' . $fa_icon_class. '"></i>';
         }
         return <<<HTML
-        <a class="{$btn_class}" href="{$href}">
+        <a class="btn {$btn_class}" href="{$href}">
             {$fa_icon_class}
             <span>{$text}</span>
         </a>
@@ -878,7 +880,7 @@ HTML;
     private function manageButton($item = null, string $link = null, string $class = null, string $fa_class = null, string $text = null)
     {
         return <<<HTML
-        <a class="app-btn {$class} pb-2" href="{$item->get($link)}">
+        <a class="btn {$class} pb-2" href="{$item->get($link)}">
             <i class="{$fa_class}"></i>{$text}
         </a>
 HTML;

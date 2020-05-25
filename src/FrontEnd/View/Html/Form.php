@@ -41,13 +41,13 @@ class Form
      */
     public function getForm($categorie, $item = null)
     {
-        if ($categorie === "administrateurs") $form = $this->adminForm($item);
+        if ($categorie === "administrateurs") return $this->addAdminUserForm($item);
         elseif ($categorie === "minis-services") $form = $this->miniServiceForm($item, $categorie);
         elseif (Model::isParentCategorie($categorie)) $form = $this->parentForm($item, $categorie);
         elseif (Model::isChildCategorie($categorie)) $form = $this->childForm($item, $categorie);
         else Utils::header(ADMIN_URL);
 
-        return $form;
+        return $this->returnForm($form);
     }
 
     /**
@@ -57,7 +57,7 @@ class Form
      * 
      * @return string
      */
-    public function adminForm($admin = null)
+    public function addAdminUserForm($admin = null)
     {
         $form_content = $this->loginInput($admin, "col-12 form-control");
         $form_content .= $this->passwordInput("col-12 form-control");
@@ -97,8 +97,7 @@ HTML;
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         accéder à cet élément</p>
 HTML;
-        $form_content = $this->commonItemsInformations($item, $prix_label, $categorie);
-        return $this->returnForm($form_content);
+        return $this->commonItemsInformations($item, $prix_label, $categorie);
     }
  
     /**
@@ -123,7 +122,40 @@ HTML;
         $formContent .= $this->articleContentTextarea($item, $categorie);
         $formContent .= $this->pdfFileInput($uploadPdf);
 
-        return $this->returnForm($formContent);
+        return $formContent;
+    }
+
+    /**
+     * Retourne le formulaire pour ajouter une formation.
+     * 
+     * @param $item
+     * 
+     * @return string
+     */
+    public function addFormationForm($item = null)
+    {
+        $prix_label = <<<HTML
+        Prix :
+        <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
+        avoir accès à cet élément</p>
+HTML;
+        $form_content = <<<HTML
+        <div class="row mb-2">
+            <div class="col-md-6">
+                {$this->titleInput($item)}
+                {$this->descriptionTextarea($item)}
+            </div>
+            <div class="col-md-6">
+                {$this->prixInput($item, $prix_label)}
+                {$this->rangInput($item, "formations")}
+                {$this->videoInput($item)}
+                {$this->imageInput()}
+                {$this->notifyUsersBox()}
+            </div>
+        </div>
+HTML;
+
+        return $form_content;
     }
 
     /**
@@ -143,8 +175,7 @@ HTML;
         </p>
 HTML;
         $form_content = $this->commonItemsInformations($item, $mini_service_label, $categorie);
-
-        return $this->returnForm($form_content);
+        return $form_content;
     }
 
     /**
@@ -161,21 +192,20 @@ HTML;
     public function commonItemsInformations($item = null, $prix_label = null, $categorie = null)
     {
         return <<<HTML
-        <div class="row mb-2">
-            <div class="col-md-6">
+        <div class="row mb-3">
+            <div class="col-md-7">
                 {$this->selectParent($categorie)}
                 {$this->titleInput($item)}
                 {$this->descriptionTextarea($item)}
-                {$this->videoInput($item)}
-                {$this->imageInput()}
             </div>
-            <div class="col-md-6">
+            <div class="col-md-5">
                 {$this->prixInput($item, $prix_label)}
+                {$this->videoInput($item)}
                 {$this->rangInput($item, $categorie)}
+                {$this->imageInput()}
                 {$this->notifyUsersBox()}
             </div>
         </div>
-
 HTML;
     }
 
@@ -339,7 +369,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("descriptionTextarea", "Description")}
-            {$this->inputTextarea('description', 'descriptionTextarea', "Saisir la description...", $description, "form-control", "5")}
+            {$this->inputTextarea('description', 'descriptionTextarea', "Saisir la description...", $description, "form-control", "10")}
         </div>
 HTML;
     }
@@ -565,7 +595,7 @@ HTML;
      */
     public function submitButton(string $name = null,  string $text = null, string $class = null)
     {
-        return $this->button("submit", $name, $text, $class);
+        return $this->button("submit", $name, $text, "btn-primary");
     }
 
     /**
@@ -827,7 +857,7 @@ HTML;
     private function button(string $type = null, string $name = null,  string $text = null, string $class = null)
     {
         return <<<HTML
-		<button type="{$type}" name="{$name}" class="app-btn bg-primary {$class}">
+		<button type="{$type}" name="{$name}" class="btn {$class}">
 			{$text}
 		</button>
 HTML;

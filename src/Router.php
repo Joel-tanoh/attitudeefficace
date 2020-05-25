@@ -31,7 +31,7 @@ use App\Controller;
 class Router
 {
     private $url;
-    private $url_array;
+    private $url_as_array;
 
     /**
      * Constructeur du routeur, prend en paramètre l'url.
@@ -43,31 +43,31 @@ class Router
     public function __construct($url)
     {
         $this->url = $url;
-        $this->url_array = explode('/', $url);
+        $this->url_as_array = explode('/', $url);
     }
 
     /**
-     * Routeur de l'administration du blog, un tableau contenant le titre et le contenu de
-     * la page.
+     * Retourne l'url de la page courante grâce au fichier .htacces qui
+     * permet de ramener toutes les urls vers l'index du dossier où le
+     * fichier il se trouve en générant une variable global $_GET["url"].
      * 
-     * @return array
-     **/
-    public function adminRouter()
+     * @return string
+     */
+    public static function getUrl()
     {
-        $controller = new Controller($this->url_array);
+        return isset($_GET["url"]) ? $_GET["url"] : "";
+    }
 
-        if ($this->match("")) $controller->dashboard();
-        elseif ($this->match("administrateurs")) $controller->listAdminUsersAccounts();
-        elseif ($this->match("motivation-plus")) $controller->listMotivationPlusVideo();
-        elseif ($this->match("motivation-plus/create")) $controller->createMotivationPlusVideo();
-        elseif ($this->match("motivation-plus/delete")) $controller->deleteMotivationPlusVideo();
-        elseif ($this->match( [Model::getAllCategories()] ) ) $controller->listCategorieItems();
-        elseif ($this->match( [Model::getAllCategories(), "create"] ) ) $controller->createItem();
-        elseif ($this->match( [Model::getAllCategories(), "delete"] ) ) $controller->deleteManyItems();
-        elseif ($this->match( [Model::getAllCategories(), Model::getAllSlugs()] ) ) $controller->readItem();
-        elseif ($this->match( [Model::getAllCategories(), Model::getAllSlugs(), "edit"] ) ) $controller->editItem();
-        elseif ($this->match( [Model::getAllCategories(), Model::getAllSlugs(), "delete"] ) ) $controller->deleteItem();
-        else $controller->adminError404();
+    /**
+     * Permet de modifier l'url passé en paramètre.
+     * 
+     * @param string $url
+     * 
+     * @return void
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
     }
 
     /**
@@ -87,62 +87,23 @@ class Router
     }
 
     /**
-     * Vérifie la concordance de l'url et la variable passée en paramètre.
-     * 
-     * @param mixed $route
-     * 
-     * @return bool
-     */
-    public function match($route)
-    {
-        if (is_string($route)) {
-            return self::getUri() == $route;
-        } elseif (is_array($route)) {
-            $url_offsets = count(self::urlAsArray());
-            $route_offsets = count($route);
-
-            if ($url_offsets === $route_offsets) {
-                $counter = 0;
-                for ($i = 0; $i <= $route_offsets - 1; $i++) {
-                    if (is_string($route[$i])) {
-                        if (self::urlAsArray()[$i] === $route[$i]) $counter++;
-                    } elseif (is_array($route[$i])) {
-                        if (in_array(self::urlAsArray()[$i], $route[$i])) $counter++;
-                    }
-                }
-
-                if ($counter === $route_offsets) return true;
-                else return false;
-
-            } else {
-                return false;
-            }
-        }
-    }
-
-    /**
-     * Retourne l'url de la page courante grâce au fichier .htacces qui
-     * permet de ramener toutes les urls vers l'index du dossier où le
-     * fichier il se trouve en générant une variable global $_GET["url"].
-     * 
-     * @return string
-     */
-    public static function getUri()
-    {
-        return isset($_GET["url"]) ? $_GET["url"] : "";
-    }
-
-    /**
      * Permet de découper l'url en plusieurs parties.
      * 
      * @return array
      */
-    public static function urlAsArray()
+    public static function getUrlAsArray()
     {
-        $url_as_array = explode("/", self::getUri());
-        if ( empty( $url_as_array[ array_key_last($url_as_array) ]) ) {
+        // On découpe l'url en tableau
+        $url_as_array = explode("/", self::getUrl());
+
+        // On récupère la dernière clé
+        $last_url_as_array_key = array_key_last($url_as_array);
+
+        // Si la dernière valeur du tableau est vide, on la supprime
+        if (empty($url_as_array[$last_url_as_array_key])) {
             array_pop($url_as_array);
         }
+
         return $url_as_array;
     }
 
@@ -154,6 +115,41 @@ class Router
     public static function getUrlVars()
     {
         
+    }
+
+    /**
+     * Vérifie la concordance de l'url et la variable passée en paramètre.
+     * 
+     * @param mixed $route
+     * 
+     * @return bool
+     */
+    public function match($route)
+    {
+        if (is_string($route)) {
+            return self::getUrl() === $route;
+        } elseif (is_array($route)) {
+
+            $url_offsets = count(self::getUrlAsArray());
+            $route_offsets = count($route);
+
+            if ($url_offsets === $route_offsets) {
+                $counter = 0;
+                for ($i = 0; $i <= $route_offsets - 1; $i++) {
+                    if (is_string($route[$i])) {
+                        if (self::getUrlAsArray()[$i] === $route[$i]) $counter++;
+                    } elseif (is_array($route[$i])) {
+                        if (in_array(self::getUrlAsArray()[$i], $route[$i])) $counter++;
+                    }
+                }
+
+                if ($counter === $route_offsets) return true;
+                else return false;
+
+            } else {
+                return false;
+            }
+        }
     }
 
 }

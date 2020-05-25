@@ -13,11 +13,18 @@ require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use App\BackEnd\Utils\Notification;
 use App\Router;
-use App\FrontEnd\Page;
+use App\Controller;
 
 try {
-    $router = new Router(Router::getUri());
-    $page = $router->publicRouter();
+    $router = new Router(Router::getUrl());
+    $controller = new Controller($router->getUrl());
+
+    // Accueil
+    if ($router->match("")) $controller->publicAccueilPage();
+
+    // Error 404
+    else $controller->publicError404();
+    
 } catch(Error|TypeError|Exception|PDOException $e) {
     $exception = 'Erreur : ' . $e->getMessage() . ', Fichier : ' . $e->getFile() . ', Ligne : ' . $e->getLine();
     $notification = new Notification;
