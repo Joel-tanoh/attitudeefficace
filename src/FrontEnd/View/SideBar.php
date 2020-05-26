@@ -83,6 +83,7 @@ HTML;
         <div class="sidebar d-lg-none">
             {$this->sidebarBrand(LOGOS_DIR. "/logo_3.png", true, ADMIN_URL)}
             {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
+            {$this->searchBar()}
             {$this->links()}
         </div>
 HTML;
