@@ -190,13 +190,6 @@ a:hover {
 .img-circle {
 	border-radius: 50%;
 }
-/** Image utilisateur */
-.navbar-user-avatar {
-	width: 1.7rem;
-}
-.sidebar-user-avatar {
-	width: 7rem;
-}
 
 /* Les textes */
 .text-small {
@@ -208,6 +201,7 @@ a:hover {
 .text-bold {
 	font-weight: bold;
 }
+
 /* Les couleurs des textes */
 .text-blue {
 	color: rgb(41, 128, 185);
@@ -215,6 +209,10 @@ a:hover {
 a.text-blue:hover {
 	color: rgb(11, 72, 112);
 }
+a.text-black {
+	color: rgb(0, 0, 0);
+}
+
 
 /* Les cartes */
 .app-card {
@@ -265,25 +263,6 @@ button {
 /* Taille du logo */
 .brand {
 	width: 5rem;
-}
-
-/* Lorsque le logo est dans la sidebar */
-.sidebar-brand {
-	width: 6rem !important;
-}
-
-/* Les layouts */
-/* Conteneur d'une layout avec une fixed sidebar et une navbar */
-.container-with-fixed-sidebar-and-navbar {
-	margin-left: 18.7rem;
-	margin-top: 5rem;
-}
-
-@media (max-width: 992px) {
-	.container-with-fixed-sidebar-and-navbar  {
-		margin-top: 3.1rem;
-		margin-left: 0;
-	}
 }
 
 /* Les formulaires */

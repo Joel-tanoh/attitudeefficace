@@ -22,7 +22,7 @@ use App\BackEnd\Models\ItemChild;
 use App\FrontEnd\View\Card;
 
 /**
- * Gère tout ce qui concerne l'affichage au niveau des items parents dans l'app.
+ * Gère tout ce qui concerne l'affichage au niveau des parents parents dans l'app.
  * 
  * @category Category
  * @package  Package
@@ -44,22 +44,22 @@ class ParentView extends \App\FrontEnd\View\View
     public function readParent($parent)
     {
         $view = new parent;
-        $self_layout = new self;
+        $self_view = new self;
         
         return <<<HTML
-        <div class="mb-3">
-            <h2 class="mb-3">{$parent->get("title")}</h2>
+        <div class="row mb-2 px-2">
+            <h2 class="col-12 col-md-6 mb-2">{$parent->get("title")}</h2>
             {$view->manageButtons($parent)}
-            {$view->showData($parent)}
-            {$self_layout->showChildren($parent)}
         </div>
+        {$view->showData($parent)}
+        {$self_view->showChildren($parent)}
 HTML;
     }
     
     /**
      * Affiche les cartes des articles, des vidéos, des ebooks et des livres.
      * 
-     * @param ItemParent $parent La catégorie dont il faut afficher les items
+     * @param ItemParent $parent La catégorie dont il faut afficher les parents
      *                         enfants.
      * 
      * @return string
@@ -67,19 +67,23 @@ HTML;
     private function showChildren($parent)
     {
         return <<<HTML
-        <div class="app-card">
-            <div class="card-body pb-2">
-                {$this->showChildrenItemsByType($parent, 'articles')}
-                {$this->showChildrenItemsByType($parent, 'videos')}
-                {$this->showChildrenItemsByType($parent, 'ebooks')}
-                {$this->showChildrenItemsByType($parent, 'livres')}
+        <div class="row">
+            <div class="col-12 px-3">
+                <div class="card">
+                    <div class="card-body pb-2">
+                        {$this->showChildrenItemsByType($parent, 'articles')}
+                        {$this->showChildrenItemsByType($parent, 'videos')}
+                        {$this->showChildrenItemsByType($parent, 'ebooks')}
+                        {$this->showChildrenItemsByType($parent, 'livres')}
+                    </div>
+                </div>
             </div>
         </div>
 HTML;
     }
 
     /**
-     * Affiche les items enfants en fonction de leur catégorie.
+     * Affiche les parents enfants en fonction de leur catégorie.
      * 
      * @param $parent          La catégorie dont il faut afficher les éléments.
      * @param $children_type Le type des éléments qu'il faut qu'il faut afficher.
@@ -116,13 +120,13 @@ HTML;
     }
 
     /**
-     * Affiche le type des items enfants et le nombre qu'il contient.
+     * Affiche le type des parents enfants et le nombre qu'il contient.
      * 
      * @param $parent 
      * 
      * @return string
      */
-    public static function itemchildrenNumber($parent)
+    public static function parentchildrenNumber($parent)
     {
         $articles = Bdd::getchildrenOf($parent->get("id"), "articles");
         $articles_number = count($articles);

@@ -55,5 +55,28 @@ label #cancel {
 	top: .5rem;
 }
 .sidebar-brand {
-	margin-left: 3.95rem;
+	width: 6rem !important;
+}
+
+.sidebar-user-avatar {
+	width: 7rem;
+	box-shadow: 0 0 1rem #2D3A4A;
+}
+
+/* Les layouts */
+/* Conteneur d'une layout avec une fixed sidebar et une navbar */
+#container-with-fixed-sidebar-and-navbar {
+	/* On donne une marge à gauche interne d'une taille supérieure ou égale
+	à celle de la sidebar*/
+	padding-left: 19rem;
+	/* On donne une marge de haut externe d'une taille supérieure ou égale
+	à celle de la navbar*/
+	margin-top: 4.95rem;
+}
+
+@media (max-width: 992px) {
+	#container-with-fixed-sidebar-and-navbar  {
+		margin-top: 3.1rem;
+		padding-left: 1rem;
+	}
 }

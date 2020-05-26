@@ -43,7 +43,7 @@ class Layout
         return <<<HTML
         {$navbar}
         {$sidebar}
-        <div class="container-with-fixed-sidebar-and-navbar px-3">
+        <div class="container-fluid mb-3" id="container-with-fixed-sidebar-and-navbar">
             {$container_content}
         </div>
 HTML;

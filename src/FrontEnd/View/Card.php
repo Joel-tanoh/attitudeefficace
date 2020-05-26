@@ -31,7 +31,7 @@ class Card extends View
         string $href = null,
         string $date_created = null
     ) {
-
+        $img = null;
         if (null !== $img_src) {
             $img = <<<HTML
             <img src="{$img_src}" alt="une photo de {$title}" class="img-fluid">
@@ -41,18 +41,18 @@ HTML;
         if (null !== $date_created) {
             $date_created = <<<HTML
             <div>
-                <i class="fas fa-clock mr-2"></i><span>Ajoutée le {$date_created} </span>
+                <i class="far fa-clock mr-2"></i><span>Ajoutée le {$date_created} </span>
             </div>
 HTML;
         }
 
         return <<<HTML
-        <div class="col-12 col-sm-6 col-md-3 mb-3">
-            <a href="{$href}">
+        <div class="col-12 col-sm-6 col-md-3 mb-2">
+            <a href="{$href}" class="text-black">
                 <div class="border">
                     {$img}
                     <div class="p-3 bg-white">
-                        <h6 class="text-black">{$title}</h6>
+                        <h6>{$title}</h6>
                         {$date_created}
                     </div>
                 </div>

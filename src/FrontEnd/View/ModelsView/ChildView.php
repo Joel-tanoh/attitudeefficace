@@ -36,16 +36,16 @@ class ChildView extends \App\FrontEnd\View\View
      */
     public static function readChild($item)
     {
-        $layout = new parent;
-        $self_layout = new self;
+        $view = new parent;
+        $self_view = new self;
 
         return <<<HTML
-        <div class="mb-3">
-            <h2 class="mb-3">{$item->get("title")}</h2>
-            {$layout->manageButtons($item)}
-            {$layout->showData($item)}
-            {$self_layout->showArticle($item)}
+        <div class="row mb-2 px-1">
+            <h2 class="col-12 col-md-6 mb-2">{$item->get("title")}</h2>
+            {$view->manageButtons($item)}
         </div>
+        {$view->showData($item)}
+        {$self_view->showArticle($item)}
 HTML;
     }
 

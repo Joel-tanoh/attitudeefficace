@@ -174,19 +174,17 @@ HTML;
         avoir accès à cet élément</p>
 HTML;
         return <<<HTML
-        <div class="row mb-3">
-            <div class="col-md-7">
-                {$this->selectParent("videos")}
-                {$this->titleInput($item)}
-                {$this->descriptionTextarea($item)}
-                {$this->videoInput($item)}
-            </div>
-            <div class="col-md-5">
-                {$this->prixInput($item, $prix_label)}
-                {$this->rangInput($item, "videos")}
-                {$this->imageInput()}
-                {$this->notifyUsersBox()}
-            </div>
+        <div class="col-md-7">
+            {$this->selectParent("videos")}
+            {$this->titleInput($item)}
+            {$this->descriptionTextarea($item)}
+            {$this->videoInput($item)}
+        </div>
+        <div class="col-md-5">
+            {$this->prixInput($item, $prix_label)}
+            {$this->rangInput($item, "videos")}
+            {$this->imageInput()}
+            {$this->notifyUsersBox()}
         </div>
 HTML;
     }
@@ -225,7 +223,7 @@ HTML;
     public function commonItemsInformations($item = null, $prix_label = null, $categorie = null)
     {
         return <<<HTML
-        <div class="row mb-3">
+        <div class="row mb-2">
             <div class="col-md-7">
                 {$this->selectParent($categorie)}
                 {$this->titleInput($item)}
@@ -354,7 +352,7 @@ HTML;
     {
         if (null !== $categorie && Model::isChildCategorie($categorie) && $categorie !== "minis-services") {
             return <<<HTML
-            <div id="chooseParentBox" class="mb-3">
+            <div id="chooseParentBox" class="mb-2">
                 {$this->label("selectParentList", "Choisir le parent :")}
                 <select name="parent_id" id="selectParentList" class="select2 col-12 form-control">
                     <option value="0">-- Sans parent --</option>

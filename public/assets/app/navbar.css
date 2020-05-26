@@ -60,3 +60,7 @@
 .btn-administrateur .content a:hover {
     background-color: rgba(176,220,239,.3);
 }
+/** Image utilisateur */
+.navbar-user-avatar {
+	width: 1.7rem;
+}

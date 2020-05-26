@@ -195,13 +195,15 @@ HTML;
     {
         if ($set_it_clickable) {
             return <<<HTML
-            <a class="brand" href="{$click_direction}">
-                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand mb-2">
+            <a class="brand text-center" href="{$click_direction}">
+                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand my-2">
             </a>
 HTML;
         } else {
             return <<<HTML
-            <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand mb-2">
+            <a class="brand text-center">
+                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand my-2">
+            </a>
 HTML;
         }
     }
@@ -255,14 +257,12 @@ HTML;
         }
 
         return <<<HTML
-        <div class="mb-3">
-            <div class="mb-4">
-                {$this->crumbs($title)}
-            </div>
-            <section class="row">
-                {$to_show}
-            </section>
+        <div class="mb-4">
+            {$this->crumbs($title)}
         </div>
+        <section class="row px-2">
+            {$to_show}
+        </section>
 HTML;
     }
 
@@ -287,16 +287,14 @@ HTML;
         }
         
         return <<<HTML
-        <div class="mb-3">
-            <h1 class="mb-3">Bienvenue dans votre rubrique Motivation +</h1>
-            <section class="d-flex align-items-center mb-4">
-                <div class="mr-2">Vous avez actuellement {$number_of_videos} vidéos.</div>
-                {$this->contextMenu()}
-            </section>
-            <section class="row">
-                {$videos_list}
-            </section>
-        </div>
+        <h1 class="mb-3">Bienvenue dans votre rubrique Motivation +</h1>
+        <section class="row d-flex align-items-center mb-4 px-2">
+            <h5 class="col-12 col-sm-6">Vous avez actuellement {$number_of_videos} vidéos.</h5>
+            {$this->contextMenu()}
+        </section>
+        <section class="row px-2">
+            {$videos_list}
+        </section>
 HTML;
     }
 
@@ -352,7 +350,7 @@ HTML;
         $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
 
         return <<<HTML
-        <div class="mb-3">
+        <div class="mb-2">
             {$this->crumbs($title)}
             {$error}
             {$formContent}
@@ -376,11 +374,9 @@ HTML;
         $title = "Motivation + &#8250 nouvelle vidéo";
 
         return <<<HTML
-        <div class="mb-3">
-            {$this->crumbs($title)}
-            {$error}
-            {$formContent}
-        </div>
+        {$this->crumbs($title)}
+        {$error}
+        {$formContent}
 HTML;
     }
 
@@ -422,11 +418,9 @@ HTML;
         $title = $item->get('title') . " &#8250 éditer";
 
         return <<<HTML
-        <div class="mb-3">
-            {$this->crumbs($title)}
-            {$error}
-            {$form}
-        </div>
+        {$this->crumbs($title)}
+        {$error}
+        {$form}
 HTML;
     }
 
@@ -455,12 +449,10 @@ HTML;
         $title = Model::getCategorieFormated($categorie, "puriel");
 
         return <<<HTML
-        <div class="mb-3">
-            {$this->crumbs($title)}
-            {$error}
-            {$notification}
-            {$list}
-        </div>
+        {$this->crumbs($title)}
+        {$error}
+        {$notification}
+        {$list}
 HTML;
     }
 
@@ -519,15 +511,16 @@ HTML;
      */
     public function manageButtons($item)
     {
-        $buttons = '';
-        $buttons .= $this->button($item->get("edit_url"), "Editer", "btn-primary mr-1", "far fa-edit fa-lg");
+        $buttons = $this->button($item->get("edit_url"), "Editer", "btn-primary mr-1", "far fa-edit fa-lg");
         $buttons .= $this->button($item->get("post_url"), "Poster", "btn-success mr-1", "fas fa-reply fa-lg");
         $buttons .= $this->button($item->get("share_url"), "Partager", "btn-success mr-1", "fas fa-share fa-lg");
         $buttons .= $this->button($item->get("delete_url"), "Supprimer", "btn-danger mr-1", "far fa-trash-alt fa-lg");
         
         return <<<HTML
-        <div class="mb-4">
-            {$buttons}
+        <div class="col-12 col-md-6">
+            <div class="float-sm-right">
+                {$buttons}
+            </div>
         </div>
 HTML;
     }
@@ -539,22 +532,19 @@ HTML;
      * 
      * @return string
      */
-    public function showYoutubeVideo(string $video_link = null)
+    public function showVideo(string $video_link = null)
     {
-        if (null === $video_link) {
-            $result = $this->noVideoBox();
+        if (null !== $video_link) {
+            $result = $this->youtubeIframe($video_link);
         } else {
-            $result = <<<HTML
-            <iframe src="https://www.youtube.com/embed/{$video_link}"
-                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen class="w-100 video" style="height:30rem"></iframe>
-HTML;
+            $result = $this->noVideoBox();
         }
 
         return <<<HTML
-        <div class="card mb-3">
-            <div class="card-header">Vidéo</div>
-            {$result}
+        <div class="row mb-3">
+            <section class="col-12 px-3">
+                {$result}
+            </section>
         </div>
 HTML;
     }
@@ -580,7 +570,7 @@ HTML;
         if (empty($list)) $list = '<div>Vide</div>';
 
         return <<<HTML
-        <div class="col-md-3 mb-3">
+        <div class="col-md-3 mb-2">
             <div class="card">
                 <h6 class="card-header bg-white">Voir aussi</h6>
                 <div class="card-body">
@@ -601,15 +591,15 @@ HTML;
     public function showData($item)
     {
         return <<<HTML
-        <div class="row mb-3">
-            <div class="col-12 col-md-6 mb-3">
+        <div class="row px-2 mb-3">
+            <div class="col-12 col-md-6">
                 {$this->data($item)}
             </div>
             <div class="col-12 col-md-6">
                 {$this->showThumbs($item)}
             </div>
         </div>
-        {$this->showYoutubeVideo($item->get("video_link"))}
+        {$this->showVideo($item->get("video_link"))}
 HTML;
     }
 
@@ -624,8 +614,8 @@ HTML;
     {
         $title = ucfirst($title);
         return <<<HTML
-        <div class="d-flex align-items-center mb-3">
-            <div class="h4 mr-3">{$title}</div>
+        <div class="row d-flex align-items-center mb-2 px-2">
+            <h3 class="col-12 col-md-6">{$title}</h1>
             {$this->contextMenu()}
         </div>
 HTML;
@@ -639,9 +629,11 @@ HTML;
     public function contextMenu()
     {
         return <<<HTML
-        <div>
-            {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", "Ajouter", "btn-success",  "fas fa-plus")}
-            {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", "Supprimer", "btn-danger", "fas fa-trash-alt")}
+        <div class="col-12 col-md-6">
+            <div class="float-sm-right">
+                {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", "Ajouter", "btn-success",  "fas fa-plus")}
+                {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", "Supprimer", "btn-danger", "fas fa-trash-alt")}
+            </div>
         </div>
 HTML;
     }
@@ -668,34 +660,17 @@ HTML;
     }
 
     /**
-     * Affiche une ligne d'une liste.
+     * Retourne le vue pour lire la vidéo issue de Youtube.
      * 
-     * @param $item L'objet dont on affiche les données.
-     *
+     * @param string $video_link
+     * 
      * @return string
      */
-    private function rowOfListingItems($item)
+    private function youtubeIframe(string $video_link)
     {
-        $title = ucfirst($item->get("title"));
-        $childrenNumber = $item->isParent() ? ParentView::itemchildrenNumber($item) . " | " : null;
-
         return <<<HTML
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="mb-2">{$title}</h5>
-                <div>
-                    Créé le {$item->get("day_creation")} |
-                    Visité {$item->get("views")} fois |
-                    {$childrenNumber}
-                    {$item->get("classement")}
-                </div>
-                <div>
-                    <a href="{$item->get('url')}" class="text-success">Voir plus</a>
-                    <a href="{$item->get('edit_url')}" class="text-blue">Editer</a>
-                    <a href="{$item->get('delete_url')}" class="text-danger">Supprimer</a>
-                </div>
-            </div>
-        </div>
+        <iframe src="https://www.youtube.com/embed/{$video_link}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen class="w-100 video" style="height:30rem"></iframe>
 HTML;
     }
 
@@ -747,8 +722,8 @@ HTML;
     private function connectBySocialsNetworks()
     {
         return <<<HTML
-        <div class="text-center text-muted h5 mb-3">-- OU --</div>
-        <div class="mb-3">
+        <div class="text-center text-muted h5 mb-2">-- OU --</div>
+        <div class="mb-2">
             <div class="mb-2">{$this->connexionFormFacebookButton()}</div>
             <div>{$this->connexionFormGoogleButton()}</div>
         </div>
@@ -849,7 +824,9 @@ HTML;
     private function noThumbsBox()
     {
         return <<<HTML
-        <div>Aucune image.</div>
+        <div class="card-body">
+            Aucune image.
+        </div>
 HTML;
     }
    
@@ -862,7 +839,11 @@ HTML;
     private function noVideoBox()
     {
         return <<<HTML
-        <div>Aucune vidéo.</div>
+        <div class="card mb-2">
+            <div class="card-body">
+                Aucune vidéo.
+            </div>
+        </div>
 HTML;
     }
 
@@ -909,7 +890,7 @@ HTML;
         }
         return <<<HTML
         <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
-            <table class='mb-3'>
+            <table class='mb-2'>
                 <thead>
                     <th><input type="checkbox" id="checkAllItemsForDelete"></th>
                     <th>Titre</th>
