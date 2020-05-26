@@ -38,8 +38,10 @@ class ChildView extends \App\FrontEnd\View\View
     {
         $layout = new parent;
         $self_layout = new self;
+
         return <<<HTML
         <div class="mb-3">
+            <h2 class="mb-3">{$item->get("title")}</h2>
             {$layout->manageButtons($item)}
             {$layout->showData($item)}
             {$self_layout->showArticle($item)}

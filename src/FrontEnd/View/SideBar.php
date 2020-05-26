@@ -42,15 +42,15 @@ class SideBar extends View
     {
         $this->links[] = $this->setLink(PUBLIC_URL, "fas fa-home", "Aller vers le site");
         $this->links[] = $this->setLink(ADMIN_URL, "fas fa-desktop", "Tableau de bord");
-        $this->links[] = $this->setLink(ADMIN_URL."/formations", "fas fa-box", "Formations", true);
-        $this->links[] = $this->setLink(ADMIN_URL."/themes", "fas fa-box", "Thèmes", true);
-        $this->links[] = $this->setLink(ADMIN_URL."/etapes", "fas fa-box", "Etapes", true);
-        $this->links[] = $this->setLink(ADMIN_URL."/motivation-plus", "fas fa-tv", "Motivation plus", true);
-        $this->links[] = $this->setLink(ADMIN_URL."/articles", "fas fa-pen-square", "Articles", true);
-        $this->links[] = $this->setLink(ADMIN_URL."/videos", "fas fa-video", "Vidéos", true);
-        $this->links[] = $this->setLink(ADMIN_URL."/livres", "fas fa-book", "Livres", true);
-        $this->links[] = $this->setLink(ADMIN_URL."/ebooks", "fas fa-book", "Ebooks", true);
-        $this->links[] = $this->setLink(ADMIN_URL."/minis-services", "fas fa-shopping-basket", "Minis services", true);
+        $this->links[] = $this->setLink(ADMIN_URL."/formations", "fas fa-box", "Formations");
+        $this->links[] = $this->setLink(ADMIN_URL."/themes", "fas fa-box", "Thèmes");
+        $this->links[] = $this->setLink(ADMIN_URL."/etapes", "fas fa-box", "Etapes");
+        $this->links[] = $this->setLink(ADMIN_URL."/motivation-plus", "fas fa-tv", "Motivation plus");
+        $this->links[] = $this->setLink(ADMIN_URL."/articles", "fas fa-pen-square", "Articles");
+        $this->links[] = $this->setLink(ADMIN_URL."/videos", "fas fa-video", "Vidéos");
+        $this->links[] = $this->setLink(ADMIN_URL."/livres", "fas fa-book", "Livres");
+        $this->links[] = $this->setLink(ADMIN_URL."/ebooks", "fas fa-book", "Ebooks");
+        $this->links[] = $this->setLink(ADMIN_URL."/minis-services", "fas fa-shopping-basket", "Minis services");
     }
 
     /**
@@ -105,6 +105,7 @@ HTML;
         <div class="sidebar d-none d-lg-block">
             {$this->sidebarBrand(LOGOS_DIR. "/logo_3.png", true, ADMIN_URL)}
             {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
+            {$this->searchBar()}
             {$this->links()}
         </div>
 HTML;

@@ -12,7 +12,6 @@ use App\BackEnd\APIs\Bdd;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Notification;
 use App\FrontEnd\View\Html\Form;
-use App\FrontEnd\View\Layout;
 use App\FrontEnd\View\ModelsView\AdministrateurView;
 use App\FrontEnd\View\ModelsView\ParentView;
 use App\FrontEnd\View\ModelsView\ChildView;
@@ -69,11 +68,6 @@ class View
                         <div class="d-flex justify-content-between mb-2">
                             {$this->activateSessionButton()}
                             {$form->submitButton("connexion", "Connexion")}
-                        </div>
-                        <div class="text-center text-muted h5">-- OU --</div>
-                        <div class="mb-3">
-                            <div class="mb-2">{$this->connexionFormFacebookButton()}</div>
-                            <div>{$this->connexionFormGoogleButton()}</div>
                         </div>
                     </div>
                     <footer>
@@ -250,20 +244,24 @@ HTML;
         $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
         if (empty($items)) {
             $notification = new Notification();
-            $to_show = $notification->info( $notification->noItems( $class_name ) );
+            $to_show = '<div class="col-12">'. $notification->info($notification->noItems($class_name)) .'</div>';
         } else {
             $list = "";
             foreach ($items as $item) {
                 $object = Model::returnObject($class_name, $item["code"]);
-                $list .= $this->rowOfListingItems($object);
+                $list .= Card::card($object->get("thumbs_src"), $object->get("title"), $object->get("admin_url"), $object->get("day_creation"));
             }
             $to_show = $list;
         }
 
         return <<<HTML
         <div class="mb-3">
-            {$this->crumbs($title)}
-            {$to_show}
+            <div class="mb-4">
+                {$this->crumbs($title)}
+            </div>
+            <section class="row">
+                {$to_show}
+            </section>
         </div>
 HTML;
     }
@@ -277,11 +275,27 @@ HTML;
      */
     public function listMotivationPlusVideos(array $videos)
     {
-        $title = "Motivation plus";
+        $number_of_videos = Bdd::countTableItems("item_childs", "categorie", "videos");
+        if (empty($videos)) {
+            $videos_list = null;
+        } else {
+            $videos_list = "";
+            foreach($videos as $video) {
+                $video = Model::returnObject("videos", $video["code"]);
+                $videos_list .= Card::card($video->get("thumbs_src"), $video->get("title"), $video->get("admin_url"), $video->get("day_creation"));
+            }
+        }
+        
         return <<<HTML
         <div class="mb-3">
-            {$this->crumbs($title)}
-            Vous êtes sur la page qu s'affiche lorsque vous demandez motivation plus
+            <h1 class="mb-3">Bienvenue dans votre rubrique Motivation +</h1>
+            <section class="d-flex align-items-center mb-4">
+                <div class="mr-2">Vous avez actuellement {$number_of_videos} vidéos.</div>
+                {$this->contextMenu()}
+            </section>
+            <section class="row">
+                {$videos_list}
+            </section>
         </div>
 HTML;
     }
@@ -359,7 +373,7 @@ HTML;
         $notification = new Notification();
         $formContent = $form->getForm("videos");
         $error = !empty($errors) ? $notification->errors($errors) : null;
-        $title = ucfirst(Model::getCategorieFormated("motivation-plus", "pluriel")) . " &#8250 nouvelle vidéo";
+        $title = "Motivation + &#8250 nouvelle vidéo";
 
         return <<<HTML
         <div class="mb-3">
@@ -519,46 +533,21 @@ HTML;
     }
 
     /**
-     * Retourne une petite carte pour afficher un item.
-     * 
-     * @param $item 
-     * 
-     * @return string
-     */
-    public function smallCard($item)
-    {
-        $title = ucfirst($item->get("title"));
-        
-        return <<<HTML
-        <div class="col-12 col-sm-6 col-md-4 mb-3">
-            <a href="{$item->get('url')}">
-                <h5>{$title}</h4>
-                <div class="mb-3">
-                    <div>Crée le {$item->get("date_creation")}</div>
-                    <div>Mis à jour {$item->get("date_modification")}</div>
-                    <div>Posté : {$item->get("posted")}</div>
-                </div>
-            </a>
-        </div>
-HTML;
-    }
-
-    /**
      * Affiche la vidéo de description de l'instance passé en paramètre.
      * 
-     * @param $item L'objet dont on affiche les données.
+     * @param string $video_link L'identifiant de la vidéos sur Youtube.
      * 
      * @return string
      */
-    public function showYoutubeVideo($item)
+    public function showYoutubeVideo(string $video_link = null)
     {
-        if (null === $item->get("video_link")) {
+        if (null === $video_link) {
             $result = $this->noVideoBox();
         } else {
             $result = <<<HTML
-            <iframe src="https://www.youtube.com/embed/{$item->get('video_link')}"
+            <iframe src="https://www.youtube.com/embed/{$video_link}"
                 allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen class="w-100 h-100 video"></iframe>
+                allowfullscreen class="w-100 video" style="height:30rem"></iframe>
 HTML;
         }
 
@@ -620,7 +609,7 @@ HTML;
                 {$this->showThumbs($item)}
             </div>
         </div>
-        {$this->showYoutubeVideo($item)}
+        {$this->showYoutubeVideo($item->get("video_link"))}
 HTML;
     }
 
@@ -653,6 +642,27 @@ HTML;
         <div>
             {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", "Ajouter", "btn-success",  "fas fa-plus")}
             {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", "Supprimer", "btn-danger", "fas fa-trash-alt")}
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne une vue pour une barre de recherche.
+     * 
+     * @return string
+     */
+    public function searchBar()
+    {
+        $form = new Form();
+
+        return <<<HTML
+        <div class="app-search-bar m-3">
+            <form action="" method="post">
+                {$form->input("search", "recherche", "rechercheInput", null, "Rechercher", "app-search-bar-input p-1")}
+                <button type="submit" class="app-search-bar-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
         </div>
 HTML;
     }
@@ -729,6 +739,23 @@ HTML;
     }
 
     /**
+     * Retourne une vue pour permmetre à l'utilisateur de se connecter
+     * par les réseaux sociaux.
+     * 
+     * @return string
+     */
+    private function connectBySocialsNetworks()
+    {
+        return <<<HTML
+        <div class="text-center text-muted h5 mb-3">-- OU --</div>
+        <div class="mb-3">
+            <div class="mb-2">{$this->connexionFormFacebookButton()}</div>
+            <div>{$this->connexionFormGoogleButton()}</div>
+        </div>
+HTML;
+    }
+
+    /**
      * Retourne un bouton qui dirige vers la page pour se connecter grâce
      * à Facebook.
      * 
@@ -795,9 +822,7 @@ HTML;
         return <<<HTML
         <div class="card">
             <div class="card-header">Image de couverture</div>
-            <div class="card-body">
-                {$content}
-            </div>
+            {$content}
         </div>
 HTML;
 }
@@ -863,26 +888,6 @@ HTML;
                 <span class="text-muted float-right text-small">{$item->get("day_creation")}</span>
             </div>
         </div>
-HTML;
-    }
-
-    /**
-     * Retourne le code pour un bouton dans le manageButtons.
-     * 
-     * @param $item     L'objet dont il faut afficher les liens dans les boutons.
-     * @param string $link     Le lien url à afficher dans le bouton
-     * @param string $class    La classe css pour le bouton (la balise <a>)
-     * @param string $fa_class La classe fontawesome pour l'icone dans le bouton
-     * @param string $text     Le texte à afficher dans le bouton
-     * 
-     * @return string
-     */
-    private function manageButton($item = null, string $link = null, string $class = null, string $fa_class = null, string $text = null)
-    {
-        return <<<HTML
-        <a class="btn {$class} pb-2" href="{$item->get($link)}">
-            <i class="{$fa_class}"></i>{$text}
-        </a>
 HTML;
     }
 

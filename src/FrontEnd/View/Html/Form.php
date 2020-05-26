@@ -42,8 +42,9 @@ class Form
     public function getForm($categorie, $item = null)
     {
         if ($categorie === "administrateurs") return $this->addAdminUserForm($item);
-        elseif ($categorie === "minis-services") $form = $this->miniServiceForm($item, $categorie);
         elseif (Model::isParentCategorie($categorie)) $form = $this->parentForm($item, $categorie);
+        elseif ($categorie === "videos") $form = $this->addVideoForm($item);
+        elseif ($categorie === "minis-services") $form = $this->miniServiceForm($item, $categorie);
         elseif (Model::isChildCategorie($categorie)) $form = $this->childForm($item, $categorie);
         else Utils::header(ADMIN_URL);
 
@@ -159,6 +160,38 @@ HTML;
     }
 
     /**
+     * Formumaire d'ajout d'une vidéo.
+     * 
+     * @param mixed $item Dans le cas ou le formulaire charge pour une modification.
+     * 
+     * @return string
+     */
+    public function addVideoForm($item = null)
+    {
+        $prix_label = <<<HTML
+        Prix :
+        <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
+        avoir accès à cet élément</p>
+HTML;
+        return <<<HTML
+        <div class="row mb-3">
+            <div class="col-md-7">
+                {$this->selectParent("videos")}
+                {$this->titleInput($item)}
+                {$this->descriptionTextarea($item)}
+                {$this->videoInput($item)}
+            </div>
+            <div class="col-md-5">
+                {$this->prixInput($item, $prix_label)}
+                {$this->rangInput($item, "videos")}
+                {$this->imageInput()}
+                {$this->notifyUsersBox()}
+            </div>
+        </div>
+HTML;
+    }
+
+    /**
      * Formulaire pour ajouter un mini service.
      * 
      * @param $item      A passer dans le cas ou on veut modifier un miniservice.
@@ -171,7 +204,7 @@ HTML;
         $mini_service_label = <<<HTML
         Prix :
         <p class="notice">
-            Cette somme sera affichée aux utilisateurs qui voudront ce service.
+            Cette somme sera affichée aux utilisateurs qui voudront ce service
         </p>
 HTML;
         $form_content = $this->commonItemsInformations($item, $mini_service_label, $categorie);
@@ -470,7 +503,7 @@ HTML;
     {
         $video_link = !is_null($item) ? $item->get("video_link") : "";
         $label = <<<HTML
-        Coller l'id de la vidéo de Youtube (facultatif) :
+        Coller l'id de la vidéo de Youtube :
         <p class="notice">Cette vidéo peut être une vidéo de description</p>
 HTML;
         extract($_POST);
@@ -478,7 +511,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             {$this->label("videoLink", $label)}
-            {$this->inputText('video_link', 'videoLink', $video_link, 'www.youtube.com?v={ID}', "col-12 form-control")}
+            {$this->inputText('video_link', 'videoLink', $video_link, 'www.youtube.com?v=...', "col-12 form-control")}
         </div>
 HTML;
     }
@@ -642,9 +675,7 @@ HTML;
             $options .= ucfirst($item->get("title"));
             $options .= '</option>';
         }
-        return <<<HTML
-        {$options}
-HTML;
+        return $options;
     }
 
     /**
@@ -799,7 +830,7 @@ HTML;
      * 
      * @return string
      */
-    private function input(
+    public function input(
         string $type = null,
         string $name = null,
         string $id = null,
@@ -854,7 +885,7 @@ HTML;
      * @author Joel
      * @return string [[Description]]
      */
-    private function button(string $type = null, string $name = null,  string $text = null, string $class = null)
+    public function button(string $type = null, string $name = null,  string $text = null, string $class = null)
     {
         return <<<HTML
 		<button type="{$type}" name="{$name}" class="btn {$class}">

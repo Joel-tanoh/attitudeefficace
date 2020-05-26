@@ -19,6 +19,7 @@ use App\BackEnd\APIs\Bdd;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\ItemChild;
+use App\FrontEnd\View\Card;
 
 /**
  * Gère tout ce qui concerne l'affichage au niveau des items parents dans l'app.
@@ -44,9 +45,10 @@ class ParentView extends \App\FrontEnd\View\View
     {
         $view = new parent;
         $self_layout = new self;
+        
         return <<<HTML
         <div class="mb-3">
-            {$this->crumbs($parent->get("title"))}
+            <h2 class="mb-3">{$parent->get("title")}</h2>
             {$view->manageButtons($parent)}
             {$view->showData($parent)}
             {$self_layout->showChildren($parent)}
@@ -66,7 +68,7 @@ HTML;
     {
         return <<<HTML
         <div class="app-card">
-            <div class="card-body">
+            <div class="card-body pb-2">
                 {$this->showChildrenItemsByType($parent, 'articles')}
                 {$this->showChildrenItemsByType($parent, 'videos')}
                 {$this->showChildrenItemsByType($parent, 'ebooks')}
@@ -96,7 +98,7 @@ HTML;
         } else {
             foreach ($children as $child) {
                 $child = Model::returnObject($children_type, $child["code"]);
-                $children_list .= $this->smallCard($child);
+                $children_list .= Card::card(null, $child->get("title"), $child->get("admin_url"));
             }
         }
 
