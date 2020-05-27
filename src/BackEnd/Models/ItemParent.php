@@ -15,8 +15,8 @@
 namespace App\BackEnd\Models;
 
 use App\BackEnd\Models\Model;
-use App\BackEnd\APIs\Bdd;
-use App\BackEnd\APIs\SqlQuery;
+use App\BackEnd\BddManager;
+use App\BackEnd\APIs\SqlQueryFormater;
 
 /**
  * Gère une catégorie
@@ -52,8 +52,8 @@ class ItemParent extends Model
      */
     public function __construct(string $code)
     {
-        $bdd = Bdd::connectToDb();
-        $sql_query1 = new SqlQuery();
+        $bdd = BddManager::connectToDb();
+        $sql_query1 = new SqlQueryFormater();
 
         $query = $sql_query1
             ->select("id, code, slug, categorie, title, description, price, rang, video_link, views")
@@ -119,7 +119,7 @@ class ItemParent extends Model
      */
     public static function getSlugs()
     {
-        return Bdd::getSlugsFrom(self::TABLE_NAME);
+        return BddManager::getSlugsFrom(self::TABLE_NAME);
     }
 
 }

@@ -40,7 +40,7 @@ class ChildView extends \App\FrontEnd\View\View
         $self_view = new self;
 
         return <<<HTML
-        <div class="row mb-2 px-1">
+        <div class="row mb-2 px-2 mb-2">
             <h2 class="col-12 col-md-6 mb-2">{$item->get("title")}</h2>
             {$view->manageButtons($item)}
         </div>

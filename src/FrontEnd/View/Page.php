@@ -13,9 +13,9 @@
  * @link     Link
  */
 
-namespace App\FrontEnd;
+namespace App\FrontEnd\View;
 
-use App\FrontEnd\View\Layout;
+use App\FrontEnd\View\Template;
 use App\FrontEnd\View\View;
 
 /**
@@ -92,7 +92,7 @@ class Page
      **/
     public function publicPage()
     {
-        $layout = new Layout();
+        $template = new Template();
         $view = new View();
 
         return <<<HTML
@@ -102,7 +102,7 @@ class Page
             {$this->publicCss()}
         </head>
         <body>
-            {$layout->navbarAndContainerAndFooter($view->navbar("public"), $this->view, $view->publicFooter())}
+            {$template->navbarAndContainerAndFooter($view->navbar("public"), $this->view, $view->publicFooter())}
             {$this->generalAppJs()}
         </body>
         </html>
@@ -116,7 +116,7 @@ HTML;
      **/
     public function adminPage()
     {
-        $layout = new Layout();
+        $template = new Template();
         $view = new View();
 
         return <<<HTML
@@ -126,7 +126,7 @@ HTML;
             {$this->adminCss()}
         </head>
         <body id="adminPart" class="bg-cloud">
-            {$layout->navbarAndSidebarAndContainer( $view->navbar("admin"), $view->adminSidebar(), $this->view ) }
+            {$template->navbarAndSidebarAndContainer( $view->navbar("admin"), $view->adminSidebar(), $this->view ) }
             {$this->adminJs()}
         </body>
         </html>

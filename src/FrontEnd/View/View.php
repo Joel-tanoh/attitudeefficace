@@ -8,14 +8,14 @@
 
 namespace App\FrontEnd\View;
 
-use App\BackEnd\APIs\Bdd;
+use App\Router;
+use App\BackEnd\BddManager;
 use App\BackEnd\Models\Model;
-use App\BackEnd\Utils\Notification;
+use App\FrontEnd\View\Notification;
 use App\FrontEnd\View\Html\Form;
 use App\FrontEnd\View\ModelsView\AdministrateurView;
 use App\FrontEnd\View\ModelsView\ParentView;
 use App\FrontEnd\View\ModelsView\ChildView;
-use App\Router;
 
 /**
  * Une vue est un bloc ou un ensemble de bloc de code HTML qui a une fonctionnalité
@@ -53,8 +53,8 @@ class View
                 <div class="error-box">
                     {$error}
                 </div>
-                <form method="post" action="{$_SERVER['PHP_SELF']}">
-                    <header class="text-white">Connexion</header>
+                <form method="post" action="{$_SERVER['PHP_SELF']}" class="rounded">
+                    <header class="text-white rounded-top">Connexion</header>
                     <div class="content">
                         <div>
                             <input placeholder="Login" type="text" name="admin_login"
@@ -188,7 +188,7 @@ HTML;
     public function listItems(array $items, string $class_name)
     {
         $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-        $number_of_items = Bdd::countTableItems(
+        $number_of_items = BddManager::countTableItems(
             Model::getTableNameFrom(Router::getUrlAsArray()[0]),
             "categorie",
             Router::getUrlAsArray()[0]
@@ -225,7 +225,7 @@ HTML;
      */
     public function listMotivationPlusVideos(array $videos)
     {
-        $number_of_videos = Bdd::countTableItems("item_childs", "categorie", "videos");
+        $number_of_videos = BddManager::countTableItems("item_childs", "categorie", "videos");
         if (empty($videos)) {
             $videos_list = null;
         } else {
@@ -271,8 +271,8 @@ HTML;
             $notification = new Notification();
             $to_return = $notification->info( $notification->noAccounts() );
         } else {
-            $admin_layout = new AdministrateurView();
-            $to_return = $admin_layout->listAccounts($accounts);
+            $admin_template = new AdministrateurView();
+            $to_return = $admin_template->listAccounts($accounts);
         }
 
         return $to_return;
@@ -464,7 +464,7 @@ HTML;
         
         return <<<HTML
         <div class="col-12 col-md-6">
-            <div class="float-sm-right">
+            <div class="float-md-right">
                 {$buttons}
             </div>
         </div>
@@ -507,7 +507,7 @@ HTML;
     public function voirAussi($exclu)
     {
         $table = Model::getTableNameFrom($exclu->get("categorie"));
-        $items = Bdd::getAllFromTableWithout($table, $exclu->get("id"), $exclu->get("categorie"));
+        $items = BddManager::getAllFromTableWithout($table, $exclu->get("id"), $exclu->get("categorie"));
         $list = '';
         foreach ($items as $item) {
             $item = Model::returnObject($exclu->get("categorie"), $item["code"]);
@@ -537,8 +537,8 @@ HTML;
     public function showData($item)
     {
         return <<<HTML
-        <div class="row px-2 mb-3">
-            <div class="col-12 col-md-6">
+        <div class="row px-2 mb-2">
+            <div class="col-12 col-md-6 mb-2">
                 {$this->data($item)}
             </div>
             <div class="col-12 col-md-6">

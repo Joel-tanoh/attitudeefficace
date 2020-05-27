@@ -8,13 +8,13 @@
 
 namespace App;
 
-use App\BackEnd\APIs\Bdd;
+use App\BackEnd\BddManager;
 use App\BackEnd\Models\Model;
-use App\BackEnd\Utils\Notification;
-use App\FrontEnd\Page;
 use App\BackEnd\Utils\Validator;
 use App\BackEnd\Utils\Utils;
+use App\FrontEnd\View\Page;
 use App\FrontEnd\View\View;
+use App\FrontEnd\View\Notification;
 
 /**
  * Gère le controlleur. Une méthode du controlleur peut être appelée en fonction du routage.
@@ -74,7 +74,7 @@ class Controller
     {
         $meta_title = "Mes " . Model::getCategorieFormated($this->url[0], "pluriel");
         $view = new View();
-        $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
+        $items = BddManager::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
         $page = new Page($meta_title, $view->listItems($items, $this->url[0]));
         echo $page->adminPage();
     }
@@ -88,7 +88,7 @@ class Controller
     {
         $view = new View();
         $meta_title = "Utilisateurs";
-        $accounts = Bdd::getAllFrom( Model::getTableNameFrom( $this->url[0] ), "utilisateur" );
+        $accounts = BddManager::getAllFrom( Model::getTableNameFrom( $this->url[0] ), "utilisateur" );
         $page = new Page($meta_title, $view->listAccounts($accounts));
         echo $page->adminPage();
     }
@@ -102,7 +102,7 @@ class Controller
     {
         $meta_title = "Motivation plus";
         $view = new View();
-        $videos = Bdd::getchildrenOf("-1", "videos");
+        $videos = BddManager::getchildrenOf("-1", "videos");
         $page = new Page($meta_title, $view->listMotivationPlusVideos($videos));
         echo $page->adminPage();
     }
@@ -224,7 +224,7 @@ class Controller
      */
     public function deleteManyItems()
     {
-        $items = Bdd::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
+        $items = BddManager::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
         $meta_title = "Supprimer des " . Model::getCategorieFormated($this->url[0], "pluriel");
         $view = new View();
         $error = null;

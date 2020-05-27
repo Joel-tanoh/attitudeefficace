@@ -16,10 +16,10 @@ require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SE
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use App\BackEnd\Models\Personnes\Administrateur;
-use App\BackEnd\Utils\Notification;
+use App\FrontEnd\View\Notification;
 use App\BackEnd\Utils\Utils;
 use App\FrontEnd\View\View;
-use App\FrontEnd\Page;
+use App\FrontEnd\View\Page;
 
 try {
     $notification = new Notification();

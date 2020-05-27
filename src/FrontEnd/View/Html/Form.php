@@ -14,7 +14,7 @@
 
 namespace App\FrontEnd\View\Html;
 
-use App\BackEnd\APIs\Bdd;
+use App\BackEnd\BddManager;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Utils;
 use App\Router;
@@ -111,8 +111,6 @@ HTML;
      */
     public function childForm($item = null, string $categorie = null)
     {
-        $uploadPdf = $categorie === "ebooks" ? true : false;
-
         $prix_label = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
@@ -121,7 +119,6 @@ HTML;
 
         $formContent = $this->commonItemsInformations($item, $prix_label, $categorie);
         $formContent .= $this->articleContentTextarea($item, $categorie);
-        $formContent .= $this->pdfFileInput($uploadPdf);
 
         return $formContent;
     }
@@ -222,6 +219,8 @@ HTML;
      */
     public function commonItemsInformations($item = null, $prix_label = null, $categorie = null)
     {
+        $uploadPdf = $categorie === "ebooks" ? true : false;
+
         return <<<HTML
         <div class="row mb-2">
             <div class="col-md-7">
@@ -230,10 +229,11 @@ HTML;
                 {$this->descriptionTextarea($item)}
             </div>
             <div class="col-md-5">
-                {$this->prixInput($item, $prix_label)}
                 {$this->videoInput($item)}
+                {$this->prixInput($item, $prix_label)}
                 {$this->rangInput($item, $categorie)}
                 {$this->imageInput()}
+                {$this->pdfFileInput($uploadPdf)}
                 {$this->notifyUsersBox()}
             </div>
         </div>
@@ -467,7 +467,7 @@ HTML;
             <p class="notice"> Cet élément apparaîtra : {$rang_actuel}</p>
 HTML;
         } else {
-            $rang = Bdd::getMaxValueOf( "rang",
+            $rang = BddManager::getMaxValueOf( "rang",
                 Model::getTableNameFrom( $categorie ),
                 "categorie",
                 "categorie",
@@ -561,7 +561,7 @@ HTML;
             return <<<HTML
             <div class="form-group">
                 {$this->label("pdfUploaded", "Importer un fichier PDF :")}
-                {$this->inputFile("pdf_uploaded", "pdfUploaded", "col-md-5")}
+                {$this->inputFile("pdf_uploaded", "pdfUploaded")}
             </div>
 HTML;
         }
@@ -664,7 +664,7 @@ HTML;
     private function parentList($categorie = null, $label = null)
     {
         $options = null;
-        $items = Bdd::getAllFrom(Model::getTableNameFrom($categorie), $categorie);
+        $items = BddManager::getAllFrom(Model::getTableNameFrom($categorie), $categorie);
         foreach ($items as $i) {
             $item = Model::returnObject($categorie, $i["code"]);
             $options .= '<option value="'. $item->get("id") . '">';
@@ -688,12 +688,10 @@ HTML;
     private function inputFile(string $name = null, string $id = null, string $class = null)
     {
         return <<<HTML
-        <div class="row">
-            <div class="col-12 {$class}">
-                <div class="custom-file">
-                    {$this->input("file", $name, $id, null, null, "custom-file-input")}
-                    {$this->label("customFile", "Importer", "custom-file-label")}
-                </div>
+        <div class="{$class}">
+            <div class="custom-file">
+                {$this->input("file", $name, $id, null, null, "custom-file-input")}
+                {$this->label("customFile", "Importer", "custom-file-label")}
             </div>
         </div>
 HTML;

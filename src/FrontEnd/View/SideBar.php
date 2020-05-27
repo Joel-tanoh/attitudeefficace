@@ -15,7 +15,7 @@
 
 namespace App\FrontEnd\View;
 
-use App\BackEnd\APIs\Bdd;
+use App\BackEnd\BddManager;
 use App\BackEnd\Models\Personnes\Administrateur;
 use App\BackEnd\Models\Model;
 
@@ -81,7 +81,7 @@ HTML;
             <i class="fas fa-bars" id="cancel"></i>
         </label>
         <div class="sidebar d-lg-none">
-            {$this->sidebarBrand(LOGOS_DIR. "/logo_3.png", true, ADMIN_URL)}
+            {$this->sidebarBrand(LOGOS_DIR. "/logo_3.png", ADMIN_URL)}
             {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
             {$this->searchBar()}
             {$this->links()}
@@ -104,7 +104,7 @@ HTML;
             <i class="fas fa-bars" id="cancel"></i>
         </label>
         <div class="sidebar d-none d-lg-block">
-            {$this->sidebarBrand(LOGOS_DIR. "/logo_3.png", true, ADMIN_URL)}
+            {$this->sidebarBrand(LOGOS_DIR. "/logo_3.png", ADMIN_URL)}
             {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
             {$this->searchBar()}
             {$this->links()}
@@ -116,26 +116,17 @@ HTML;
      * Affiche le logo dans la sidebar.
      *
      * @param string $brand_src        Le lien vers l'image.
-     * @param bool   $set_it_clickable Permet de rendre le logo clickable.
      * @param string $click_direction  L'url exécuté lors du click sur le logo.
      * 
      * @return string
      */
-    public function sidebarBrand(string $brand_src, bool $set_it_clickable = false, string $click_direction = null) : string
+    public function sidebarBrand(string $brand_src, string $click_direction = null) : string
     {
-        if ($set_it_clickable) {
-            return <<<HTML
-            <a class="brand text-center" href="{$click_direction}">
-                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand my-2">
-            </a>
+        return <<<HTML
+        <a class="brand text-center" href="{$click_direction}">
+            <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand my-2">
+        </a>
 HTML;
-        } else {
-            return <<<HTML
-            <a class="brand text-center">
-                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand my-2">
-            </a>
-HTML;
-        }
     }
 
     /**
@@ -182,33 +173,18 @@ HTML;
      * @param string $href              Le lien vers lequel le bouton va diriger.
      * @param string $fontawesome_class La classe fontawesome pour l'icône.
      * @param string $text              Le texte qui sera visible dans la sidebar.
-     * @param bool   $badge             S'il doit avoir un badge
      * 
      * @return string
      */
-    private function setLink(string $href, string $fontawesome_class, string $text, bool $badge = null)
+    private function setLink(string $href, string $fontawesome_class, string $text)
     {
-        $badge_box = null;
-        $categorie = "";
-
-        if ($badge) {
-            if ( strchr("motivation-plus", $href) ) {
-                $categorie = "-1";
-            } else {
-                $categorie = explode("/", $href)[array_key_last(explode("/", $href))];
-            }
-            $count = Bdd::countTableItems(Model::getTableNameFrom($categorie), "categorie", $categorie);
-            if (!empty($count) || $count == 0) {
-                $badge_box = '<span class="float-right badge bg-orange">' . $count . '</span>';
-            }
-        }
-        
         return <<<HTML
-        <a class="py-2 px-3" href="{$href}">
-            <div class="row align-items-center">
-                <i class="col-3 icons {$fontawesome_class} fa-lg"></i>
-                <span class="col-7 texts p-0">{$text}</span>
-                {$badge_box}
+        <a class="py-2 px-4" href="{$href}">
+            <div class="row">
+                <span class="col-2">
+                    <i class="{$fontawesome_class} fa-lg"></i>
+                </span>
+                <span class="col-9">{$text}</span>
             </div>
         </a>
 HTML;

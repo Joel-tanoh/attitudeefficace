@@ -15,7 +15,7 @@
 
 namespace App\FrontEnd\View\ModelsView;
 
-use App\BackEnd\APIs\Bdd;
+use App\BackEnd\BddManager;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\ItemChild;
@@ -92,7 +92,7 @@ HTML;
      */
     private function showChildrenItemsByType($parent, string $children_type)
     {
-        $children = Bdd::getchildrenOf($parent->get("id"), $children_type);
+        $children = BddManager::getchildrenOf($parent->get("id"), $children_type);
         $children_type = ucfirst($children_type);
         $children_number = count($children);
         $children_list = '';
@@ -128,16 +128,16 @@ HTML;
      */
     public static function parentchildrenNumber($parent)
     {
-        $articles = Bdd::getchildrenOf($parent->get("id"), "articles");
+        $articles = BddManager::getchildrenOf($parent->get("id"), "articles");
         $articles_number = count($articles);
 
-        $videos = Bdd::getchildrenOf($parent->get("id"), "videos");
+        $videos = BddManager::getchildrenOf($parent->get("id"), "videos");
         $videos_number = count($videos);
 
-        $livres = Bdd::getchildrenOf($parent->get("id"), "livres");
+        $livres = BddManager::getchildrenOf($parent->get("id"), "livres");
         $livres_number = count($livres);
 
-        $ebooks = Bdd::getchildrenOf($parent->get("id"), "ebooks");
+        $ebooks = BddManager::getchildrenOf($parent->get("id"), "ebooks");
         $ebooks_number = count($ebooks);
         
         return <<<HTML

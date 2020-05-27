@@ -15,7 +15,7 @@
 
 namespace App\BackEnd\APIs;
 
-use App\BackEnd\APIs\Bdd;
+use App\BackEnd\BddManager;
 
 /**
  * Gère les requêtes SQL.
@@ -28,7 +28,7 @@ use App\BackEnd\APIs\Bdd;
  * @license  url.com license_name
  * @link     Link
  */
-class SqlQuery
+class SqlQueryFormater
 {
     private $data;
     private $select_length;
@@ -269,7 +269,7 @@ class SqlQuery
      */
     public static function countTableItem($table_name)
     {
-        $bdd = Bdd::connectToDb();
+        $bdd = BddManager::connectToDb();
         $query = $bdd->prepare("SELECT COUNT(*) FROM $table_name");
         $query->execute(
             ["table_name" => $table_name]
@@ -286,7 +286,7 @@ class SqlQuery
      */
     public static function autoIncrementTo1($table_name)
     {
-        $bdd = Bdd::connectToDb();
+        $bdd = BddManager::connectToDb();
         if (self::countTableItem($table_name) == 0) {
             $query = $bdd->prepare("ALTER TABLE $table_name auto_increment = 1");
             $query->execute(

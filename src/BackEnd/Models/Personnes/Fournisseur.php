@@ -15,7 +15,7 @@
 
 namespace App\BackEnd\Models\Personnes;
 
-use App\BackEnd\APIs\Bdd;
+use App\BackEnd\BddManager;
 
 /**
  * Classe qui gère tout ce qui est en relation avec le fournisseur de service.
@@ -36,7 +36,7 @@ class Fournisseur extends Personne
      */
     public function create()
     {
-        $bdd = Bdd::connectToDb();
+        $bdd = BddManager::connectToDb();
     }
     
     // /**

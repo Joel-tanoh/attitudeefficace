@@ -13,12 +13,13 @@
  * @link     Link
  */
 
-namespace App\BackEnd\APIs;
+namespace App\BackEnd;
 
-use App\BackEnd\Models\ItemChild;
-use App\BackEnd\Models\Personnes\Suscriber;
+use App\BackEnd\APIs\SqlQueryFormater;
 use PDO;
 use PDOException;
+use App\BackEnd\Models\ItemChild;
+use App\BackEnd\Models\Personnes\Suscriber;
 
 /**
  * Gère la base de données.
@@ -31,7 +32,7 @@ use PDOException;
  * @license  url.com license_name
  * @link     Link
  */
-class Bdd
+class BddManager
 {
     /**
      * Méthode de connexion à la base de données. Retourne l'instance de connexion.
@@ -54,6 +55,7 @@ class Bdd
 
         } catch (PDOException $e) {
             echo '<h1>Erreur de connexion à la base de données, veuillez contacter votre administrateur !</h1>';
+            die();
         }
     }
 
@@ -68,7 +70,7 @@ class Bdd
      */
     public static function getItemBy(string $col = null, string $col_value = null, string $table = null)
     {
-        $sql_query = new SqlQuery();
+        $sql_query = new SqlQueryFormater();
         $query = $sql_query
             ->select("code")
             ->from($table)

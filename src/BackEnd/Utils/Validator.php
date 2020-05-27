@@ -18,7 +18,7 @@ namespace App\BackEnd\Utils;
 use App\BackEnd\APIs\Files\FileUploaded;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Models\Personnes\Administrateur;
-use App\BackEnd\Utils\Notification;
+use App\FrontEnd\View\Notification;
 
 /**
  * Permet de faire toutes les vérifications sur les données entrées dans les

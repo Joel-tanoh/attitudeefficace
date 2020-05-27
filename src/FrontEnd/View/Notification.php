@@ -12,7 +12,7 @@
  * @link     Link
  */
 
-namespace App\BackEnd\Utils;
+namespace App\FrontEnd\View;
 
 /**
  * Permet de gérer toutes les notifications d'error, de succès et d'informations
@@ -53,8 +53,9 @@ class Notification
     public function error(string $error) : string
     {
         return <<<HTML
-        <div class="alert app-alert-danger">
-            {$error}
+        <div class="alert app-alert-danger d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle text-danger mr-3"></i>
+            <div>{$error}</div>
         </div>
 HTML;
     }
@@ -555,4 +556,3 @@ HTML;
     }
 
 }
-

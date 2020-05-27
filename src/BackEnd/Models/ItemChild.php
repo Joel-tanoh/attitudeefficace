@@ -16,8 +16,8 @@
 namespace App\BackEnd\Models;
 
 use App\BackEnd\Models\Model;
-use App\BackEnd\APIs\Bdd;
-use App\BackEnd\APIs\SqlQuery;
+use App\BackEnd\BddManager;
+use App\BackEnd\APIs\SqlQueryFormater;
 
 /**
  * Gère tout ce qui concerne les éléments.
@@ -49,8 +49,8 @@ class ItemChild extends Model
      */
     public function __construct(string $code)
     {
-        $bdd = Bdd::connectToDb();
-        $sql_query = new SqlQuery();
+        $bdd = BddManager::connectToDb();
+        $sql_query = new SqlQueryFormater();
         $query = $sql_query
             ->select("id, code, categorie, slug, title, description, price, rang, video_link, article_content, views, parent_id")
             ->select("date_format(date_creation, '%d/%m/%Y') AS day_creation")
@@ -105,7 +105,7 @@ class ItemChild extends Model
             if ($this->parent_id == "-1") {
                 $this->parent = "motivation plus";
             } else {
-                $sql_query = new SqlQuery();
+                $sql_query = new SqlQueryFormater();
                 $query = $sql_query->
                     select("code, categorie")
                     ->from(ItemParent::TABLE_NAME)
@@ -130,7 +130,7 @@ class ItemChild extends Model
      */
     public static function getSlugs()
     {
-        return Bdd::getSlugsFrom(self::TABLE_NAME);
+        return BddManager::getSlugsFrom(self::TABLE_NAME);
     }
 }
 

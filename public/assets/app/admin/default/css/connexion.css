@@ -1,6 +1,7 @@
 div#connexion {
   display: flex;
   justify-content: center;
+  align-items: center;
   height: 100vh;
   background-color: rgb(240, 240, 240);
   font-size: .95rem;
@@ -12,12 +13,12 @@ div#connexion #container {
   padding: 1.5rem 1rem;
 }
 div#connexion form, div#connexion .error-box {
-  width: 375px;
+  width: 325px;
   transition: .5s;
 }
 div#connexion form {
   background-color: white;
-  box-shadow: .2rem .2rem .2rem rgba(230,230,230,1);
+  border: 1px solid rgba(200, 200, 200, .5);
 }
 @media (max-width: 600px) {
 	div#connexion form, div#connexion .error-box {

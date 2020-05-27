@@ -63,8 +63,8 @@ label #cancel {
 	box-shadow: 0 0 1rem #2D3A4A;
 }
 
-/* Les layouts */
-/* Conteneur d'une layout avec une fixed sidebar et une navbar */
+/* Les Templates */
+/* Conteneur d'une Template avec une fixed sidebar et une navbar */
 #container-with-fixed-sidebar-and-navbar {
 	/* On donne une marge à gauche interne d'une taille supérieure ou égale
 	à celle de la sidebar*/

@@ -16,7 +16,7 @@
 namespace App\BackEnd\Models;
 
 use Exception;
-use App\BackEnd\APIs\Bdd;
+use App\BackEnd\BddManager;
 use App\BackEnd\APIs\Email;
 use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\ItemChild;
@@ -346,7 +346,7 @@ class Model
      */
     public static function isParentSlug(string $slug)
     {
-        return in_array($slug, Bdd::getSlugsFrom(ItemParent::TABLE_NAME));
+        return in_array($slug, BddManager::getSlugsFrom(ItemParent::TABLE_NAME));
     }
 
     /**
@@ -358,7 +358,7 @@ class Model
      */
     public static function isChildSlug(string $slug)
     {
-        return in_array($slug, Bdd::getSlugsFrom(ItemChild::TABLE_NAME));
+        return in_array($slug, BddManager::getSlugsFrom(ItemChild::TABLE_NAME));
     }
 
     /**
@@ -374,7 +374,7 @@ class Model
      */
     public static function getObjectBy(string $col = null, string $col_value = null, string $table = null, string $categorie = null)
     {
-        $code = Bdd::getItemBy($col, $col_value, $table);
+        $code = BddManager::getItemBy($col, $col_value, $table);
         return self::returnObject($categorie, $code);
     }
 
@@ -502,7 +502,7 @@ class Model
      */
     public function set(string $col, $value, $table)
     {
-        Bdd::set($col, $value, $table, $this->id);
+        BddManager::set($col, $value, $table, $this->id);
         $this->modified($table);
         return true;
     }
@@ -636,7 +636,7 @@ class Model
     {
         $this->unsetRang();
         $this->deleteImage();
-        Bdd::deleteById($this->table, $this->id);
+        BddManager::deleteById($this->table, $this->id);
         return true;
     }
 
@@ -661,11 +661,11 @@ class Model
     public function setRang(int $rang)
     {
         $table = $this->table;
-        if ($rang !== 0 && Bdd::dataIsset($table, "rang", $rang)) {
-            $items = Bdd::getItemsOfColValueMoreOrEqualTo( $table, "rang", $rang, $this->categorie );
+        if ($rang !== 0 && BddManager::dataIsset($table, "rang", $rang)) {
+            $items = BddManager::getItemsOfColValueMoreOrEqualTo( $table, "rang", $rang, $this->categorie );
             foreach ($items as $item) {
                 $obj = self::returnObject($this->categorie, $item["code"]);
-                Bdd::incOrDecColValue("increment", "rang", $table, $obj->id);
+                BddManager::incOrDecColValue("increment", "rang", $table, $obj->id);
             }
         }
         $this->set("rang", (int)$rang, $table);
@@ -679,10 +679,10 @@ class Model
     public function unsetRang()
     {
         $table = $this->table;
-        $items = Bdd::getItemsOfColValueMoreOrEqualTo($table, "rang", $this->rang, $this->categorie);
+        $items = BddManager::getItemsOfColValueMoreOrEqualTo($table, "rang", $this->rang, $this->categorie);
         foreach ($items as $item) {
             $item = self::returnObject($this->categorie, $item["code"]);
-            Bdd::incOrDecColValue("decrement", "rang", $table, $item->get("id"));
+            BddManager::incOrDecColValue("decrement", "rang", $table, $item->get("id"));
         }
         return true;
     }
@@ -701,7 +701,7 @@ class Model
         extract($data);
         $table = self::getTableNameFrom($categorie);
 
-        if (Bdd::insertPincipalsData($table, $code, $title, $description, $categorie)) {
+        if (BddManager::insertPincipalsData($table, $code, $title, $description, $categorie)) {
             $new_item = self::returnObject($categorie, $code);
             
             $slug = Utils::slugify($new_item->get("title")) . '-' . $new_item->get("id");
@@ -761,7 +761,7 @@ class Model
      */
     private function modified() : bool
     {
-        Bdd::set("date_modification", date("Y-m-d H:i:s"), $this->table, $this->id);
+        BddManager::set("date_modification", date("Y-m-d H:i:s"), $this->table, $this->id);
         return true;
     }
 

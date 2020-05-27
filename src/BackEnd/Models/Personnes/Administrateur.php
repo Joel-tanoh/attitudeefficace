@@ -14,9 +14,9 @@
 
 namespace App\BackEnd\Models\Personnes;
 
-use App\BackEnd\APIs\Bdd;
+use App\BackEnd\BddManager;
 use App\BackEnd\APIs\Files\Image;
-use App\BackEnd\APIs\SqlQuery;
+use App\BackEnd\APIs\SqlQueryFormater;
 use App\BackEnd\Utils\Utils;
 use Exception;
 
@@ -43,8 +43,8 @@ class Administrateur extends Personne
      */
     public function __construct(string $code)
     {
-        $bdd = Bdd::connectToDb();
-        $sql_query = new SqlQuery();
+        $bdd = BddManager::connectToDb();
+        $sql_query = new SqlQueryFormater();
 
         $query = $sql_query
             ->select("id, code, login, password, email, categorie, statut")
@@ -139,7 +139,7 @@ class Administrateur extends Personne
      */
     public function changeStatut($new_statut)
     {
-        $bdd = Bdd::connectToDb();
+        $bdd = BddManager::connectToDb();
         $query = $bdd->prepare('UPDATE administrateurs SET statut = ? WHERE id = ?');
         $query->execute([$new_statut, $this->id]);
         return true;
@@ -152,7 +152,7 @@ class Administrateur extends Personne
      */
     public function delete()
     {
-        $bdd = Bdd::connectToDb();
+        $bdd = BddManager::connectToDb();
         $query = 'DELETE FROM administrateurs WHERE id = ?';
         $rep = $bdd->prepare($query);
         $rep->execute([$this->id]);
@@ -168,8 +168,8 @@ class Administrateur extends Personne
      */
     static function loginIsset(string $login) : bool
     {
-        $bdd = Bdd::connectToDb();
-        $sql_query = new SqlQuery();
+        $bdd = BddManager::connectToDb();
+        $sql_query = new SqlQueryFormater();
         $query = $sql_query
             ->select("COUNT(id) AS administrateur")
             ->from(self::TABLE_NAME)
@@ -192,8 +192,8 @@ class Administrateur extends Personne
      */
     public static function getByLogin(string $login)
     {
-        $bdd = Bdd::connectToDb();
-        $sql_query = new SqlQuery();
+        $bdd = BddManager::connectToDb();
+        $sql_query = new SqlQueryFormater();
 
         $query = $sql_query
             ->select("code, login, password")
@@ -218,7 +218,7 @@ class Administrateur extends Personne
      */
     private static function insertPrincipalData($code, $login, $password)
     {
-        $bdd = Bdd::connectToDb();
+        $bdd = BddManager::connectToDb();
         $query = "INSERT INTO " . self::TABLE_NAME
             . "(code, login, password)"
             . " VALUES(?, ?, ?)";

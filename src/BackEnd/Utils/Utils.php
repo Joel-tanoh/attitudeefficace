@@ -14,7 +14,7 @@
 
 namespace App\BackEnd\Utils;
 
-use App\BackEnd\APIs\Bdd;
+use App\BackEnd\BddManager;
 use Cocur\Slugify\Slugify;
 use DateTime;
 
@@ -102,13 +102,13 @@ class Utils
         $year = date("Y");
         $month = date("m");
         $day = date("d");
-        $visite = Bdd::verifyDateVisitIsset($year, $month, $day);
+        $visite = BddManager::verifyDateVisitIsset($year, $month, $day);
 
         if (self::isNewVisit()) {
             if ($visite["date_isset"]) {
-                Bdd::incOrDecColValue("increment", "nombre_visite", "compteur_visites", $visite["id"]);
+                BddManager::incOrDecColValue("increment", "nombre_visite", "compteur_visites", $visite["id"]);
             } else {
-                Bdd::insertNewVisit($year, $month, $day, 1);
+                BddManager::insertNewVisit($year, $month, $day, 1);
             }
         }
     }

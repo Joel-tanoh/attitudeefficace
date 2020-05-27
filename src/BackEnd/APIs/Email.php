@@ -15,6 +15,7 @@
 
 namespace App\BackEnd\APIs;
 
+use App\BackEnd\BddManager;
 use App\BackEnd\Models\Personnes\Suscriber;
 
 /**
@@ -98,7 +99,7 @@ class Email
      */
     public function notifyNewsletter(string $subject = null, string $message = null)
     {
-        $newsletters_mails = Bdd::select("adresse_email", "newsletters");
+        $newsletters_mails = BddManager::select("adresse_email", "newsletters");
         if (!empty($newsletters_mails)) {
             $this->sendMail(
                 $newsletters_mails,
@@ -115,7 +116,7 @@ class Email
      */
     public function notifySuscribers()
     {
-        $suscribers_mails = Bdd::select("adresse_email", Suscriber::TABLE_NAME);
+        $suscribers_mails = BddManager::select("adresse_email", Suscriber::TABLE_NAME);
         if (!empty($suscribers_mails)) {
             $this->sendMail(
                 $suscribers_mails,
@@ -135,7 +136,7 @@ class Email
      */
     public function getAllEmails(string $category = null)
     {
-        return Bdd::getAllEmails();
+        return BddManager::getAllEmails();
     }
 
     /**

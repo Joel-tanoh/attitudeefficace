@@ -16,8 +16,8 @@
 namespace App\FrontEnd\View;
 
 /**
- * Une layout est un type de disposition du contenu d'une page.
- * Le contenu de la page est une layout, et à cette layout, on passera
+ * Une template est un type de disposition du contenu d'une page.
+ * Le contenu de la page est une template, et à cette template, on passera
  * donc les vues.
  * 
  * @category Category
@@ -27,10 +27,36 @@ namespace App\FrontEnd\View;
  * @version  "Release: package_version"
  * @link     Link
  */
-class Layout
+class Template extends View
 {
     /**
-     * Layout avec une navbar fixe et une sidebar fixe.
+     * Template de lecture d'un item.
+     * 
+     * @param mixed $item L'item qu'on veut afficher.
+     * 
+     * @return string
+     */
+    public function readItem($item = null)
+    {
+
+    }
+
+    /**
+     * Template de suppression d'items.
+     * 
+     * @param array $items     Les items qu'on veut supprimer.
+     * @param array $categorie 
+     * @param array $error     En cas d'erreur à afficher.
+     * 
+     * @return string
+     */
+    public function deleteItems($items, $categorie, $error = null)
+    {
+
+    }
+
+    /**
+     * Template avec une navbar fixe et une sidebar fixe.
      * 
      * @param mixed $navbar
      * @param mixed $sidebar
@@ -70,7 +96,7 @@ HTML;
     }
 
     /**
-     * Une layout avec une navbar fixe et le contenu.
+     * Une template avec une navbar fixe et le contenu.
      * 
      * @param mixed $navbar
      * @param mixed $container_content
@@ -88,7 +114,7 @@ HTML;
     }
 
     /**
-     * Layout de la page d'administration. Elle comporte une navbar, une sidebar,
+     * Template de la page d'administration. Elle comporte une navbar, une sidebar,
      * le contenu de la page et le footer.
      * 
      * @param string $sidebar La barre de gauche à fixer.
@@ -122,11 +148,18 @@ HTML;
         </div>
 HTML;
     }
-
+    
     /**
-     * Layout de liste de cartes.
+     * Template de liste de cartes.
      * 
-     * @param 
+     * @param array $items Un tableau contenant les items.
+     * 
+     * @return string
      */
+    public function gridOfCards($items = null)
+    {
+
+    }
+
 }
 
