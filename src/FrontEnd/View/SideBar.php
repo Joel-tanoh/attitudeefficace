@@ -113,6 +113,49 @@ HTML;
     }
 
     /**
+     * Affiche le logo dans la sidebar.
+     *
+     * @param string $brand_src        Le lien vers l'image.
+     * @param bool   $set_it_clickable Permet de rendre le logo clickable.
+     * @param string $click_direction  L'url exécuté lors du click sur le logo.
+     * 
+     * @return string
+     */
+    public function sidebarBrand(string $brand_src, bool $set_it_clickable = false, string $click_direction = null) : string
+    {
+        if ($set_it_clickable) {
+            return <<<HTML
+            <a class="brand text-center" href="{$click_direction}">
+                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand my-2">
+            </a>
+HTML;
+        } else {
+            return <<<HTML
+            <a class="brand text-center">
+                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand my-2">
+            </a>
+HTML;
+        }
+    }
+
+    /**
+     * Peremet d'afficher l'avatar de l'utilisateur dans la sidebar.
+     * 
+     * @param string $avatar_src
+     * @param string $alt_information
+     * 
+     * @return string
+     */
+    public function sidebarUserAvatar(string $avatar_src, string $alt_information = null)
+    {
+        return <<<HTML
+        <div class="text-center my-2">
+            <img src="{$avatar_src}" alt="{$alt_information}" class="sidebar-user-avatar img-circle img-fluid"/>
+        </div>
+HTML;
+    }
+
+    /**
      * Retourne les liens.
      * 
      * @return string

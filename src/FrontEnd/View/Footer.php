@@ -27,17 +27,16 @@ class Footer extends View
     /**
      * Pied de page
      * 
-     * @param string $footer_content Contenu du pied de page
-     * 
      * @author Joel
      * @return [[Type]] [[Description]]
      */
-    public static function footer(string $footer_content) : string
+    public function publicFooter() : string
     {
         return <<<HTML
-        <p class="footer fixed-bottom text-center border-top" style="background-color:#fff">
-            {$footer_content}
-        </p>
+        <footer class="footer bg-dark">
+            <div class="container">
+            </div>
+        </footer>
 HTML;
     }
 }

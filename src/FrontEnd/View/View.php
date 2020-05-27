@@ -142,73 +142,6 @@ HTML;
     }
 
     /**
-     * Peremet d'afficher l'avatar de l'utilisateur dans la sidebar.
-     * 
-     * @param string $avatar_src
-     * @param string $alt_information
-     * 
-     * @return string
-     */
-    public function sidebarUserAvatar(string $avatar_src, string $alt_information = null)
-    {
-        return <<<HTML
-        <div class="text-center my-2">
-            <img src="{$avatar_src}" alt="{$alt_information}" class="sidebar-user-avatar img-circle img-fluid"/>
-        </div>
-HTML;
-    }
-
-    /**
-     * Permet d'afficher le logo dans la navbar.
-     * 
-     * @param string $brand_src        Le lien vers l'image.
-     * @param bool   $set_it_clickable Permet de rendre le logo clickable.
-     * @param string $click_direction  L'url exécuté lors du click sur le logo.
-     * 
-     * @return string
-     */
-    public function navbarBrand(string $brand_src, bool $set_it_clickable = false, string $click_direction = null)
-    {
-        if ($set_it_clickable) {
-            return <<<HTML
-            <a class="brand" href="{$click_direction}">
-                <img src="{$brand_src}" alt="Attitude efficace" class="brand navbar-brand mb-2">
-            </a>
-HTML;
-        } else {
-            return <<<HTML
-            <img src="{$brand_src}" alt="Attitude efficace" class="brand navbar-brand mb-2">
-HTML;
-        }
-    }
-
-    /**
-     * Affiche le logo dans la sidebar.
-     *
-     * @param string $brand_src        Le lien vers l'image.
-     * @param bool   $set_it_clickable Permet de rendre le logo clickable.
-     * @param string $click_direction  L'url exécuté lors du click sur le logo.
-     * 
-     * @return string
-     */
-    public function sidebarBrand(string $brand_src, bool $set_it_clickable = false, string $click_direction = null) : string
-    {
-        if ($set_it_clickable) {
-            return <<<HTML
-            <a class="brand text-center" href="{$click_direction}">
-                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand my-2">
-            </a>
-HTML;
-        } else {
-            return <<<HTML
-            <a class="brand text-center">
-                <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand my-2">
-            </a>
-HTML;
-        }
-    }
-
-    /**
      * Tableau de bord (Tableau de bord de la partie administration).
      * 
      * @return string
@@ -233,6 +166,17 @@ HTML;
     }
 
     /**
+     * Retourne le pied de page de la partie publique.
+     * 
+     * @return string
+     */
+    public function publicFooter()
+    {
+        $footer = new Footer();
+        return $footer->publicFooter();
+    }
+
+    /**
      * Methode qui permet de lister les items.
      * 
      * @param array $items      La liste des items à lister.
@@ -244,6 +188,12 @@ HTML;
     public function listItems(array $items, string $class_name)
     {
         $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
+        $number_of_items = Bdd::countTableItems(
+            Model::getTableNameFrom(Router::getUrlAsArray()[0]),
+            "categorie",
+            Router::getUrlAsArray()[0]
+        );
+
         if (empty($items)) {
             $notification = new Notification();
             $to_show = '<div class="col-12">'. $notification->info($notification->noItems($class_name)) .'</div>';
@@ -258,7 +208,7 @@ HTML;
 
         return <<<HTML
         <div class="mb-4">
-            {$this->crumbs($title)}
+            {$this->crumbs($title, $number_of_items)}
         </div>
         <section class="row px-2">
             {$to_show}
@@ -287,11 +237,7 @@ HTML;
         }
         
         return <<<HTML
-        <h1 class="mb-3">Bienvenue dans votre rubrique Motivation +</h1>
-        <section class="row d-flex align-items-center mb-4 px-2">
-            <h5 class="col-12 col-sm-6">Vous avez actuellement {$number_of_videos} vidéos.</h5>
-            {$this->contextMenu()}
-        </section>
+        {$this->crumbs("Motivation +", $number_of_videos)}
         <section class="row px-2">
             {$videos_list}
         </section>
@@ -607,17 +553,26 @@ HTML;
      * Retourne un crumbs.
      * 
      * @param string $title
+     * @param mixed  $number_of_items
      * 
      * @return string
      */
-    public function crumbs(string $title = null)
+    public function crumbs(string $title = null, $number_of_items = null)
     {
         $title = ucfirst($title);
+
+        if ($number_of_items) {
+            $number_of_items = '<p>Vous avez actuellement ' . $number_of_items . ' élément(s).</p>';
+        } else {
+            $number_of_items = null;
+        }
+        
         return <<<HTML
         <div class="row d-flex align-items-center mb-2 px-2">
             <h3 class="col-12 col-md-6">{$title}</h1>
             {$this->contextMenu()}
         </div>
+        {$number_of_items}
 HTML;
     }
 
@@ -631,8 +586,8 @@ HTML;
         return <<<HTML
         <div class="col-12 col-md-6">
             <div class="float-sm-right">
-                {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", "Ajouter", "btn-success",  "fas fa-plus")}
-                {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", "Supprimer", "btn-danger", "fas fa-trash-alt")}
+                {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", null, "btn-success",  "fas fa-plus")}
+                {$this->button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", null, "btn-danger", "fas fa-trash-alt")}
             </div>
         </div>
 HTML;
@@ -770,7 +725,7 @@ HTML;
      *
      * @return string
      */
-    private function button(string $href, string $text, string $btn_class = null, string $fa_icon_class = null)
+    private function button(string $href, string $text = null, string $btn_class = null, string $fa_icon_class = null)
     {
         if (null !== $fa_icon_class) {
             $fa_icon_class = '<i class="' . $fa_icon_class. '"></i>';

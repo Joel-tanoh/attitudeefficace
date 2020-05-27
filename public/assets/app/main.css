@@ -18,6 +18,10 @@ a:hover {
   background-color: #a40000;
   color: #fff;
 }
+.navbar-marron {
+	background-color: rgb(44, 0, 0);
+	color: #fff;
+  }
 .navbar-blue {
   background-color: #000226;
   color: #fff;
@@ -86,6 +90,10 @@ a:hover {
 }
 .bg-gray-strong {
 	background-color: rgb(44, 62, 80);
+}
+.bg-marron,
+.bg-chocolat {
+	background-color: rgb(44, 0, 0);
 }
 
 /* LES MARGES AUQUELLES BOOTSTRAP NE DONNENT PAS ACCES */

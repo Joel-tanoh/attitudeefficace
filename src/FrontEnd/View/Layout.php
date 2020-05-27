@@ -52,18 +52,20 @@ HTML;
     /**
      * Disposition de page avec une navbar.
      * 
-     * @param mixed $navbar
-     * @param mixed $container_content
+     * @param string $navbar
+     * @param string $container_content
+     * @param string $footer
      * 
      * @return string
      */
-    public function navbarAndContainer($navbar = null, $container_content = null)
+    public function navbarAndContainerAndFooter($navbar = null, $container_content = null, $footer = null)
     {
         return <<<HTML
         {$navbar}
-        <div class="container">
+        <section class="container">
             {$container_content}
-        </div>
+        </section>
+        {$footer}
 HTML;
     }
 

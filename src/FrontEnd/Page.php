@@ -92,6 +92,9 @@ class Page
      **/
     public function publicPage()
     {
+        $layout = new Layout();
+        $view = new View();
+
         return <<<HTML
         {$this->debutDePage("fr")}
         <head>
@@ -99,7 +102,7 @@ class Page
             {$this->publicCss()}
         </head>
         <body>
-            {$this->view}
+            {$layout->navbarAndContainerAndFooter($view->navbar("public"), $this->view, $view->publicFooter())}
             {$this->generalAppJs()}
         </body>
         </html>
