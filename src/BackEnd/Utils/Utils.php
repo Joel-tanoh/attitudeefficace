@@ -14,7 +14,9 @@
 
 namespace App\BackEnd\Utils;
 
+use App\BackEnd\APIs\Bdd;
 use Cocur\Slugify\Slugify;
+use DateTime;
 
 /**
  * Gère toutes les fonctions de l'application.
@@ -74,6 +76,41 @@ class Utils
     {
         $slugify = new Slugify(['rulesets' => ['default', 'turkish']]);
         return $slugify->slugify($string);
+    }
+
+    /**
+     * Vérifie si c'est une nouvelle visite.
+     * 
+     * @return bool
+     */
+    public static function isNewVisit()
+    {
+        if (isset($_SERVER["HTTP_REFERER"]) && strchr($_SERVER["HTTP_REFERER"], $_SERVER["SERVER_NAME"])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Permet de mettre à jour le compteur de visite de l'app.
+     * 
+     * @return bool 
+     */
+    public static function setAppComputerVisite()
+    {
+        $year = date("Y");
+        $month = date("m");
+        $day = date("d");
+        $visite = Bdd::verifyDateVisitIsset($year, $month, $day);
+
+        if (self::isNewVisit()) {
+            if ($visite["date_isset"]) {
+                Bdd::incOrDecColValue("increment", "nombre_visite", "compteur_visites", $visite["id"]);
+            } else {
+                Bdd::insertNewVisit($year, $month, $day, 1);
+            }
+        }
     }
 
 }

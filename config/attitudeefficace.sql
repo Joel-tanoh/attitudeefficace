@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  lun. 25 mai 2020 à 11:19
+-- Généré le :  mer. 27 mai 2020 à 00:28
 -- Version du serveur :  5.7.19
 -- Version de PHP :  7.1.9
 
@@ -98,6 +98,29 @@ CREATE TABLE IF NOT EXISTS `commands` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `compteur_visites`
+--
+
+DROP TABLE IF EXISTS `compteur_visites`;
+CREATE TABLE IF NOT EXISTS `compteur_visites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `year` varchar(4) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `month` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `day` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `nombre_visite` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+--
+-- Déchargement des données de la table `compteur_visites`
+--
+
+INSERT INTO `compteur_visites` (`id`, `year`, `month`, `day`, `nombre_visite`) VALUES
+(3, '2020', '05', '26', 2);
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `item_childs`
 --
 
@@ -125,7 +148,18 @@ CREATE TABLE IF NOT EXISTS `item_childs` (
   `views` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UN_CODE` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=53 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=utf8;
+
+--
+-- Déchargement des données de la table `item_childs`
+--
+
+INSERT INTO `item_childs` (`id`, `code`, `categorie`, `parent_id`, `title`, `description`, `slug`, `article_content`, `author`, `provider`, `pages`, `price`, `rang`, `edition_home`, `annee_parution`, `date_creation`, `date_modification`, `date_post`, `video_link`, `views`) VALUES
+(53, '3jytEu2qF', 'videos', -1, 'Lorem ipsum', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus reprehenderit sit velit necessitatibus ea in.', 'lorem-ipsum-53', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-05-26 07:04:29', '2020-05-26 08:26:13', NULL, 'R9gACncMkoo', 0),
+(54, 'wvDISgF', 'videos', -1, 'Lorem ipsum', 'Une belle petite description', 'lorem-ipsum-54', NULL, NULL, NULL, NULL, 0, 2, NULL, NULL, '2020-05-26 08:34:54', '2020-05-26 08:35:47', NULL, '', 0),
+(55, 'eQZGGlB', 'videos', -1, 'Lorem', 'Une belle description', 'lorem-55', NULL, NULL, NULL, NULL, 0, 3, NULL, NULL, '2020-05-26 11:50:45', '2020-05-26 11:50:45', NULL, 'R9gACncMkoo', 0),
+(56, 'VRsXAOM', 'videos', -1, 'Lorem', 'Une belle description', 'lorem-56', NULL, NULL, NULL, NULL, 0, 4, NULL, NULL, '2020-05-26 11:52:13', '2020-05-26 12:02:14', NULL, '', 0),
+(57, '_vk40r', 'minis-services', NULL, 'Développement web', 'Une belle description', 'developpement-web-57', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-05-26 12:25:52', '2020-05-26 12:25:52', NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -149,7 +183,19 @@ CREATE TABLE IF NOT EXISTS `item_parents` (
   `views` int(11) DEFAULT '0',
   `video_link` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=83 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=89 DEFAULT CHARSET=utf8;
+
+--
+-- Déchargement des données de la table `item_parents`
+--
+
+INSERT INTO `item_parents` (`id`, `code`, `categorie`, `title`, `description`, `slug`, `price`, `rang`, `date_creation`, `date_modification`, `date_post`, `views`, `video_link`) VALUES
+(83, 'IMpFxrEJI', 'formations', 'Penser comme un gagnant', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Totam fugit deserunt laboriosam ut. Excepturi dolores nam unde possimus? Minus, a voluptates? Perferendis at consectetur cupiditate!', 'penser-comme-un-gagnant-83', 2500, 1, '2020-05-25 19:34:15', '2020-05-26 14:24:48', NULL, 0, ''),
+(84, 'LvDkJDkqb', 'themes', 'Développement personnel', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Totam fugit deserunt laboriosam ut. Excepturi dolores nam unde possimus? Minus, a voluptates? Perferendis at consectetur cupiditate!', 'developpement-personnel-84', 0, 1, '2020-05-25 19:37:01', '2020-05-25 19:37:01', NULL, 0, NULL),
+(85, 'zel7_FIv', 'themes', 'Leadership', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Totam fugit deserunt laboriosam ut. Excepturi dolores nam unde possimus? Minus, a voluptates? Perferendis at consectetur cupiditate!', 'leadership-85', 0, 2, '2020-05-25 19:38:08', '2020-05-25 19:38:08', NULL, 0, NULL),
+(86, 'vcdCSG3', 'themes', 'Séduction', 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quasi laborum tenetur fugit eveniet exercitationem! Vitae blanditiis veniam laborum corporis delectus.', 'seduction-86', 0, 3, '2020-05-25 19:59:15', '2020-05-25 19:59:15', NULL, 0, NULL),
+(87, 'ZK8DgL1t', 'themes', 'Art oratoire', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus cumque sed ex dolores quos aperiam reprehenderit labore cum, possimus aliquam?', 'art-oratoire-87', 0, 4, '2020-05-25 20:28:40', '2020-05-25 20:28:40', NULL, 0, NULL),
+(88, '_kP1ccBZT', 'etapes', 'Lorem ipsum', 'une belle description', 'lorem-ipsum-88', 0, 1, '2020-05-26 12:12:35', '2020-05-26 12:12:35', NULL, 0, NULL);
 
 -- --------------------------------------------------------
 

@@ -48,6 +48,7 @@ class Controller
         $meta_title = "Bienvenu sur " . APP_NAME;
         $view = new View();
         $page = new Page($meta_title, $view->publicAccueil());
+        Utils::setAppComputerVisite();
         echo $page->publicPage();
     }
 

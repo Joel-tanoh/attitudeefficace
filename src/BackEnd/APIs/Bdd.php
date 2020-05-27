@@ -58,60 +58,6 @@ class Bdd
     }
 
     /**
-     * Récupère les données spécifiés de la table spécifiée selon les clauses
-     * spécifiées en paramètre.
-     * 
-     * @param string $to_select    Les colonnes à prendre dans la même chaîne de
-     *                             caractère séparée. Les champs doivent être séparés
-     *                             par une virgule.
-     * @param string $table        La table.
-     * @param string $clause 
-     * @param string $clause_value 
-     * 
-     * @return array Un tableau qui contient les données retournées.
-     */
-    public static function select(string $to_select, string $table, string $clause = null, string $clause_value = null) 
-    {
-        $bdd = self::connectToDb();
-        $query = "SELECT $to_select FROM $table";
-        if (null !== $clause) {
-            $query .= " WHERE $clause = ?";
-            $rep = $bdd->prepare($query);
-            $rep->execute([$clause_value]);
-        } else {
-            $rep = $bdd->query($query);
-        }
-        return $rep->fetchAll();
-    }
-   
-    /**
-     * Récupère toutes les occurences de la table passée en paramètre. Prend en
-     * paramètre le nom d'une table et optionnellement la catégorie de données à 
-     * retourner.
-     * 
-     * @param string $table     Le nom de la table de laquelle récupérer les
-     *                          occurences.
-     * @param string $categorie Une clause de spécification de la catégorie des
-     *                          données à renvoyer.
-     * @param string $order_by  Le nom de la colonne par rapport à laquelle ordonner
-     *                          les résultats de la requette.
-     * 
-     * @return array Tableau qui contient les occurences de la table passée en param.
-     */
-    public static function getAllFrom(string $table, string $categorie = null)
-    {
-        $query = "SELECT code, slug FROM $table";
-        if (null !== $categorie) {
-            $query .= " WHERE categorie = ?";
-            $rep = self::connectToDb()->prepare($query);
-            $rep->execute([$categorie]);
-        } else {
-            $rep = self::connectToDb()->query($query);
-        }
-        return $rep->fetchAll();
-    }
-
-    /**
      * Retourne le code d'un item dont les paramètres sont passés en paramètres.
      * 
      * @param string $col 
@@ -161,8 +107,7 @@ class Bdd
      */
     public static function getchildrenOf($parent_id, $children_categorie)
     {
-        $query = "SELECT code FROM " . ItemChild::TABLE_NAME 
-            . " WHERE parent_id = ? AND categorie = ?";
+        $query = "SELECT code FROM " . ItemChild::TABLE_NAME . " WHERE parent_id = ? AND categorie = ?";
         $rep = self::connectToDb()->prepare($query);
         $rep->execute([$parent_id, $children_categorie]);
         return $rep->fetchAll();
@@ -273,7 +218,12 @@ class Bdd
      * 
      * @return array
      */
-    public static function getItemsOfColValueMoreOrEqualTo(string $table, string $col, int $col_value, string $categorie) {
+    public static function getItemsOfColValueMoreOrEqualTo(
+        string $table = null,
+        string $col = null,
+        int $col_value = null,
+        string $categorie = null
+    ) {
         $query = "SELECT code FROM $table WHERE $col >= ? AND categorie = ?";
         $rep = self::connectToDb()->prepare($query);
         $rep->execute([$col_value, $categorie,]);
@@ -292,11 +242,11 @@ class Bdd
      * @return bool True si les données ont été bien insérées.
      */
     public static function insertPincipalsData(
-        string $table,
-        string $code,
-        string $title,
-        string $description,
-        string $categorie
+        string $table = null,
+        string $code = null,
+        string $title = null,
+        string $description = null,
+        string $categorie = null
     ) {
         $query = "INSERT INTO $table(code, title, description, categorie) VALUES(?, ?, ?, ?)";
         $rep = self::connectToDb()->prepare($query);
@@ -308,7 +258,7 @@ class Bdd
      * Incrémente ou décrémente une propriété dont la valeur est un entier.
      * 
      * @param string $action Increment ou decrement.
-     * @param string $col    La colonne dont on veut incrémenter la valeur.
+     * @param string $col    La colonne dont on veut incrémenter ou décrémenter la valeur.
      * @param string $table  Le nom de la table de l'item à modifier.
      * @param $id     Id L'item dont on veut incrémenter ou décrémenter la valeur.
      * 
@@ -320,6 +270,51 @@ class Bdd
         $query .= $action == "increment" ? "$col+1" : "$col-1";
         $query .= " WHERE id = " . $id;
         self::connectToDb()->query($query);
+        return true;
+    }
+
+    /**
+     * Vérifie si une date est déjà dans la table qui compte les visites sur l'app.
+     * 
+     * @param string $year
+     * @param string $month
+     * @param string $day
+     * 
+     * @return array
+     */
+    public static function verifyDateVisitIsset(string $year, string $month, string $day)
+    {
+        $query = "SELECT id, COUNT(id) as date_isset FROM compteur_visites WHERE year = :year AND month = :month AND day = :day";
+        $rep = self::connectToDb()->prepare($query);
+        $rep->execute([
+            "year" => $year,
+            "month" => $month,
+            "day" => $day
+        ]);
+        return $rep->fetch();
+    }
+
+    /**
+     * Insère une nouvelle date de visite dans la table compteur_visite.
+     * 
+     * @param string $year
+     * @param string $month
+     * @param string $day
+     * @param int    $nombre_visite
+     * 
+     * @return bool
+     */
+    public static function insertNewVisit(string $year, string $month, string $day, int $nombre_visite = 1)
+    {
+        $query = "INSERT INTO compteur_visites(year, month, day, nombre_visite)
+            VALUES(:year, :month, :day, :nombre_visite)";
+        $rep = self::connectToDb()->prepare($query);
+        $rep->execute([
+            "year" => $year,
+            "month" => $month,
+            "day" => $day,
+            "nombre_visite" => $nombre_visite,
+        ]);
         return true;
     }
 
@@ -372,6 +367,60 @@ class Bdd
         $newsletter_mails = self::select("adresse_email", "newsletters");
         $suscribers_mails = self::select("adresse_email", Suscriber::TABLE_NAME);
         return array_merge($newsletter_mails, $suscribers_mails);
+    }
+
+    /**
+     * Récupère les données spécifiés de la table spécifiée selon les clauses
+     * spécifiées en paramètre.
+     * 
+     * @param string $to_select    Les colonnes à prendre dans la même chaîne de
+     *                             caractère séparée. Les champs doivent être séparés
+     *                             par une virgule.
+     * @param string $table        La table.
+     * @param string $clause 
+     * @param string $clause_value 
+     * 
+     * @return array Un tableau qui contient les données retournées.
+     */
+    public static function select(string $to_select, string $table, string $clause = null, string $clause_value = null) 
+    {
+        $bdd = self::connectToDb();
+        $query = "SELECT $to_select FROM $table";
+        if (null !== $clause) {
+            $query .= " WHERE $clause = ?";
+            $rep = $bdd->prepare($query);
+            $rep->execute([$clause_value]);
+        } else {
+            $rep = $bdd->query($query);
+        }
+        return $rep->fetchAll();
+    }
+   
+    /**
+     * Récupère toutes les occurences de la table passée en paramètre. Prend en
+     * paramètre le nom d'une table et optionnellement la catégorie de données à 
+     * retourner.
+     * 
+     * @param string $table     Le nom de la table de laquelle récupérer les
+     *                          occurences.
+     * @param string $categorie Une clause de spécification de la catégorie des
+     *                          données à renvoyer.
+     * @param string $order_by  Le nom de la colonne par rapport à laquelle ordonner
+     *                          les résultats de la requette.
+     * 
+     * @return array Tableau qui contient les occurences de la table passée en param.
+     */
+    public static function getAllFrom(string $table, string $categorie = null)
+    {
+        $query = "SELECT code, slug FROM $table";
+        if (null !== $categorie) {
+            $query .= " WHERE categorie = ?";
+            $rep = self::connectToDb()->prepare($query);
+            $rep->execute([$categorie]);
+        } else {
+            $rep = self::connectToDb()->query($query);
+        }
+        return $rep->fetchAll();
     }
 
 }
