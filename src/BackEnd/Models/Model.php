@@ -17,7 +17,6 @@ namespace App\BackEnd\Models;
 
 use Exception;
 use App\BackEnd\BddManager;
-use App\BackEnd\EmailManager;
 use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\ItemChild;
 use App\BackEnd\Utils\Utils;
@@ -518,7 +517,6 @@ class Model
      */
     public static function createItem(string $categorie, array $data)
     {
-        // $email_sender = new Email();
         $code = Utils::generateCode();
 
         if ($categorie === "administrateurs") {
@@ -539,8 +537,6 @@ class Model
             $pdf_file_name = $new_item->get("title") . "-" . $new_item->get("id");
             $pdf->savePdfFile($pdf_file_name);
         }
-
-        // $email_sender->notifyUsers(new_item);
 
         $new_item = self::returnObject($categorie, $new_item->get("code"));
         Utils::header($new_item->get("admin_url"));
