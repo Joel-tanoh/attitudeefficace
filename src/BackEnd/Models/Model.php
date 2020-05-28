@@ -21,8 +21,8 @@ use App\BackEnd\APIs\Email;
 use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\ItemChild;
 use App\BackEnd\Utils\Utils;
-use App\BackEnd\APIs\Files\Image;
-use App\BackEnd\APIs\Files\Pdf;
+use App\BackEnd\Files\Image;
+use App\BackEnd\Files\Pdf;
 use App\BackEnd\Models\Personnes\Administrateur;
 
 /**

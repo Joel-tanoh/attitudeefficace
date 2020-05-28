@@ -15,7 +15,7 @@
 namespace App\BackEnd\Models\Personnes;
 
 use App\BackEnd\BddManager;
-use App\BackEnd\APIs\Files\Image;
+use App\BackEnd\Files\Image;
 use App\BackEnd\APIs\SqlQueryFormater;
 use App\BackEnd\Utils\Utils;
 use Exception;

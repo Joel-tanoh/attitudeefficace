@@ -12,7 +12,7 @@
  * @link     Link
  */
 
-namespace App\BackEnd\APIs\Files;
+namespace App\BackEnd\Files;
 
 /**
  * Gère une Les fichiers.
