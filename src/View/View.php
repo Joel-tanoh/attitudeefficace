@@ -6,16 +6,16 @@
  * @author Joel Tanoh <joel.developpeur@gmail.com>
  */
 
-namespace App\FrontEnd\View;
+namespace App\View;
 
 use App\Router;
 use App\BackEnd\BddManager;
 use App\BackEnd\Models\Model;
-use App\FrontEnd\View\Notification;
-use App\FrontEnd\View\Html\Form;
-use App\FrontEnd\View\ModelsView\AdministrateurView;
-use App\FrontEnd\View\ModelsView\ParentView;
-use App\FrontEnd\View\ModelsView\ChildView;
+use App\View\Notification;
+use App\View\Form;
+use App\View\ModelsView\AdministrateurView;
+use App\View\ModelsView\ParentView;
+use App\View\ModelsView\ChildView;
 
 /**
  * Une vue est un bloc ou un ensemble de bloc de code HTML qui a une fonctionnalité

@@ -3,7 +3,7 @@
  * Grace au fichiers .htaccess,
  * toutes les urls sont transmises comme étant une variable du tableau GET[],
  * En explodant ce tableau on obtient des variables indexées
- * qui permettent de router les urls.
+ * qui permettent de route les urls.
  * 
  * PHP version 7.1.9
  * 
@@ -16,32 +16,34 @@
 
 session_start();
 
-require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SEPARATOR . 'config.php';
+require_once ROOT_PATH . 'global' . DIRECTORY_SEPARATOR . 'functions.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use App\Router;
 use App\Controller;
 use App\BackEnd\Utils\Utils;
 use App\BackEnd\Models\Model;
-use App\FrontEnd\View\Notification;
+use App\View\Notification;
 
 try {
     
     if (!someoneIsConnected()) { Utils::header(ADMIN_URL . "/connexion"); }
-    $router = new Router(Router::getUrl());
+
+    $route = new Router(Router::getUrl());
     $controller = new Controller(Router::getUrlAsArray());
 
-    if ($router->match("")) $controller->dashboard();
-    elseif ($router->match("administrateurs")) $controller->listAdminUsersAccounts();
-    elseif ($router->match("motivation-plus")) $controller->listMotivationPlusVideo();
-    elseif ($router->match("motivation-plus/create")) $controller->createMotivationPlusVideo();
-    elseif ($router->match("motivation-plus/delete")) $controller->deleteMotivationPlusVideo();
-    elseif ($router->match( [Model::getAllCategories()] ) ) $controller->listCategorieItems();
-    elseif ($router->match( [Model::getAllCategories(), "create"] ) ) $controller->createItem();
-    elseif ($router->match( [Model::getAllCategories(), "delete"] ) ) $controller->deleteManyItems();
-    elseif ($router->match( [Model::getAllCategories(), Model::getAllSlugs()] ) ) $controller->readItem();
-    elseif ($router->match( [Model::getAllCategories(), Model::getAllSlugs(), "edit"] ) ) $controller->editItem();
-    elseif ($router->match( [Model::getAllCategories(), Model::getAllSlugs(), "delete"] ) ) $controller->deleteItem();
+    if ($route->match("")) $controller->dashboard();
+    elseif ($route->match("administrateurs")) $controller->listAdminUsersAccounts();
+    elseif ($route->match("motivation-plus")) $controller->listMotivationPlusVideo();
+    elseif ($route->match("motivation-plus/create")) $controller->createMotivationPlusVideo();
+    elseif ($route->match("motivation-plus/delete")) $controller->deleteMotivationPlusVideo();
+    elseif ($route->match( [Model::getAllCategories()] ) ) $controller->listCategorieItems();
+    elseif ($route->match( [Model::getAllCategories(), "create"] ) ) $controller->createItem();
+    elseif ($route->match( [Model::getAllCategories(), "delete"] ) ) $controller->deleteManyItems();
+    elseif ($route->match( [Model::getAllCategories(), Model::getAllSlugs()] ) ) $controller->readItem();
+    elseif ($route->match( [Model::getAllCategories(), Model::getAllSlugs(), "edit"] ) ) $controller->editItem();
+    elseif ($route->match( [Model::getAllCategories(), Model::getAllSlugs(), "delete"] ) ) $controller->deleteItem();
     
     else $controller->adminError404();
 

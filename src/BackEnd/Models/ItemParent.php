@@ -92,7 +92,7 @@ class ItemParent extends Model
         // variables relatives à l'image
         $this->image_name = $this->categorie . "-" . $this->slug . IMAGES_EXTENSION;
         $this->thumbs_path = THUMBS_PATH . $this->image_name;
-        $this->thumbs_src = THUMBS_DIR . "/" . $this->image_name;
+        $this->thumbs_src = THUMBS_DIR_URL . "/" . $this->image_name;
         $this->original_image_path = ORIGINALS_IMAGES_PATH . $this->image_name;
         $this->original_image_src =  ORIGINALS_IMAGES_DIR . "/" . $this->image_name;
 

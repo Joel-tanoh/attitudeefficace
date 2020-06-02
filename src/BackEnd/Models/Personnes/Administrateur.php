@@ -74,7 +74,7 @@ class Administrateur extends Personne
         $this->url = ADMIN_URL . '/' . self::TABLE_NAME . "/" . $this->code;
         $this->avatar_name = Utils::slugify($this->login) . "-" . $this->id . IMAGES_EXTENSION;
         $this->avatar_path = AVATARS_PATH . $this->avatar_name;
-        $this->avatar_src = AVATARS_DIR . "/" . $this->avatar_name;
+        $this->avatar_src = AVATARS_DIR_URL . "/" . $this->avatar_name;
         $this->table = self::TABLE_NAME;
     }
 

@@ -13,13 +13,13 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\View\ModelsView;
+namespace App\View\ModelsView;
 
 use App\BackEnd\BddManager;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\ItemChild;
-use App\FrontEnd\View\Card;
+use App\View\Card;
 
 /**
  * Gère tout ce qui concerne l'affichage au niveau des parents parents dans l'app.
@@ -31,7 +31,7 @@ use App\FrontEnd\View\Card;
  * @version  "Release: package_version"
  * @link     Link
  */
-class ParentView extends \App\FrontEnd\View\View
+class ParentView extends \App\View\View
 {
     /**
      * Retourne la page qui permet d'afficher un parent parent et toutes ses

@@ -8,21 +8,19 @@
 
 session_start();
 
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
+require_once dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SEPARATOR . 'config.php';
+require_once ROOT_PATH . 'global' . DIRECTORY_SEPARATOR . 'functions.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use App\Router;
 use App\Controller;
-use App\FrontEnd\View\Notification;
+use App\View\Notification;
 
 try {
-    $router = new Router(Router::getUrl());
-    $controller = new Controller($router->getUrl());
+    $route = new Router(Router::getUrl());
+    $controller = new Controller($route->getUrl());
 
-    // Accueil
-    if ($router->match("")) $controller->publicAccueilPage();
-
-    // Error 404
+    if ($route->match("")) $controller->publicAccueilPage();
     else $controller->publicError404();
     
 } catch(Error|TypeError|Exception|PDOException $e) {

@@ -89,7 +89,7 @@ class ItemChild extends Model
         $this->original_image_path = ORIGINALS_IMAGES_PATH . $this->image_name;
         $this->thumbs_path = THUMBS_PATH . $this->image_name;
         $this->original_image_src = ORIGINALS_IMAGES_DIR . "/" . $this->image_name;
-        $this->thumbs_src = THUMBS_DIR . "/" . $this->image_name;
+        $this->thumbs_src = THUMBS_DIR_URL . "/" . $this->image_name;
 
         // Les urls de l'objet pour le localiser
         $this->url = $this->categorie . "/" . $this->slug;

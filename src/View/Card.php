@@ -6,7 +6,7 @@
  * @author Joel Tanoh <joel.developpeur@gmail.com>
  */
 
-namespace App\FrontEnd\View;
+namespace App\View;
 
 /**
  * Gère toutes les vues de type cartes.

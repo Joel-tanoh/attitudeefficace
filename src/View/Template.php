@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\View;
+namespace App\View;
 
 /**
  * Une template est un type de disposition du contenu d'une page.

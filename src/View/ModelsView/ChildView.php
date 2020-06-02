@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\View\ModelsView;
+namespace App\View\ModelsView;
 
 /**
  * Gère tout ce qui concerne l'affichage au niveau des catégories
@@ -25,7 +25,7 @@ namespace App\FrontEnd\View\ModelsView;
  * @version  "Release: package_version"
  * @link     Link
  */
-class ChildView extends \App\FrontEnd\View\View
+class ChildView extends \App\View\View
 {
     /**
      * Retourne la page d'affichage d'un item enfant.

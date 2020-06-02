@@ -12,9 +12,9 @@ use App\BackEnd\BddManager;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Validator;
 use App\BackEnd\Utils\Utils;
-use App\FrontEnd\View\Page;
-use App\FrontEnd\View\View;
-use App\FrontEnd\View\Notification;
+use App\View\Page;
+use App\View\View;
+use App\View\Notification;
 
 /**
  * Gère le controlleur. Une méthode du controlleur peut être appelée en fonction du routage.

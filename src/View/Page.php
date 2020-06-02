@@ -13,16 +13,16 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\View;
+namespace App\View;
 
-use App\FrontEnd\View\Template;
-use App\FrontEnd\View\View;
+use App\View\Template;
+use App\View\View;
 
 /**
  * Classe qui gère tout ce qui est en rapport à une page.
  *  
  * @category Category
- * @package  App\FrontEnd
+ * @package  App
  * @author   Joel <joel.developpeur@gmail.com>
  * @license  url.com license_name
  * @version  Release: 1

@@ -12,7 +12,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\View;
+namespace App\View;
 
 /**
  * Gère tout ce qui concerne le pied de page

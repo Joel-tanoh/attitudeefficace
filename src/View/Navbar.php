@@ -12,7 +12,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\View;
+namespace App\View;
 
 use App\BackEnd\Models\Personnes\Administrateur;
 
@@ -20,7 +20,7 @@ use App\BackEnd\Models\Personnes\Administrateur;
  * Perlet de gérer tout ce qui concerne la barre de navigation supérieure.
  * 
  * @category Category
- * @package  App\FrontEnd\
+ * @package  App\
  * @author   Joel <joel.developpeur@gmail.com>
  * @license  url.com License
  * @link     Link
@@ -131,7 +131,7 @@ HTML;
     {
         $admin_url = ADMIN_URL;
         $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
-        $private_buttons = $admin_user->get("categorie") == "administrateur" ? $this->administratorActions() : null;
+        $private_buttons = $admin_user->get("categorie") === "administrateur" ? $this->administratorActions() : null;
 
         return <<<HTML
         <li class="btn-administrateur">

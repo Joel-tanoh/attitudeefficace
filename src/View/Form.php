@@ -12,12 +12,11 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\View\Html;
+namespace App\View;
 
 use App\BackEnd\BddManager;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Utils;
-use App\Router;
 
 /**
  * Classe qui gère les formulaires.
@@ -29,7 +28,7 @@ use App\Router;
  * @version  "Release: package_version"
  * @link     Link
  */
-class Form
+class Form extends View
 {
     /**
      * Retourne un formulaire en fonction de la catégorie passée en paramètre.

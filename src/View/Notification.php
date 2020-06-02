@@ -12,7 +12,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\View;
+namespace App\View;
 
 /**
  * Permet de gérer toutes les notifications d'error, de succès et d'informations

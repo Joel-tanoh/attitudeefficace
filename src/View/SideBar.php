@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\FrontEnd\View;
+namespace App\View;
 
 use App\BackEnd\BddManager;
 use App\BackEnd\Models\Personnes\Administrateur;

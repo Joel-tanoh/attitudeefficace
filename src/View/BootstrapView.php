@@ -1,6 +1,6 @@
 <?php
 
-namespace App\FrontEnd\View;
+namespace App\View;
 
 /**
  * Gère toutes les vues qu'offrent Bootstrap.

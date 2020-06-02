@@ -12,14 +12,16 @@
  * @link     Link
  */
 session_start();
-require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
+
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SEPARATOR . 'config.php';
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SEPARATOR . 'functions.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use App\BackEnd\Models\Personnes\Administrateur;
-use App\FrontEnd\View\Notification;
+use App\View\Notification;
 use App\BackEnd\Utils\Utils;
-use App\FrontEnd\View\View;
-use App\FrontEnd\View\Page;
+use App\View\View;
+use App\View\Page;
 
 try {
     $notification = new Notification();
