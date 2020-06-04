@@ -97,7 +97,7 @@ class Utils
      * 
      * @return bool 
      */
-    public static function setAppComputerVisite()
+    public static function appVisitCounter()
     {
         $year = date("Y");
         $month = date("m");

@@ -30,32 +30,6 @@ namespace App\View;
 class Template extends View
 {
     /**
-     * Template de lecture d'un item.
-     * 
-     * @param mixed $item L'item qu'on veut afficher.
-     * 
-     * @return string
-     */
-    public function readItem($item = null)
-    {
-
-    }
-
-    /**
-     * Template de suppression d'items.
-     * 
-     * @param array $items     Les items qu'on veut supprimer.
-     * @param array $categorie 
-     * @param array $error     En cas d'erreur à afficher.
-     * 
-     * @return string
-     */
-    public function deleteItems($items, $categorie, $error = null)
-    {
-
-    }
-
-    /**
      * Template avec une navbar fixe et une sidebar fixe.
      * 
      * @param mixed $navbar
@@ -64,11 +38,15 @@ class Template extends View
      * 
      * @return string
      */
-    public function navbarAndSidebarAndContainer($navbar = null, $sidebar = null, $container_content = null)
+    public static function navbarAndSidebarAndContainer($navbar = null, $sidebar = null, $container_content = null)
     {
         return <<<HTML
-        {$navbar}
-        {$sidebar}
+        <header>
+            {$navbar}
+        </header>
+        <section>
+            {$sidebar}
+        </section>
         <div class="container-fluid mb-3" id="container-with-fixed-sidebar-and-navbar">
             {$container_content}
         </div>
@@ -76,7 +54,7 @@ HTML;
     }
 
     /**
-     * Disposition de page avec une navbar.
+     * Disposition de page avec une navbar, un contenu et un footer.
      * 
      * @param string $navbar
      * @param string $container_content
@@ -84,14 +62,18 @@ HTML;
      * 
      * @return string
      */
-    public function navbarAndContainerAndFooter($navbar = null, $container_content = null, $footer = null)
+    public static function navbarAndContainerAndFooter($navbar = null, $container_content = null, $footer = null)
     {
         return <<<HTML
-        {$navbar}
+        <header>
+            {$navbar}
+        </header>
         <section class="container">
             {$container_content}
         </section>
-        {$footer}
+        <footer>
+            {$footer}
+        </footer>
 HTML;
     }
 
@@ -103,10 +85,12 @@ HTML;
      * 
      * @return string
      */
-    public function fixedNavbarAndContainer($navbar = null, $container_content = null)
+    public static function fixedNavbarAndContainer($navbar = null, $container_content = null)
     {
         return <<<HTML
-        {$navbar}
+        <header>
+            {$navbar}
+        </header>
         <div class="container">
             {$container_content}
         </div>
@@ -122,10 +106,12 @@ HTML;
      * 
      * @return string
      */
-    public function fixedSidebarAndContainer($sidebar, $container_content = null)
+    public static function fixedSidebarAndContainer($sidebar = null, $container_content = null)
     {
         return <<<HTML
-        {$sidebar}
+        <section>
+            {$sidebar}
+        </section>
         <div id="container_content">
             {$container_content}
         </div>
@@ -140,7 +126,7 @@ HTML;
      * 
      * @return string
      */
-    public function singleColumn($container_content)
+    public static function singleColumn($container_content = null)
     {
         return <<<HTML
         <div class="container">
@@ -152,11 +138,11 @@ HTML;
     /**
      * Template de liste de cartes.
      * 
-     * @param array $items Un tableau contenant les items.
+     * @param array $cards Un tableau contenant des cartes.
      * 
      * @return string
      */
-    public function gridOfCards($items = null)
+    public static function gridOfCards($cards = null)
     {
 
     }

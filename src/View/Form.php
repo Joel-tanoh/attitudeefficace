@@ -15,6 +15,7 @@
 namespace App\View;
 
 use App\BackEnd\BddManager;
+use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Utils;
 
@@ -38,16 +39,14 @@ class Form extends View
      * 
      * @return string Le contenu du formulaire.
      */
-    public function getForm($categorie, $item = null)
+    public static function getForm($categorie, $item = null)
     {
-        if ($categorie === "administrateurs") return $this->addAdminUserForm($item);
-        elseif (Model::isParentCategorie($categorie)) $form = $this->parentForm($item, $categorie);
-        elseif ($categorie === "videos") $form = $this->addVideoForm($item);
-        elseif ($categorie === "minis-services") $form = $this->miniServiceForm($item, $categorie);
-        elseif (Model::isChildCategorie($categorie)) $form = $this->childForm($item, $categorie);
+        if ($categorie === "administrateurs") return self::addAdminUserForm($item);
+        elseif (Model::isParentCategorie($categorie)) return self::parentForm($item, $categorie);
+        elseif ($categorie === "videos") return self::addVideoForm($item);
+        elseif ($categorie === "minis-services") return self::addMiniserviceForm($item, $categorie);
+        elseif (Model::isChildCategorie($categorie)) return self::childForm($item, $categorie);
         else Utils::header(ADMIN_URL);
-
-        return $this->returnForm($form);
     }
 
     /**
@@ -57,14 +56,15 @@ class Form extends View
      * 
      * @return string
      */
-    public function addAdminUserForm($admin = null)
+    public static function addAdminUserForm($admin = null)
     {
-        $form_content = $this->loginInput($admin, "col-12 form-control");
-        $form_content .= $this->passwordInput("col-12 form-control");
-        $form_content .= $this->confirmPasswordInput("col-12 form-control");
-        $form_content .= $this->emailInput($admin, "col-12 form-control");
-        $form_content .= $this->chooseAdminAccountType();
-        $form_content .= $this->avatarInput();
+        $form_content = self::loginInput($admin, "col-12 form-control");
+        $form_content .= self::passwordInput("col-12 form-control");
+        $form_content .= self::confirmPasswordInput("col-12 form-control");
+        $form_content .= self::emailInput($admin, "col-12 form-control");
+        $form_content .= self::chooseAdminAccountType();
+        $form_content .= self::avatarInput();
+        $submitButton = self::submitButton('enregistrement', 'Enregistrer');
 
         return <<<HTML
         <div class="row">
@@ -73,7 +73,7 @@ class Form extends View
                     <div class="card-body">
                         <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
                             {$form_content}
-                            {$this->submitButton('enregistrement', 'Enregistrer')}
+                            {$submitButton}
                         </form>
                     </div>
                 </div>
@@ -90,14 +90,14 @@ HTML;
      * 
      * @return string Le formulaire.
      */
-    public function parentForm($item = null, string $categorie)
+    public static function parentForm($item = null, string $categorie)
     {
         $prix_label = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         accéder à cet élément</p>
 HTML;
-        return $this->commonItemsInformations($item, $prix_label, $categorie);
+        return self::commonItemsInformations($item, $prix_label, $categorie);
     }
  
     /**
@@ -108,7 +108,7 @@ HTML;
      * 
      * @return string Le formulaire.
      */
-    public function childForm($item = null, string $categorie = null)
+    public static function childForm($item = null, string $categorie = null)
     {
         $prix_label = <<<HTML
         Prix :
@@ -116,10 +116,9 @@ HTML;
         avoir accès à cet élément</p>
 HTML;
 
-        $formContent = $this->commonItemsInformations($item, $prix_label, $categorie);
-        $formContent .= $this->articleContentTextarea($item, $categorie);
-
-        return $formContent;
+        return 
+            self::commonItemsInformations($item, $prix_label, $categorie) .
+            self::articleContentTextarea($item, $categorie);
     }
 
     /**
@@ -129,30 +128,37 @@ HTML;
      * 
      * @return string
      */
-    public function addFormationForm($item = null)
+    public static function addFormationForm($item = null)
     {
         $prix_label = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         avoir accès à cet élément</p>
 HTML;
-        $form_content = <<<HTML
+
+        $titleInput = self::titleInput($item);
+        $descriptionTextarea = self::descriptionTextarea($item);
+        $videoInput = self::videoInput($item);
+        $prixInput = self::prixInput($item, $prix_label);
+        $rangInput = self::rangInput($item, "formations");
+        $imageInput = self::imageInput();
+        $notifyUserBox = self::notifyUsersBox();
+
+        return <<<HTML
         <div class="row mb-2">
-            <div class="col-md-6">
-                {$this->titleInput($item)}
-                {$this->descriptionTextarea($item)}
+            <div class="col-md-7">
+                {$titleInput}
+                {$descriptionTextarea}
             </div>
-            <div class="col-md-6">
-                {$this->prixInput($item, $prix_label)}
-                {$this->rangInput($item, "formations")}
-                {$this->videoInput($item)}
-                {$this->imageInput()}
-                {$this->notifyUsersBox()}
+            <div class="col-md-5">
+                {$prixInput}
+                {$rangInput}
+                {$videoInput}
+                {$imageInput}
+                {$notifyUserBox}
             </div>
         </div>
 HTML;
-
-        return $form_content;
     }
 
     /**
@@ -162,25 +168,34 @@ HTML;
      * 
      * @return string
      */
-    public function addVideoForm($item = null)
+    public static function addVideoForm($item = null)
     {
         $prix_label = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         avoir accès à cet élément</p>
 HTML;
+        $selectParent = self::selectParent("videos");
+        $titleInput = self::titleInput($item);
+        $descriptionTextarea = self::descriptionTextarea($item);
+        $videoInput = self::videoInput($item);
+        $prixInput = self::prixInput($item, $prix_label);
+        $rangInput = self::rangInput($item, "videos");
+        $imageInput = self::imageInput();
+        $notifyUserBox = self::notifyUsersBox();
+
         return <<<HTML
         <div class="col-md-7">
-            {$this->selectParent("videos")}
-            {$this->titleInput($item)}
-            {$this->descriptionTextarea($item)}
-            {$this->videoInput($item)}
+            {$selectParent}
+            {$titleInput}
+            {$descriptionTextarea}
+            {$videoInput}
         </div>
         <div class="col-md-5">
-            {$this->prixInput($item, $prix_label)}
-            {$this->rangInput($item, "videos")}
-            {$this->imageInput()}
-            {$this->notifyUsersBox()}
+            {$prixInput}
+            {$rangInput}
+            {$imageInput}
+            {$notifyUserBox}
         </div>
 HTML;
     }
@@ -193,7 +208,7 @@ HTML;
      * 
      * @return string
      */
-    public function miniServiceForm($item = null, string $categorie = null)
+    public static function addMiniserviceForm($item = null, string $categorie = null)
     {
         $mini_service_label = <<<HTML
         Prix :
@@ -201,7 +216,7 @@ HTML;
             Cette somme sera affichée aux utilisateurs qui voudront ce service
         </p>
 HTML;
-        $form_content = $this->commonItemsInformations($item, $mini_service_label, $categorie);
+        $form_content = self::commonItemsInformations($item, $mini_service_label, $categorie);
         return $form_content;
     }
 
@@ -216,24 +231,33 @@ HTML;
      * 
      * @return string
      */
-    public function commonItemsInformations($item = null, $prix_label = null, $categorie = null)
+    public static function commonItemsInformations($item = null, $prix_label = null, $categorie = null)
     {
         $uploadPdf = $categorie === "ebooks" ? true : false;
+        $selectParent = self::selectParent($categorie);
+        $titleInput = self::titleInput($item);
+        $descriptionTextarea = self::descriptionTextarea($item);
+        $videoInput = self::videoInput($item);
+        $prixInput = self::prixInput($item, $prix_label);
+        $rangInput = self::rangInput($item, $categorie);
+        $imageInput = self::imageInput();
+        $pdfFileInput = self::pdfFileInput($uploadPdf);
+        $notifyUserBox = self::notifyUsersBox();
 
         return <<<HTML
         <div class="row mb-2">
             <div class="col-md-7">
-                {$this->selectParent($categorie)}
-                {$this->titleInput($item)}
-                {$this->descriptionTextarea($item)}
+                {$selectParent}
+                {$titleInput}
+                {$descriptionTextarea}
             </div>
             <div class="col-md-5">
-                {$this->videoInput($item)}
-                {$this->prixInput($item, $prix_label)}
-                {$this->rangInput($item, $categorie)}
-                {$this->imageInput()}
-                {$this->pdfFileInput($uploadPdf)}
-                {$this->notifyUsersBox()}
+                {$videoInput}
+                {$prixInput}
+                {$rangInput}
+                {$imageInput}
+                {$pdfFileInput}
+                {$notifyUserBox}
             </div>
         </div>
 HTML;
@@ -248,14 +272,16 @@ HTML;
      * 
      * @return string
      */
-    public function loginInput($user = null, string $class = null)
+    public static function loginInput($user = null, string $class = null)
     {
         $login = !is_null($user) ? $user->get("login") : "";
+        $label = self::label("login", "Login");
         extract($_POST);
+        $input = self::text('login', 'login', $login, "Login", $class);
         return <<<HTML
         <div class="form-group">
-            {$this->label("login", "Login")}
-            {$this->inputText('login', 'login', $login, "Login", $class)}
+            {$label}
+            {$input}
         </div>
 HTML;
     }
@@ -267,14 +293,16 @@ HTML;
      * 
      * @return string
      */
-    public function passwordInput(string $class = null)
+    public static function passwordInput(string $class = null)
     {
         $password = "";
+        $label = self::label("password", "Entrez le mot de passe");
         extract($_POST);
+        $input = self::passwordInput('password', 'password', $password, "Saisir le mot de passe", $class);
         return <<<HTML
         <div class="form-group">
-            {$this->label("password", "Entrez le mot de passe")}
-            {$this->inputPassword('password', 'password', $password, "Saisir le mot de passe", $class)}
+            {$label}
+            {$input}
         </div>
 HTML;
     }
@@ -287,14 +315,17 @@ HTML;
      * 
      * @return string
      */
-    public function emailInput($user = null, string $class = null)
+    public static function emailInput($user = null, string $class = null)
     {
         $email = !is_null($user) ? $user->get("email") : "";
+        $label = self::label("email", "Adresse email");
         extract($_POST);
+        $input = self::email('email', 'email', $email, "johny@mail.com", $class);
+
         return <<<HTML
         <div class="form-group">
-            {$this->label("email", "Adresse email")}
-            {$this->email('email', 'email', $email, "johny@mail.com", $class)}
+            {$label}
+            {$input}
         </div>
 HTML;
     }
@@ -304,17 +335,20 @@ HTML;
      * 
      * @return string
      */
-    public function chooseAdminAccountType()
+    public static function chooseAdminAccountType()
     {
+        $label = self::label("", "Type de compte :");
+        $adminRadio = self::radio("account_type", "administrateur", "Administrateur");
+        $userRadio = self::radio("account_type", "utilisateur", "Utilisateur");
         return <<<HTML
-        {$this->label("", "Type de compte :")}
+        {$label}
         <div class="row mb-2">
-            <div class="col-6">
-                {$this->inputRadio("account_type", "administrateur", "Administrateur")}
-            </div>
-            <div>
-                {$this->inputRadio("account_type", "utilisateur", "Utilisateur")}
-            </div>
+            <span class="col-6">
+                {$adminRadio}
+            </span>
+            <span class="col-6">
+                {$userRadio}
+            </span>
         </div>
 HTML;
     }
@@ -326,14 +360,17 @@ HTML;
      * 
      * @return string
      */
-    public function confirmPasswordInput(string $class = null)
+    public static function confirmPasswordInput(string $class = null)
     {
-        $confirminputPassword = "";
+        $confirmInputPassword = "";
+        $label = self::label("confirmPassword", "Confirmez le mot de passe");
         extract($_POST);
+        $input = self::passwordInput("confirminputPassword", "confirmPassword", $confirmInputPassword, "Confirmer le mot de passe", $class);
+
         return <<<HTML
         <div class="form-group">
-            {$this->label("confirmPassword", "Confirmez le mot de passe")}
-            {$this->inputPassword("confirminputPassword", "confirmPassword", $confirminputPassword, "Confirmer le mot de passe", $class)}
+            {$label}
+            {$input}
         </div>
 HTML;
     }
@@ -347,18 +384,19 @@ HTML;
      * 
      * @return string
      */
-    public function selectParent(string $categorie = null)
+    public static function selectParent(string $categorie = null)
     {
         if (null !== $categorie && Model::isChildCategorie($categorie) && $categorie !== "minis-services") {
+            $label = self::label("selectParentList", "Choisir le parent :");
+            $parentListOptions = self::parentList("themes", "Thèmes");
+
             return <<<HTML
             <div id="chooseParentBox" class="mb-2">
-                {$this->label("selectParentList", "Choisir le parent :")}
+                {$label}
                 <select name="parent_id" id="selectParentList" class="select2 col-12 form-control">
                     <option value="0">-- Sans parent --</option>
                     <option value="-1">Motivation plus</option>
-                    {$this->parentList("themes", "Thèmes")}
-                    {$this->parentList("etapes", "Etapes")}
-                    {$this->parentList("formations", "Formations")}
+                    {$parentListOptions}
                 </select>
             </div>
 HTML;
@@ -372,14 +410,19 @@ HTML;
      * 
      * @return string Le code HTML pour le champ.
      */
-    public function titleInput($item = null)
+    public static function titleInput($item = null)
     {
         $title = !is_null($item) ? $item->get("title") : "";
+
         extract($_POST);
+
+        $labelAndInput =
+            self::label("title", "Titre") .
+            self::text('title', 'title', $title, "Saisir le titre", "col-12 form-control");
+
         return <<<HTML
         <div class="form-group">
-            {$this->label("title", "Titre")}
-            {$this->inputText('title', 'title', $title, "Saisir le titre", "col-12 form-control")}
+            {$labelAndInput}
         </div>
 HTML;
     }
@@ -392,14 +435,19 @@ HTML;
      * 
      * @return string Le code HTML de la description.
      */
-    public function descriptionTextarea($item)
+    public static function descriptionTextarea($item)
     {
         $description = !is_null($item) ? $item->get("description") : "";
+
         extract($_POST);
+
+        $labelAndInput =
+            self::label("descriptionTextarea", "Description") .
+            self::textarea('description', 'descriptionTextarea', "Saisir la description...", $description, "form-control", "10");
+
         return <<<HTML
         <div class="form-group">
-            {$this->label("descriptionTextarea", "Description")}
-            {$this->inputTextarea('description', 'descriptionTextarea', "Saisir la description...", $description, "form-control", "10")}
+            {$labelAndInput}
         </div>
 HTML;
     }
@@ -412,16 +460,18 @@ HTML;
      * 
      * @return string Le code HTML pour le champ du contenu de l'article.
      */
-    public function articleContentTextarea($item = null, string $categorie = null)
+    public static function articleContentTextarea($item = null, string $categorie = null)
     {
         $article_content = null !== $item ? $item->get("article_content") : $categorie === "articles" ? "" : null;
 
         extract($_POST);
 
+        $labelAndInput = self::textarea('article_content', "summernote", null, $article_content, null);
+
         if (null !== $article_content) {
             return <<<HTML
-            <div class="form-group mt-2">
-                {$this->inputTextarea('article_content', "summernote", null, $article_content, null)}
+            <div class="form-group">
+                {$labelAndInput}
             </div>
 HTML;
         }
@@ -435,15 +485,19 @@ HTML;
      * 
      * @return string Le code HTML pour le champ.
      */
-    public function prixInput($item = null, $label = null)
+    public static function prixInput($item = null, $label = null)
     {
         $prix =  !is_null($item) ? $item->get("price") : "";
+
         extract($_POST);
+
+        $labelAndInput =
+            self::label("Prix", $label) .
+            self::number('prix', 'Prix', $prix, "Prix", "col-12 form-control", 0);
 
         return <<<HTML
         <div class="form-group">
-            {$this->label("Prix", $label)}
-            {$this->inputNumber('prix', 'Prix', $prix, "Prix", "col-12 form-control", 0)}
+            {$labelAndInput}
         </div>
 HTML;
     }
@@ -456,7 +510,7 @@ HTML;
      * 
      * @return string Le code HTML pour le champ.
      */
-    public function rangInput($item = null, string $categorie = null)
+    public static function rangInput($item = null, string $categorie = null)
     {
         if (null !== $item) {
             $rang = $item->get("rang");
@@ -466,12 +520,7 @@ HTML;
             <p class="notice"> Cet élément apparaîtra : {$rang_actuel}</p>
 HTML;
         } else {
-            $rang = BddManager::getMaxValueOf( "rang",
-                Model::getTableNameFrom( $categorie ),
-                "categorie",
-                "categorie",
-                $categorie
-            ) + 1;
+            $rang = BddManager::getMaxValueOf("rang", Model::getTableNameFrom( $categorie ), "categorie", "categorie", $categorie ) + 1;
             $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
             $label = <<<HTML
             Donnez un rang à cet élément :
@@ -481,10 +530,13 @@ HTML;
 
         extract($_POST);
 
+        $labelAndInput = 
+            self::label("rang", $label) .
+            self::number('rang', 'Rang', $rang, "Rang", "col-12 form-control", 0);
+
         return <<<HTML
         <div class="form-group">
-            {$this->label("rang", $label)}
-            {$this->inputNumber('rang', 'Rang', $rang, "Rang", "col-12 form-control", 0)}
+            {$labelAndInput}
         </div>
 HTML;
     }
@@ -496,7 +548,7 @@ HTML;
      * 
      * @return string|null
      */
-    public function videoInput($item = null)
+    public static function videoInput($item = null)
     {
         $video_link = !is_null($item) ? $item->get("video_link") : "";
         $label = <<<HTML
@@ -505,10 +557,13 @@ HTML;
 HTML;
         extract($_POST);
         
+        $labelAndInput = 
+            self::label("videoLink", $label) .
+            self::text('video_link', 'videoLink', $video_link, 'www.youtube.com?v=...', "col-12 form-control");
+
         return <<<HTML
         <div class="form-group">
-            {$this->label("videoLink", $label)}
-            {$this->inputText('video_link', 'videoLink', $video_link, 'www.youtube.com?v=...', "col-12 form-control")}
+            {$lablAndInput}
         </div>
 HTML;
     }
@@ -518,12 +573,15 @@ HTML;
      * 
      * @return string Le code HTML pour le champ.
      */
-    public function avatarInput()
+    public static function avatarInput()
     {
+        $labelAndInput = 
+            self::label("avatarUploaded", "Importer un avatar :") .
+            self::FileInput("avatar_uploaded", "avatarUploaded");
+
         return <<<HTML
         <div class="form-group">
-            {$this->label("avatarUploaded", "Importer un avatar :")}
-            {$this->inputFile("avatar_uploaded", "avatarUploaded")}
+            {$labelAndInput}
         </div>
 HTML;
     }
@@ -536,12 +594,15 @@ HTML;
      * 
      * @return string Le code HTML pour le champ.
      */
-    public function imageInput(bool $image_uploaded = null)
+    public static function imageInput(bool $image_uploaded = null)
     {
+        $labelAndInput = 
+            self::label("imageUploaded", "Importer une image de couverture :") .
+            self::FileInput("image_uploaded", "imageUploaded");
+
         return <<<HTML
         <div class="form-group">
-            {$this->label("imageUploaded", "Importer une image de couverture :")}
-            {$this->inputFile("image_uploaded", "imageUploaded")}
+            {$labelAndInput}
         </div>
 HTML;
     }
@@ -554,13 +615,16 @@ HTML;
      * 
      * @return string Le code HTML pour le champ.
      */
-    public function pdfFileInput(bool $pdf_uploaded = null)
+    public static function pdfFileInput(bool $pdf_uploaded = null)
     {
+        $labelAndInput =
+            self::label("pdfUploaded", "Importer un fichier PDF :") .
+            self::FileInput("pdf_uploaded", "pdfUploaded");
+
         if ($pdf_uploaded) {
             return <<<HTML
             <div class="form-group">
-                {$this->label("pdfUploaded", "Importer un fichier PDF :")}
-                {$this->inputFile("pdf_uploaded", "pdfUploaded")}
+                {$labelAndInput}
             </div>
 HTML;
         }
@@ -572,7 +636,7 @@ HTML;
      * 
      * @return string|null
      */
-    public function notifyUsersBox()
+    public static function notifyUsersBox()
     {
         return <<<HTML
         <div class="card p-3">
@@ -607,7 +671,7 @@ HTML;
      * @author Joel
      * @return string
      */
-    public function label(string $for = null, string $label = null, string $class = null) : string
+    public static function label(string $for = null, string $label = null, string $class = null) : string
     {
         return <<<HTML
 		<label for="{$for}" class="{$class}">{$label}</label>
@@ -623,9 +687,9 @@ HTML;
      * 
      * @return string
      */
-    public function submitButton(string $name = null,  string $text = null, string $class = null)
+    public static function submitButton(string $name = null,  string $text = null, string $class = null)
     {
-        return $this->button("submit", $name, $text, "btn-primary");
+        return self::button("submit", $name, $text, "btn-primary");
     }
 
     /**
@@ -635,15 +699,16 @@ HTML;
      * 
      * @return string
      */
-    private function returnForm($form_content)
+    private static function returnForm($form_content)
     {
+        $submitButton = self::submitButton('enregistrement', 'Enregistrer');
         if ($form_content) {
             return <<<HTML
             <div class="card">
                 <div class="card-body">
                     <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
                         {$form_content}
-                        {$this->submitButton('enregistrement', 'Enregistrer')}
+                        {$submitButton}
                     </form>
                 </div>
             </div>
@@ -660,16 +725,16 @@ HTML;
      * 
      * @return string
      */
-    private function parentList($categorie = null, $label = null)
+    private static function parentList($categorie = null, $label = null)
     {
         $options = null;
-        $items = BddManager::getAllFrom(Model::getTableNameFrom($categorie), $categorie);
+        $items = BddManager::getAllFrom(ItemParent::TABLE_NAME);
         foreach ($items as $i) {
             $item = Model::returnObject($categorie, $i["code"]);
             $options .= '<option value="'. $item->get("id") . '">';
-            $options .= '<span class="text-small">'. ucfirst($item->get('categorie')) . '</span>';
-            $options .= ' - ';
             $options .= ucfirst($item->get("title"));
+            $options .= ' - ';
+            $options .= '<span class="italic">'. ucfirst($item->get('categorie')) . '</span>';
             $options .= '</option>';
         }
         return $options;
@@ -684,13 +749,16 @@ HTML;
      * 
      * @return string
      */
-    private function inputFile(string $name = null, string $id = null, string $class = null)
+    private static function FileInput(string $name = null, string $id = null, string $class = null)
     {
+        $labelAndInput = 
+            self::input("file", $name, $id, null, null, "custom-file-input") .
+            self::label("customFile", "Importer", "custom-file-label");
+
         return <<<HTML
         <div class="{$class}">
             <div class="custom-file">
-                {$this->input("file", $name, $id, null, null, "custom-file-input")}
-                {$this->label("customFile", "Importer", "custom-file-label")}
+                {$labelAndInput}
             </div>
         </div>
 HTML;
@@ -707,14 +775,14 @@ HTML;
      * 
      * @return string
      */
-    private function inputText(
+    private static function text(
         string $name = null, 
         string $id = null, 
         string $value = null, 
         string $placeholder = null,
         string $class = null
     ) {
-        return $this->input("text", $name, $id, $value, $placeholder, $class);
+        return self::input("text", $name, $id, $value, $placeholder, $class);
     }
     
     /**
@@ -728,14 +796,14 @@ HTML;
      * 
      * @return string
      */
-    private function inputPassword(
+    private static function password(
         string $name = null, 
         string $id = null, 
         string $value = null, 
         string $placeholder = null, 
         string $class = null
     ) {
-        return$this->input("password", $name, $id, $value, $placeholder, $class);
+        return self::input("password", $name, $id, $value, $placeholder, $class);
     }
 
     /**
@@ -750,14 +818,14 @@ HTML;
      * @author Joel
      * @return string [[Description]]
      */
-    private function email(
+    private static function email(
         string $name = null, 
         string $id = null,
         string $value = null, 
         string $placeholder = null,
         string $class = null
     ) {
-        return $this->input("email", $name, $id, $value, $placeholder, $class);
+        return self::input("email", $name, $id, $value, $placeholder, $class);
     }
 
     /**
@@ -770,7 +838,7 @@ HTML;
      * 
      * @return string
      */
-    private function inputRadio(
+    private static function radio(
         string $name = null, 
         string $value = null,
         string $text = null, 
@@ -797,18 +865,16 @@ HTML;
      * @author Joel
      * @return string [[Description]]
      */
-    private function inputNumber(
+    private static function number(
         string $name = null,
         string $id = null,
         string $value = null,
         string $placeholder = null,
         string $class = null,
-        int $min = null,
-        int $max = null
+        int    $min = null,
+        int    $max = null
     ) {
-        return $this->input(
-            "number", $name, $id, $value, $placeholder, $class, $min, $max
-        );
+        return self::input("number", $name, $id, $value, $placeholder, $class, $min, $max);
     }
 
     /**
@@ -825,15 +891,15 @@ HTML;
      * 
      * @return string
      */
-    public function input(
+    public static function input(
         string $type = null,
         string $name = null,
         string $id = null,
         string $value = null,
         string $placeholder = null,
         string $class = null,
-        int $min = null,
-        int $max = null
+        int    $min = null,
+        int    $max = null
     ) {
         return <<<HTML
         <input type="{$type}" name="{$name}" id="{$id}" value="{$value}"
@@ -854,7 +920,7 @@ HTML;
      * @author Joel
      * @return string 
      */
-    private function inputTextarea(
+    private static function textarea(
         string $name = null,
         string $id = null,
         string $placeholder = null,
@@ -863,11 +929,9 @@ HTML;
         string $rows = null
     ) {
         return <<<HTML
-        <textarea name="{$name}" id="{$id}" rows="{$rows}" placeholder="{$placeholder}"
-            class="col-12 {$class}">{$value}</textarea>
+        <textarea name="{$name}" id="{$id}" rows="{$rows}" placeholder="{$placeholder}" class="col-12 {$class}">{$value}</textarea>
 HTML;
     }
-
     
     /**
      * Retourne une balise HTML button
@@ -880,12 +944,10 @@ HTML;
      * @author Joel
      * @return string [[Description]]
      */
-    public function button(string $type = null, string $name = null,  string $text = null, string $class = null)
+    public static function button(string $type = null, string $name = null,  string $text = null, string $class = null)
     {
         return <<<HTML
-		<button type="{$type}" name="{$name}" class="btn {$class}">
-			{$text}
-		</button>
+		<button type="{$type}" name="{$name}" class="btn {$class}">{$text}</button>
 HTML;
     }
 

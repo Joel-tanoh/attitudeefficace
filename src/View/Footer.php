@@ -30,7 +30,7 @@ class Footer extends View
      * @author Joel
      * @return [[Type]] [[Description]]
      */
-    public function publicFooter() : string
+    public static function publicFooter() : string
     {
         return <<<HTML
         <footer class="footer bg-dark">

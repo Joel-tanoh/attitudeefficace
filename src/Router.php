@@ -71,35 +71,14 @@ class Router
     }
 
     /**
-     * Routeur de la partie publique.
-     * 
-     * @return array
-     **/
-    public function publicRouter()
-    {
-        $controller = new Controller($this->url);
-
-        // Accueil
-        if ($this->match("")) $controller->publicAccueilPage();
-
-        // Error 404
-        else $controller->publicError404();
-    }
-
-    /**
-     * Permet de découper l'url en plusieurs parties.
+     * Permet de découper l'url en plusieurs parties. Index 0 : catégorie
      * 
      * @return array
      */
     public static function getUrlAsArray()
     {
-        // On découpe l'url en tableau
         $url_as_array = explode("/", self::getUrl());
-
-        // On récupère la dernière clé
         $last_url_as_array_key = array_key_last($url_as_array);
-
-        // Si la dernière valeur du tableau est vide, on la supprime
         if (empty($url_as_array[$last_url_as_array_key])) {
             array_pop($url_as_array);
         }

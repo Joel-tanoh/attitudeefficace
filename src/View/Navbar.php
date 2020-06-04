@@ -32,19 +32,21 @@ class Navbar extends View
      * 
      * @return string
      */
-    public function publicNavbar()
+    public static function publicNavbar()
     {
-        $brand_src = LOGOS_DIR . "/logo_3.png";
+        $navbarBrand = self::navbarBrand(LOGOS_DIR_URL."/logo_3.png", PUBLIC_URL, APP_NAME);
+        $publicNavbarLinks = self::publicNavbarLinks();
+
         return <<<HTML
         <nav class="navbar navbar-expand-md navbar-dark bg-marron mb-3">
             <div class="container">
-                {$this->navbarBrand($brand_src, PUBLIC_URL, APP_NAME)}
+                {$navbarBrand}
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <i class="navbar-toggler-icon"></i>
                 </button>
                 <div class="collapse navbar-collapse d-md-flex justify-content-between" id="navbarNav">
-                    {$this->publicNavbarLinks()}
+                    {$publicNavbarLinks}
                 </div>
             </div>
         </nav>
@@ -57,15 +59,18 @@ HTML;
      * @author Joel
      * @return string
      */
-    public function adminNavBar()
+    public static function adminNavBar()
     {
+        $addItemsLinksView = self::addItemsLinksView();
+        $getAdminManagementButtonsView = self::getAdminManagementButtonsView();
+
         return <<<HTML
-        <div class="navbar fixed-top navbar-content bg-white border-bottom w-100 d-flex justify-content-end">
+        <nav class="navbar fixed-top navbar-content bg-white border-bottom w-100 d-flex justify-content-end">
             <ul class="navbar-nav d-flex align-items-center flex-row">
-                {$this->addItemsLinksView()}
-                {$this->getAdminManagementButtonsView()}
+                {$addItemsLinksView}
+                {$getAdminManagementButtonsView}
             </ul>
-        </div>
+        </nav>
 HTML;
     }
     
@@ -78,7 +83,7 @@ HTML;
      * 
      * @return string
      */
-    public function navbarBrand(string $brand_src, string $click_direction = null, string $alt_information = null)
+    public static function navbarBrand(string $brand_src, string $click_direction = null, string $alt_information = null)
     {
         return <<<HTML
         <a class="navbar-brand" href="{$click_direction}">
@@ -92,7 +97,7 @@ HTML;
      * 
      * @return string code HTML
      */
-    public function addItemsLinksView()
+    public static function addItemsLinksView()
     {
         $admin_url = ADMIN_URL;
         return <<<HTML
@@ -127,16 +132,17 @@ HTML;
      * @author Joel
      * @return string
      */
-    public function getAdminManagementButtonsView()
+    public static function getAdminManagementButtonsView()
     {
         $admin_url = ADMIN_URL;
         $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
-        $private_buttons = $admin_user->get("categorie") === "administrateur" ? $this->administratorActions() : null;
+        $private_buttons = $admin_user->get("categorie") === "administrateur" ? self::administrateurReservedActions() : null;
+        $navbarUserAvatar = self::navbarUserAvatar($admin_user->get("avatar_src"), $admin_user->get("login"));
 
         return <<<HTML
         <li class="btn-administrateur">
             <a id="btnAdministrateurIcon" class="nav-link d-flex align-items-center">
-                {$this->navbarUserAvatar($admin_user->get("avatar_src"), $admin_user->get("login"))}
+                {$navbarUserAvatar}
                 <span class="fas fa-caret-down"></span>
             </a>
             <ul id="btnAdministrateurContent" class="content border list-unstyled">
@@ -153,12 +159,31 @@ HTML;
     }
 
     /**
+     * Retourne l'image miniature de l'utilisateur connecté dans la navbar.
+     * 
+     * @param string $avatar_src
+     * @param string $alt_information
+     * 
+     * @param $user 
+     * 
+     * @return string
+     */
+    public static function navbarUserAvatar(string $avatar_src, string $alt_information = null)
+    {
+        return <<<HTML
+        <div>
+            <img src="{$avatar_src}" alt="{$alt_information}" class="navbar-user-avatar img-circle shdw mr-2"/>
+        </div>
+HTML;
+    }
+
+    /**
      * Retourne les liens réservés qu'aux administrateurs dans la barre de navigation
      * supérieure de la partie adminsitration.
      * 
      * @return string
      */
-    private function administratorActions()
+    private static function administrateurReservedActions()
     {
         $admin_url = ADMIN_URL;
         return <<<HTML
@@ -179,36 +204,29 @@ HTML;
      * 
      * @return string
      */
-    private function publicNavbarLinks()
+    private static function publicNavbarLinks()
     {
         $public_url = PUBLIC_URL;
         return <<<HTML
         <ul class="navbar-nav">
-            {$this->setLink(PUBLIC_URL . "/a_propos", "A propos")}
-            {$this->setLink(PUBLIC_URL . "/rejoindre_la_communaute", "Rejoindre la communauté")}
+            <li class="nav-item">
+                <a class="nav-link" href="{$public_url}/a_propos">A propos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{$public_url}/communaute">Rejoindre la communauté</a>
+            </li>
         </ul>
         <ul class="navbar-nav">
-            {$this->setLink(PUBLIC_URL, "Accueil")}
-            {$this->setLink(PUBLIC_URL . "/articles", "Articles")}
-            {$this->setLink(PUBLIC_URL . "/videos", "Vidéos")}
+            <li class="nav-item">
+                <a class="nav-link" href="{$public_url}">Accueil</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{$public_url}/articles">Articles</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{$public_url}/videos">Vidéos</a>
+            </li>
         </ul>
-HTML;
-    }
-
-    /**
-     * Permet de créer un lien dans la navbar.
-     * 
-     * @param string $href
-     * @param string $caption
-     * 
-     * @return string
-     */
-    private function setLink(string $href = null, string $caption = null)
-    {
-        return <<<HTML
-        <li class="nav-item">
-            <a class="nav-link" href="{$href}">{$caption}</a>
-        </li>
 HTML;
     }
 

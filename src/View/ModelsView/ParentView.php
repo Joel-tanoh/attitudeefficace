@@ -33,48 +33,47 @@ use App\View\Card;
  */
 class ParentView extends \App\View\View
 {
+    private $item;
+
+    public function __construct($item = null)
+    {
+        $this->item = $item;
+    }
+
     /**
      * Retourne la page qui permet d'afficher un parent parent et toutes ses
      * informations.
      * 
-     * @param $parent 
-     * 
      * @return string
      */
-    public function readParent($parent)
+    public function readParent()
     {
-        $view = new parent;
-        $self_view = new self;
-        
         return <<<HTML
-        <div class="row mb-2 px-2">
-            <h2 class="col-12 col-md-6 mb-2">{$parent->get("title")}</h2>
-            {$view->manageButtons($parent)}
+        <div class="row">
+            <h2 class="col-12 col-md-6">{$this->item->get("title")}</h2>
+            {$view->manageButtons($this->item)}
         </div>
-        {$view->showData($parent)}
-        {$self_view->showChildren($parent)}
+        {$view->showData($this->item)}
+        {$this->showChildren($this->item)}
 HTML;
     }
     
     /**
      * Affiche les cartes des articles, des vidéos, des ebooks et des livres.
      * 
-     * @param ItemParent $parent La catégorie dont il faut afficher les parents
-     *                         enfants.
-     * 
      * @return string
      */
-    private function showChildren($parent)
+    private function showChildren()
     {
         return <<<HTML
         <div class="row">
-            <div class="col-12 px-3">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-body pb-2">
-                        {$this->showChildrenItemsByType($parent, 'articles')}
-                        {$this->showChildrenItemsByType($parent, 'videos')}
-                        {$this->showChildrenItemsByType($parent, 'ebooks')}
-                        {$this->showChildrenItemsByType($parent, 'livres')}
+                        {$this->showChildrenItemsByType($this->item, 'articles')}
+                        {$this->showChildrenItemsByType($this->item, 'videos')}
+                        {$this->showChildrenItemsByType($this->item, 'ebooks')}
+                        {$this->showChildrenItemsByType($this->item, 'livres')}
                     </div>
                 </div>
             </div>
@@ -85,21 +84,20 @@ HTML;
     /**
      * Affiche les parents enfants en fonction de leur catégorie.
      * 
-     * @param $parent          La catégorie dont il faut afficher les éléments.
      * @param $children_type Le type des éléments qu'il faut qu'il faut afficher.
      * 
      * @return string
      */
-    private function showChildrenItemsByType($parent, string $children_type)
+    private function showChildrenItemsByType(string $children_type)
     {
-        $children = BddManager::getchildrenOf($parent->get("id"), $children_type);
+        $children = BddManager::getchildrenOf($this->item->get("id"), $children_type);
         $children_type = ucfirst($children_type);
         $children_number = count($children);
-        $children_list = '';
 
         if (empty($children)) {
             $children_list = '<div class="col-12 text-italic text-muted">Vide</div>';
         } else {
+            $children_list = null;
             foreach ($children as $child) {
                 $child = Model::returnObject($children_type, $child["code"]);
                 $children_list .= Card::card(null, $child->get("title"), $child->get("admin_url"));
@@ -107,7 +105,7 @@ HTML;
         }
 
         return <<<HTML
-        <div class="mb-2">
+        <div>
             <h5 class="m-0">
                 {$children_type}
                 <span class="badge bg-primary text-white">{$children_number}</span>
@@ -122,22 +120,20 @@ HTML;
     /**
      * Affiche le type des parents enfants et le nombre qu'il contient.
      * 
-     * @param $parent 
-     * 
      * @return string
      */
-    public static function parentchildrenNumber($parent)
+    public function parentchildrenNumber()
     {
-        $articles = BddManager::getchildrenOf($parent->get("id"), "articles");
+        $articles = BddManager::getchildrenOf($this->item->get("id"), "articles");
         $articles_number = count($articles);
 
-        $videos = BddManager::getchildrenOf($parent->get("id"), "videos");
+        $videos = BddManager::getchildrenOf($this->item->get("id"), "videos");
         $videos_number = count($videos);
 
-        $livres = BddManager::getchildrenOf($parent->get("id"), "livres");
+        $livres = BddManager::getchildrenOf($this->item->get("id"), "livres");
         $livres_number = count($livres);
 
-        $ebooks = BddManager::getchildrenOf($parent->get("id"), "ebooks");
+        $ebooks = BddManager::getchildrenOf($this->item->get("id"), "ebooks");
         $ebooks_number = count($ebooks);
         
         return <<<HTML

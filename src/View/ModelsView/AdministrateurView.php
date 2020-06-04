@@ -28,6 +28,13 @@ use App\View\Form;
  */
 class AdministrateurView extends \App\View\View
 {
+    private $admin_user;
+
+    public function __construct($admin_user = null)
+    {  
+       $this->admin_user = $admin_user;
+    }
+
     /**
      * Liste tous les comptes administrateurs créées sur le site.
      * 

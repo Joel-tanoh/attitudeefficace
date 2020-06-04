@@ -92,8 +92,7 @@ class Page
      **/
     public function publicPage()
     {
-        $template = new Template();
-        $view = new View();
+        $template = Template::navbarAndContainerAndFooter(Navbar::publicNavbar(), $this->view, Footer::publicFooter());
 
         return <<<HTML
         {$this->debutDePage("fr")}
@@ -102,7 +101,7 @@ class Page
             {$this->publicCss()}
         </head>
         <body>
-            {$template->navbarAndContainerAndFooter($view->navbar("public"), $this->view, $view->publicFooter())}
+            {$template}
             {$this->generalAppJs()}
         </body>
         </html>
@@ -116,8 +115,7 @@ HTML;
      **/
     public function adminPage()
     {
-        $template = new Template();
-        $view = new View();
+        $template = Template::navbarAndSidebarAndContainer( Navbar::adminNavBar(), Sidebar::adminSidebar(), $this->view );
 
         return <<<HTML
         {$this->debutDePage("fr")}
@@ -126,7 +124,7 @@ HTML;
             {$this->adminCss()}
         </head>
         <body id="adminPart" class="bg-cloud">
-            {$template->navbarAndSidebarAndContainer( $view->navbar("admin"), $view->adminSidebar(), $this->view ) }
+            {$template}
             {$this->adminJs()}
         </body>
         </html>
@@ -194,7 +192,7 @@ HTML;
      */
     private function appIcon()
     {
-        $logos_dir = LOGOS_DIR;
+        $logos_dir = LOGOS_DIR_URL;
         return <<<HTML
         <link rel="icon" href="{$logos_dir}/favicon.ico" type="image/x-icon">
         <link rel="shortcut icon" href="{$logos_dir}/favicon.ico" type="image/x-icon">

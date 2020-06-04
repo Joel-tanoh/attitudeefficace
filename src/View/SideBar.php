@@ -31,39 +31,15 @@ use App\BackEnd\Models\Model;
  */
 class SideBar extends View
 {
-    private $links = [];
-
-    /**
-     * Constructeur
-     * 
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->links[] = $this->setLink(PUBLIC_URL, "fas fa-home", "Aller vers le site");
-        $this->links[] = $this->setLink(ADMIN_URL, "fas fa-desktop", "Tableau de bord");
-        $this->links[] = $this->setLink(ADMIN_URL."/formations", "fas fa-box", "Formations");
-        $this->links[] = $this->setLink(ADMIN_URL."/themes", "fas fa-box", "Thèmes");
-        $this->links[] = $this->setLink(ADMIN_URL."/etapes", "fas fa-box", "Etapes");
-        $this->links[] = $this->setLink(ADMIN_URL."/motivation-plus", "fas fa-tv", "Motivation plus");
-        $this->links[] = $this->setLink(ADMIN_URL."/articles", "fas fa-pen-square", "Articles");
-        $this->links[] = $this->setLink(ADMIN_URL."/videos", "fas fa-video", "Vidéos");
-        $this->links[] = $this->setLink(ADMIN_URL."/livres", "fas fa-book", "Livres");
-        $this->links[] = $this->setLink(ADMIN_URL."/ebooks", "fas fa-book", "Ebooks");
-        $this->links[] = $this->setLink(ADMIN_URL."/minis-services", "fas fa-shopping-basket", "Minis services");
-    }
-
     /**
      * Barre de gauche sur la partie Administration.
      * 
      * @return string
      */
-    public function adminSidebar()
+    public static function adminSidebar()
     {
-        return <<<HTML
-        {$this->smallScreenSideBar()}
-        {$this->largeScreenSideBar()}
-HTML;
+        return self::smallScreenSideBar() .
+        self::largeScreenSideBar();
     }
 
     /**
@@ -71,9 +47,14 @@ HTML;
      * 
      * @return string 
      **/
-    public function smallScreenSideBar()
+    public static function smallScreenSideBar()
     {
         $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
+        $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
+        $sidebarUserAvatar = self::sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")));
+        $searchBar = Snippet::searchBar();
+        $links = self::links();
+
         return <<<HTML
         <input class="d-lg-none" type="checkbox" id="check">
         <label class="d-lg-none" for="check">
@@ -81,10 +62,10 @@ HTML;
             <i class="fas fa-bars" id="cancel"></i>
         </label>
         <div class="sidebar d-lg-none">
-            {$this->sidebarBrand(LOGOS_DIR. "/logo_3.png", ADMIN_URL)}
-            {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
-            {$this->searchBar()}
-            {$this->links()}
+            {$sidebarBrand}
+            {$sidebarUserAvatar}
+            {$searchBar}
+            {$links}
         </div>
 HTML;
     }
@@ -94,9 +75,14 @@ HTML;
      * 
      * @return string 
      **/
-    public function largeScreenSideBar()
+    public static function largeScreenSideBar()
     {
         $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
+        $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
+        $sidebarUserAvatar = self::sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")));
+        $searchBar = Snippet::searchBar();
+        $links = self::links();
+
         return <<<HTML
         <input type="checkbox" id="check" checked> 
         <label class="d-lg-none" for="check">
@@ -104,10 +90,10 @@ HTML;
             <i class="fas fa-bars" id="cancel"></i>
         </label>
         <div class="sidebar d-none d-lg-block">
-            {$this->sidebarBrand(LOGOS_DIR. "/logo_3.png", ADMIN_URL)}
-            {$this->sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")))}
-            {$this->searchBar()}
-            {$this->links()}
+            {$sidebarBrand}
+            {$sidebarUserAvatar}
+            {$searchBar}
+            {$links}
         </div>
 HTML;
     }
@@ -120,7 +106,7 @@ HTML;
      * 
      * @return string
      */
-    public function sidebarBrand(string $brand_src, string $click_direction = null) : string
+    public static function sidebarBrand(string $brand_src, string $click_direction = null) : string
     {
         return <<<HTML
         <a class="brand text-center" href="{$click_direction}">
@@ -137,7 +123,7 @@ HTML;
      * 
      * @return string
      */
-    public function sidebarUserAvatar(string $avatar_src, string $alt_information = null)
+    public static function sidebarUserAvatar(string $avatar_src, string $alt_information = null)
     {
         return <<<HTML
         <div class="text-center my-2">
@@ -151,18 +137,21 @@ HTML;
      * 
      * @return string
      */
-    private function links()
+    private static function links()
     {
-        $links = null;
-        for ($i = 0; $i < count($this->links); $i++) {
-            $links .= $this->links[$i];
-        }
-        
-        return <<<HTML
-        <div>
-            {$links}
-        </div>
-HTML;
+        $links = self::setLink(PUBLIC_URL, "fas fa-home", "Aller vers le site");
+        $links .= self::setLink(ADMIN_URL, "fas fa-desktop", "Tableau de bord");
+        $links .= self::setLink(ADMIN_URL."/formations", "fas fa-box", "Formations");
+        $links .= self::setLink(ADMIN_URL."/themes", "fas fa-box", "Thèmes");
+        $links .= self::setLink(ADMIN_URL."/etapes", "fas fa-box", "Etapes");
+        $links .= self::setLink(ADMIN_URL."/motivation-plus", "fas fa-tv", "Motivation plus");
+        $links .= self::setLink(ADMIN_URL."/articles", "fas fa-pen-square", "Articles");
+        $links .= self::setLink(ADMIN_URL."/videos", "fas fa-video", "Vidéos");
+        $links .= self::setLink(ADMIN_URL."/livres", "fas fa-book", "Livres");
+        $links .= self::setLink(ADMIN_URL."/ebooks", "fas fa-book", "Ebooks");
+        $links .= self::setLink(ADMIN_URL."/minis-services", "fas fa-shopping-basket", "Minis services");
+
+        return $links;
     }
 
     /**
@@ -176,14 +165,12 @@ HTML;
      * 
      * @return string
      */
-    private function setLink(string $href, string $fontawesome_class, string $text)
+    private static function setLink(string $href, string $fontawesome_class, string $text)
     {
         return <<<HTML
         <a class="py-2 px-4" href="{$href}">
             <div class="row">
-                <span class="col-2">
-                    <i class="{$fontawesome_class} fa-lg"></i>
-                </span>
+                <span class="col-2"><i class="{$fontawesome_class} fa-lg"></i></span>
                 <span class="col-9">{$text}</span>
             </div>
         </a>

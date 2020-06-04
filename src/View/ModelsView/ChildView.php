@@ -27,44 +27,44 @@ namespace App\View\ModelsView;
  */
 class ChildView extends \App\View\View
 {
+    private $item;
+
+    public function __construct($item = null)
+    {
+        $this->item = $item;
+    }
+
     /**
      * Retourne la page d'affichage d'un item enfant.
      * 
-     * @param $item 
-     * 
      * @return string
      */
-    public static function readChild($item)
+    public function readChild()
     {
-        $view = new parent;
-        $self_view = new self;
-
         return <<<HTML
-        <div class="row mb-2 px-2 mb-2">
-            <h2 class="col-12 col-md-6 mb-2">{$item->get("title")}</h2>
-            {$view->manageButtons($item)}
+        <div class="row">
+            <h2 class="col-12 col-md-6">{$this->item->get("title")}</h2>
+            {$view->manageButtons($this->item)}
         </div>
-        {$view->showData($item)}
-        {$self_view->showArticle($item)}
+        {$view->showData($this->item)}
+        {$this->showArticle()}
 HTML;
     }
 
     /**
      * Retourne une carte dans laquelle on a le contenu de l'article.
      * 
-     * @param $item Un item de catégorie article.
-     * 
      * @return string
      */
-    private function showArticle($item)
+    private function showArticle()
     {
-        if ($item->get("article_content")) {
+        if ($this->item->get("article_content")) {
             return <<<HTML
             <div class="card">
                 <div class="card-header bg-white">Contenu de l'article
                 </div>
                 <div class="card-body">
-                    <article>{$item->get("article_content")}</article>
+                    <article>{$this->item->get("article_content")}</article>
                 </div>
             </div>
 HTML;

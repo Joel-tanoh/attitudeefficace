@@ -49,6 +49,6 @@ define("IMAGES_DIR_URL", FILES_DIR_URL . "/images");
 define("ORIGINALS_IMAGES_DIR", IMAGES_DIR_URL . "/orgininals");
 define("THUMBS_DIR_URL", IMAGES_DIR_URL . "/thumbs");
 define("AVATARS_DIR_URL", IMAGES_DIR_URL . "/avatars");
-define("LOGOS_DIR", IMAGES_DIR_URL . "/logos");
+define("LOGOS_DIR_URL", IMAGES_DIR_URL . "/logos");
 define("DEFAULT_THUMBS", THUMBS_DIR_URL . "/default-thumbs" . IMAGES_EXTENSION);
 define("DEFAULT_AVATAR", AVATARS_DIR_URL . "/default-avatar" . IMAGES_EXTENSION);
