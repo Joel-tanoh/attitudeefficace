@@ -559,7 +559,7 @@ HTML;
      */
     public static function videoInput($item = null)
     {
-        $video_link = !is_null($item) ? $item->get("video_link") : "";
+        $youtube_video_link = !is_null($item) ? $item->get("youtube_video_link") : "";
         $label = <<<HTML
         Coller l'id de la vidéo de Youtube :
         <p class="notice">Cette vidéo peut être une vidéo de description</p>
@@ -568,7 +568,7 @@ HTML;
         
         $labelAndInput = 
             self::label("videoLink", $label) .
-            self::text('video_link', 'videoLink', $video_link, 'www.youtube.com?v=...', "col-12 form-control");
+            self::text('youtube_video_link', 'videoLink', $youtube_video_link, 'www.youtube.com?v=...', "col-12 form-control");
 
         return <<<HTML
         <div class="form-group">

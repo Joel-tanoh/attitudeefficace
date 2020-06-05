@@ -91,7 +91,7 @@ class Model
      * 
      * @var string
      */
-    public $video_link;
+    public $youtube_video_link;
 
     /**
      * Prix de l'instance.  
@@ -167,7 +167,7 @@ class Model
         if ($property == "password") return $this->password;
 
         if ($property == "parent") return $this->parent;
-        if ($property == "video_link") return $this->video_link;
+        if ($property == "youtube_video_link") return $this->youtube_video_link;
         if ($property == "statut") return $this->statut;
         if ($property == "email") return $this->email;
         if ($property == "price" || $property == "prix")  return $this->price;
@@ -219,17 +219,16 @@ class Model
     /**
      * Retourne certains caractères de la description.
      * 
-     * @param $item 
      * @param int $length Le nombre de caractères qu'on veut.
      * 
      * @return string
      */
-    public function getDescriptionExtrait($item, $length)
+    public function getDescriptionExtrait($length)
     {
-        $description_length = strlen($item->get("description"));
+        $description_length = strlen($this->get("description"));
         return $description_length > $length
-            ? substr($item->get("description"), 0, $length) . '...'
-            : $item->get("description");
+            ? substr($this->get("description"), 0, $length) . '...'
+            : $this->get("description");
     }
 
     /**
@@ -414,7 +413,7 @@ class Model
     {
         if ($categorie == "administrateurs") $table = Administrateur::TABLE_NAME;
         elseif (self::isParentCategorie($categorie)) $table = ItemParent::TABLE_NAME;
-        elseif (self::isChildCategorie($categorie) || $categorie == "motivation-plus") $table = ItemChild::TABLE_NAME;
+        elseif (self::isChildCategorie($categorie) || $categorie === "motivation-plus") $table = ItemChild::TABLE_NAME;
         else throw new Exception("La table $categorie n'existe pas");
         return $table;
     }
@@ -433,7 +432,7 @@ class Model
     }
 
     /**
-     * Retourne les catégories en minisucule avec les accents et sans et au singulier
+     * Retourne les catégories bien formatées, avec les accents, les tirets, etc.
      * 
      * @param string $categorie La catégorie à transformer
      * @param string $nombre    Singulier ou pluriel. Par défaut le nombre est au
@@ -476,7 +475,7 @@ class Model
         $voyelleCategorie = ["articles", "ebooks"];
 
         if ($categorie == Administrateur::TABLE_NAME) {
-            $page_title = "Nouveau compte";
+            $page_title = "Nouveau administrateur";
         } elseif (in_array($categorie, $femininCategorie)) {
             $page_title = "Nouvelle " . self::getCategorieFormated($categorie);
         } elseif (in_array($categorie, $voyelleCategorie)) {
@@ -593,8 +592,8 @@ class Model
             $this->setRang((int)$rang);
         }
 
-        if (isset($video_link)){
-            $this->set("video_link", $video_link, $table);
+        if (isset($youtube_video_link)){
+            $this->set("youtube_video_link", $youtube_video_link, $table);
         }
 
         if (isset($slug)) {
@@ -739,8 +738,8 @@ class Model
                 $new_item->set("parution_year", $parution_year, $table);
             }
 
-            if (!empty($video_link)) {
-                $new_item->set("video_link", $video_link, $table);
+            if (!empty($youtube_video_link)) {
+                $new_item->set("youtube_video_link", $youtube_video_link, $table);
             }
 
             return self::returnObject($categorie, $code);

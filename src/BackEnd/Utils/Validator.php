@@ -89,8 +89,8 @@ class Validator
             $this->validateRang($rang);
         }
 
-        if (!empty($video_link) ) {
-            $this->validateVideoLink($video_link);
+        if (!empty($youtube_video_link) ) {
+            $this->validateVideoLink($youtube_video_link);
         }
 
         if (!empty($_FILES["image_uploaded"]["name"])) {
@@ -287,15 +287,15 @@ class Validator
     /**
      * Effectue les validations sur le lien de la vidéo.
      * 
-     * @param $video_link Lien de la vidéo de description.
+     * @param $youtube_video_link Lien de la vidéo de description.
      * 
      * @return string|null
      */
-    public function validateVideoLink(string $video_link = null)
+    public function validateVideoLink(string $youtube_video_link = null)
     {
-        $this->to_validate["video_link"] = $video_link;
-        if ($this->containsHTML($video_link)) {
-            $this->errors["video_link"] = $this->notificateur->videoLinkIsInvalid();
+        $this->to_validate["youtube_video_link"] = $youtube_video_link;
+        if ($this->containsHTML($youtube_video_link)) {
+            $this->errors["youtube_video_link"] = $this->notificateur->videoLinkIsInvalid();
         }
     }
     

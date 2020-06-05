@@ -96,14 +96,14 @@ HTML;
     /**
      * Affiche la vidéo de description de l'instance passé en paramètre.
      * 
-     * @param string $video_link L'identifiant de la vidéos sur Youtube.
+     * @param string $youtube_video_link L'identifiant de la vidéos sur Youtube.
      * 
      * @return string
      */
-    public static function showVideo(string $video_link = null)
+    public static function showVideo(string $youtube_video_link = null)
     {
-        if (null !== $video_link) {
-            $result = self::youtubeIframe($video_link);
+        if (null !== $youtube_video_link) {
+            $result = self::youtubeIframe($youtube_video_link);
         } else {
             $result = self::noVideoBox();
         }
@@ -216,7 +216,7 @@ HTML;
      */
     public static function showData($item)
     {
-        $videoBox = self::showVideo($item->get("video_link"));
+        $videoBox = self::showVideo($item->get("youtube_video_link"));
         $bddData = self::bddData($item);
         $thumbs = self::showThumbs($item);
 
@@ -274,14 +274,14 @@ HTML;
     /**
      * Retourne le vue pour lire la vidéo issue de Youtube.
      * 
-     * @param string $video_link
+     * @param string $youtube_video_link
      * 
      * @return string
      */
-    public static function youtubeIframe(string $video_link)
+    public static function youtubeIframe(string $youtube_video_link)
     {
         return <<<HTML
-        <iframe src="https://www.youtube.com/embed/{$video_link}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+        <iframe src="https://www.youtube.com/embed/{$youtube_video_link}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen class="w-100 video" style="height:30rem"></iframe>
 HTML;
     }

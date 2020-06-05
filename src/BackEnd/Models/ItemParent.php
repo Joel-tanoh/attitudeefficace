@@ -56,7 +56,7 @@ class ItemParent extends Model
         $sql_query1 = new SqlQueryFormater();
 
         $query = $sql_query1
-            ->select("id, code, slug, categorie, title, description, price, rang, video_link, views")
+            ->select("id, code, slug, categorie, title, description, price, rang, youtube_video_link, views")
             ->select("date_format(date_creation, '%d/%m/%Y') AS day_creation")
             ->select("date_format(date_creation, '%H:%i') AS hour_creation")
             ->select("date_format(date_modification, '%d/%m/%Y') AS day_modification")
@@ -76,7 +76,7 @@ class ItemParent extends Model
         $this->categorie = $result['categorie'];
         $this->title = $result['title'];
         $this->description = $result['description'];
-        $this->video_link = $result['video_link'];
+        $this->youtube_video_link = $result['youtube_video_link'];
         $this->price = $result['price'];
         $this->rang = $result['rang'];
         $this->day_creation = $result["day_creation"];

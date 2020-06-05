@@ -52,7 +52,7 @@ class ItemChild extends Model
         $bdd = BddManager::connectToDb();
         $sql_query = new SqlQueryFormater();
         $query = $sql_query
-            ->select("id, code, categorie, slug, title, description, price, rang, video_link, article_content, views, parent_id")
+            ->select("id, code, categorie, slug, title, description, price, rang, youtube_video_link, article_content, views, parent_id")
             ->select("date_format(date_creation, '%d/%m/%Y') AS day_creation")
             ->select("date_format(date_creation, '%H:%i') AS hour_creation")
             ->select("date_format(date_modification, '%d/%m/%Y') AS day_modification")
@@ -71,7 +71,7 @@ class ItemChild extends Model
         $this->categorie = $result['categorie'];
         $this->title = $result['title'];
         $this->description = $result['description'];
-        $this->video_link = $result['video_link'];
+        $this->youtube_video_link = $result['youtube_video_link'];
         $this->price = $result['price'];
         $this->rang = $result['rang'];
         $this->day_creation = $result["day_creation"];
