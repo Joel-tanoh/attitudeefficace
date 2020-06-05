@@ -177,7 +177,7 @@ HTML;
      * Retourne une liste "voir aussi" pour afficher les autres items de la même
      * catégorie que l'item courant en excluant l'item courant.
      * 
-     * @param string $exclu Le titre de la méthode qu'on ne veut pas
+     * @param $exclu Le titre de la méthode qu'on ne veut pas
      *                      afficher. 
      * 
      * @return $array

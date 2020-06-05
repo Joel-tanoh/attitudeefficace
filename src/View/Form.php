@@ -460,7 +460,7 @@ HTML;
     /**
      * Retourne un champ de type textarea pour écrire le contenu d'un article.
      * 
-     * @param string $item      A passer dans le cas ou on veut modifier un item.
+     * @param $item      A passer dans le cas ou on veut modifier un item.
      * @param string $categorie 
      * 
      * @return string Le code HTML pour le champ du contenu de l'article.

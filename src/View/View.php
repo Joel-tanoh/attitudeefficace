@@ -262,7 +262,7 @@ HTML;
     /**
      * Retourne la page de modification d'un item.
      * 
-     * @param string $item      L'item qu'on veut modifier.
+     * @param $item      L'item qu'on veut modifier.
      * @param string $categorie La catégorie ou la table de l'item qu'on veut00
      *                          modifier.
      * @param array  $errors    Les erreurs à afficher dans le cas où la validation
