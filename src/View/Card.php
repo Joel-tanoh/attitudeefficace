@@ -47,7 +47,7 @@ HTML;
         }
 
         return <<<HTML
-        <div class="col-12 col-sm-6 col-md-3">
+        <div class="col-12 col-sm-6 col-md-3 mb-3">
             <a href="{$href}" class="text-black">
                 <div class="border">
                     {$img}
