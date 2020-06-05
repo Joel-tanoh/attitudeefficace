@@ -24,7 +24,25 @@ namespace App\View;
  * @link     Link
  */
 class Notification
-{
+{    
+    /**
+     * Permet d'afficher un message d'exception.
+     * 
+     * @param string $message Message d'erreur à afficher pour les alert-danger
+     * 
+     * @return string
+     */
+    public function exception(string $message) : string
+    {
+        return <<<HTML
+        <div class="container">
+            <div class="alert alert-danger">
+                {$message}
+            </div>
+        </div>
+HTML;
+    }
+
     /**
      * Retourne la liste des erreurs lors de l'exécution de la validation des
      * données issues d'un formulaire.
@@ -53,31 +71,9 @@ class Notification
     public function error(string $message) : string
     {
         return <<<HTML
-        <div class="row">
-            <div class="col-12">
-                <div class="alert app-alert-danger d-flex align-items-center">
-                    <i class="fas fa-exclamation-triangle text-danger mr-3"></i>
-                    <div>{$message}</div>
-                </div>
-            </div>
-        </div>
-HTML;
-    }
-    
-    /**
-     * Permet d'afficher un message d'exception.
-     * 
-     * @param string $message Message d'erreur à afficher pour les alert-danger
-     * 
-     * @return string
-     */
-    public function exception(string $message) : string
-    {
-        return <<<HTML
-        <div class="container">
-            <div class="alert alert-danger">
-                {$message}
-            </div>
+        <div class="alert app-alert-danger d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle text-danger mr-3"></i>
+            <div>{$message}</div>
         </div>
 HTML;
     }
