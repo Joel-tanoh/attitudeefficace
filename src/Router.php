@@ -15,9 +15,6 @@
 
 namespace App;
 
-use App\BackEnd\Models\Model;
-use App\Controller;
-
 /**
  * Routeur de l'application.
  *  
@@ -32,6 +29,7 @@ class Router
 {
     private $url;
     private $url_as_array;
+    private $categorie;
 
     /**
      * Constructeur du routeur, prend en paramètre l'url.
@@ -44,18 +42,7 @@ class Router
     {
         $this->url = $url;
         $this->url_as_array = explode('/', $url);
-    }
-
-    /**
-     * Retourne l'url de la page courante grâce au fichier .htacces qui
-     * permet de ramener toutes les urls vers l'index du dossier où le
-     * fichier il se trouve en générant une variable global $_GET["url"].
-     * 
-     * @return string
-     */
-    public static function getUrl()
-    {
-        return isset($_GET["url"]) ? $_GET["url"] : "";
+        $this->categorie = !empty($this->url_as_array[0]) ? $this->url_as_array[0] : null;
     }
 
     /**
@@ -68,32 +55,6 @@ class Router
     public function setUrl($url)
     {
         $this->url = $url;
-    }
-
-    /**
-     * Permet de découper l'url en plusieurs parties. Index 0 : catégorie
-     * 
-     * @return array
-     */
-    public static function getUrlAsArray()
-    {
-        $url_as_array = explode("/", self::getUrl());
-        $last_url_as_array_key = array_key_last($url_as_array);
-        if (empty($url_as_array[$last_url_as_array_key])) {
-            array_pop($url_as_array);
-        }
-
-        return $url_as_array;
-    }
-
-    /**
-     * Retourne les variables passées par url.
-     * 
-     * @return array
-     */
-    public static function getUrlVars()
-    {
-        
     }
 
     /**
@@ -129,6 +90,44 @@ class Router
                 return false;
             }
         }
+    }
+
+    /**
+     * Retourne l'url de la page courante grâce au fichier .htacces qui
+     * permet de ramener toutes les urls vers l'index du dossier où le
+     * fichier il se trouve en générant une variable global $_GET["url"].
+     * 
+     * @return string
+     */
+    public static function getUrl()
+    {
+        return isset($_GET["url"]) ? $_GET["url"] : "";
+    }
+
+    /**
+     * Permet de découper l'url en plusieurs parties. Index 0 : catégorie
+     * 
+     * @return array
+     */
+    public static function getUrlAsArray()
+    {
+        $url_as_array = explode("/", self::getUrl());
+        $last_url_as_array_key = array_key_last($url_as_array);
+        if (empty($url_as_array[$last_url_as_array_key])) {
+            array_pop($url_as_array);
+        }
+
+        return $url_as_array;
+    }
+
+    /**
+     * Retourne les variables passées par url.
+     * 
+     * @return array
+     */
+    public static function getUrlVars()
+    {
+        
     }
 
 }

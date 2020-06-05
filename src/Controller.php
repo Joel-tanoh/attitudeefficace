@@ -21,9 +21,9 @@ use App\View\Notification;
  * 
  * @author Joel <joel.developpeur@gmail.com>
  */
-class Controller
-{
+class Controller{
     private $url;
+    private $categorie;
 
     /**
      * Permet d'instancier un controlleur.
@@ -35,6 +35,7 @@ class Controller
     function __construct($url)
     {
         $this->url = $url;
+        $this->categorie = !empty($this->url[0]) ? $this->url[0] : null;
     }
 
     /**
@@ -45,7 +46,6 @@ class Controller
     public function publicAccueilPage()
     {
         $meta_title = "Bienvenu sur " . APP_NAME;
-        
         $page = new Page($meta_title, View::publicAccueilView());
         Utils::appVisitCounter();
         echo $page->publicPage();
@@ -59,7 +59,6 @@ class Controller
     public function dashboard()
     {
         $meta_title = "Tableau de bord";
-        
         $page = new Page($meta_title, View::adminDashboardView());
         echo $page->adminPage();
     }
@@ -71,10 +70,9 @@ class Controller
      */
     public function listCategorieItems()
     {
-        $meta_title = "Mes " . Model::getCategorieFormated($this->url[0], "pluriel");
-        
-        $items = BddManager::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
-        $page = new Page($meta_title, View::listItemsView($items, $this->url[0]));
+        $meta_title = "Mes " . Model::getCategorieFormated($this->categorie, "pluriel");
+        $items = BddManager::getAllFrom(Model::getTableNameFrom($this->categorie), $this->categorie);
+        $page = new Page($meta_title, View::listItemsView($items, $this->categorie));
         echo $page->adminPage();
     }
 
@@ -85,9 +83,8 @@ class Controller
      */
     public function listAdminUsersAccounts()
     {
-        
         $meta_title = "Utilisateurs";
-        $accounts = BddManager::getAllFrom( Model::getTableNameFrom( $this->url[0] ), "utilisateur" );
+        $accounts = BddManager::getAllFrom(Model::getTableNameFrom( $this->categorie ), "utilisateur");
         $page = new Page($meta_title, View::listAccountsView($accounts));
         echo $page->adminPage();
     }
@@ -113,18 +110,33 @@ class Controller
     function createItem()
     {
         $errors = null;
-        $meta_title = Model::getCreateItemPageTitle($this->url[0]);
         
+        if ($this->categorie === "motivation-plus") {
+            $meta_title = "Motivation plus &#8250 nouvelle vidéo";
+        } else {
+            $meta_title = Model::getCreateItemPageTitle($this->categorie);
+        }
 
         if (isset($_POST['enregistrement'])) {
+
             $validator = new Validator($_POST);
             $errors = $validator->getErrors();
+
             if (empty($errors)) {
-                Model::createItem($this->url[0], $_POST);
+                if ($this->categorie === "motivation-plus") {
+                    Model::createItem("videos", $_POST);
+                } else {
+                    Model::createItem($this->categorie, $_POST);
+                }
             }
         }
 
-        $page = new Page($meta_title, View::createItemView($this->url[0], $errors));
+        if ($this->categorie === "motivation-plus") {
+            $page = new Page($meta_title, View::createMotivationPlusVideoView($errors));
+        } else {
+            $page = new Page($meta_title, View::createItemView($this->categorie, $errors));
+        }
+
         echo $page->adminPage();
     }
 
@@ -136,7 +148,6 @@ class Controller
     function createMotivationPlusVideo()
     {
         $errors = null;
-        
         $meta_title = "Motivation plus &#8250 nouvelle vidéo";
         if (isset($_POST["enregistrement"])) {
             $validator = new Validator($_POST);
@@ -156,7 +167,7 @@ class Controller
      */
     public function readItem()
     {
-        $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
+        $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->categorie), $this->categorie);
         $meta_title = ucfirst($item->get("categorie")) . ' &#8250; ' . ucfirst($item->get("title"));
         $page = new Page($meta_title, View::readItemView($item));
         echo $page->adminPage();
@@ -169,7 +180,7 @@ class Controller
      */
     function editItem()
     {
-        $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
+        $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->categorie), $this->categorie);
         $errors = null;
         $meta_title = ucfirst($item->get("categorie")) . " &#8250 " . ucfirst($item->get("title")) . " &#8250 Editer";
 
@@ -177,25 +188,42 @@ class Controller
             $validator = new Validator($_POST);
             $errors = $validator->getErrors();
             if (empty($errors)) {
-                $item->editItem($this->url[0], $_POST);
+                $item->editItem($this->categorie, $_POST);
             }
         }
 
-        $page = new Page($meta_title, View::editItemView($item, $this->url[0], $errors));
+        $page = new Page($meta_title, View::editItemView($item, $this->categorie, $errors));
         echo $page->adminPage();
     }
 
     /**
-     * Controlleur appelé lorsque url = motivation-plus/delete
+     * Controlleur appelé lorque url = categorie/delete.
      * 
      * @return void
      */
-    public function deleteMotivationPlusVideo()
+    public function deleteItems()
     {
-        
-        $meta_title = "Motivation plus &#8250 supprimer";
-        $to_delete = [];
-        $page = new Page($meta_title, View::deleteItemsView($to_delete, "motivation-plus"));
+        $error = null;
+
+        if ($this->categorie === "motivation-plus") {
+            $meta_title = "Motivation plus &#8250 supprimer";
+            $to_delete = BddManager::getchildrenOf("-1", "videos");
+        } else {
+            $meta_title = "Supprimer des " . Model::getCategorieFormated($this->categorie, "pluriel");
+            $to_delete = BddManager::getAllFrom(Model::getTableNameFrom($this->categorie), $this->categorie);
+        }
+
+        if (isset($_POST["suppression"])) {
+            if (empty($_POST["codes"])) {
+                $notification = new Notification();
+                $error = $notification->nothingSelected();
+            } else {
+                Model::deleteItems($this->categorie);
+                Utils::header(ADMIN_URL . "/" . $this->categorie);
+            }
+        }
+
+        $page = new Page($meta_title, View::deleteItemsView($to_delete, $this->categorie, $error));
         echo $page->adminPage();
     }
 
@@ -206,36 +234,10 @@ class Controller
      */
     public function deleteItem()
     {
-        $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->url[0]), $this->url[0]);
+        $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->categorie), $this->categorie);
         if ($item->delete()) {
-            Utils::header(ADMIN_URL . "/" . $this->url[0]);
+            Utils::header(ADMIN_URL . "/" . $this->categorie);
         }
-    }
-
-    /**
-     * Controlleur appelé lorque url = categorie/delete.
-     * 
-     * @return void
-     */
-    public function deleteManyItems()
-    {
-        $items = BddManager::getAllFrom(Model::getTableNameFrom($this->url[0]), $this->url[0]);
-        $meta_title = "Supprimer des " . Model::getCategorieFormated($this->url[0], "pluriel");
-        
-        $error = null;
-
-        if (isset($_POST["suppression"])) {
-            if (empty($_POST["codes"])) {
-                $notification = new Notification();
-                $error = $notification->nothingSelected();
-            } else {
-                Model::deleteItems($this->url[0]);
-                Utils::header(ADMIN_URL . "/" . $this->url[0]);
-            }
-        }
-
-        $page = new Page($meta_title, View::deleteItemsView($items, $this->url[0], $error));
-        echo $page->adminPage();
     }
 
     /**

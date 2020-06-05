@@ -46,16 +46,20 @@ class Notification
     /**
      * Permet d'afficher un message d'erreur.
      * 
-     * @param string $error Message d'erreur à afficher pour les alert-danger
+     * @param string $message Message d'erreur à afficher pour les alert-danger
      * 
      * @return string
      */
-    public function error(string $error) : string
+    public function error(string $message) : string
     {
         return <<<HTML
-        <div class="alert app-alert-danger d-flex align-items-center">
-            <i class="fas fa-exclamation-triangle text-danger mr-3"></i>
-            <div>{$error}</div>
+        <div class="row">
+            <div class="col-12">
+                <div class="alert app-alert-danger d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle text-danger mr-3"></i>
+                    <div>{$message}</div>
+                </div>
+            </div>
         </div>
 HTML;
     }
@@ -63,16 +67,16 @@ HTML;
     /**
      * Permet d'afficher un message d'exception.
      * 
-     * @param string $exception Message d'erreur à afficher pour les alert-danger
+     * @param string $message Message d'erreur à afficher pour les alert-danger
      * 
      * @return string
      */
-    public function exception(string $exception) : string
+    public function exception(string $message) : string
     {
         return <<<HTML
         <div class="container">
             <div class="alert alert-danger">
-                {$exception}
+                {$message}
             </div>
         </div>
 HTML;

@@ -39,7 +39,7 @@ class Snippet extends View
 
         return <<<HTML
         <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
-            <table>
+            <table class="mb-3">
                 <thead>
                     <th><input type="checkbox" id="checkAllItemsForDelete"></th>
                     <th>Titre</th>
@@ -64,10 +64,10 @@ HTML;
      */
     public static function manageButtons($item)
     {
-        $buttons = self::button($item->get("edit_url"), "Editer", "btn-primary mr-1", "far fa-edit fa-lg");
-        $buttons .= self::button($item->get("post_url"), "Poster", "btn-success mr-1", "fas fa-reply fa-lg");
-        $buttons .= self::button($item->get("share_url"), "Partager", "btn-success mr-1", "fas fa-share fa-lg");
-        $buttons .= self::button($item->get("delete_url"), "Supprimer", "btn-danger mr-1", "far fa-trash-alt fa-lg");
+        $buttons = self::button($item->get("edit_url"), "Editer", "btn-primary mr-1", "d-none d-md-inline", "far fa-edit fa-lg");
+        $buttons .= self::button($item->get("post_url"), "Poster", "btn-success mr-1", "d-none d-md-inline", "fas fa-reply fa-lg");
+        $buttons .= self::button($item->get("share_url"), "Partager", "btn-success mr-1", "d-none d-md-inline", "fas fa-share fa-lg");
+        $buttons .= self::button($item->get("delete_url"), "Supprimer", "btn-danger mr-1", "d-none d-md-inline", "far fa-trash-alt fa-lg");
         
         return <<<HTML
         <div class="float-sm-right">
@@ -165,9 +165,11 @@ HTML;
         $manageButtons = Snippet::manageButtons($item);
         return <<<HTML
         <div class="row mb-3">
-            <h2 class="col-12 col-md-5">{$item->get("title")}</h2>
-            <div class="col-12 col-sm-7">
-                {$manageButtons}
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>{$item->get("title")}</h2>
+                    {$manageButtons}
+                </div>
             </div>
         </div>
 HTML;
@@ -215,12 +217,12 @@ HTML;
     public static function showData($item)
     {
         $videoBox = self::showVideo($item->get("video_link"));
-        $bddData = self::data($item);
+        $bddData = self::bddData($item);
         $thumbs = self::showThumbs($item);
 
         return <<<HTML
         <div class="row mb-3">
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-6 mb-3">
                 {$bddData}
             </div>
             <div class="col-12 col-md-6">
@@ -292,11 +294,11 @@ HTML;
      * 
      * @return string
      */
-    public static function data($item)
+    public static function bddData($item)
     {
         return <<<HTML
         <div class="card">
-            <div class="card-header">Données</div>
+            <div class="card-header bg-white">Données</div>
             <div class="card-body">
                 <div>Description : {$item->get("description")}</div>
                 <div>Prix : {$item->get("prix")}</div>
@@ -377,13 +379,14 @@ HTML;
      * Retourne un lien du contextMenu.
      * 
      * @param string $href 
-     * @param string $text 
+     * @param string $caption 
      * @param string $btn_class 
+     * @param string $caption_class 
      * @param string $fa_icon_class 
      *
      * @return string
      */
-    public static function button(string $href, string $text = null, string $btn_class = null, string $fa_icon_class = null)
+    public static function button(string $href, string $caption = null, string $btn_class = null, string $caption_class = null, string $fa_icon_class = null)
     {
         if (null !== $fa_icon_class) {
             $fa_icon_class = '<i class="' . $fa_icon_class. '"></i>';
@@ -392,7 +395,7 @@ HTML;
         return <<<HTML
         <a class="btn {$btn_class}" href="{$href}">
             {$fa_icon_class}
-            <span>{$text}</span>
+            <span class="{$caption_class}">{$caption}</span>
         </a>
 HTML;
     }
@@ -422,7 +425,7 @@ HTML;
     {
         return <<<HTML
         <div class="card">
-            <div class="card-header">Image de couverture</div>
+            <div class="card-header bg-white">Image de couverture</div>
             <img src="{$item->get('thumbs_src')}" alt="{$item->get('image_name')}" class="img-fluid"/>
         </div>
 HTML;

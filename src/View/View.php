@@ -45,9 +45,14 @@ class View
         return <<<HTML
         <div id="connexion">
             <div id="container" class="container-fluid">
-                <div class="mb-2 d-flex flex-column align-items-center">
-                    <img class="img-fluid rounded mb-3" src="{$logo_dir}/logo_1.png" alt="Attitude efficace" width="75rem">
-                    <div class="h5">Attitude efficace</div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-2 d-flex flex-column align-items-center">
+                            <img class="img-fluid rounded mb-3" src="{$logo_dir}/logo_1.png"
+                             alt="Attitude efficace" width="75rem">
+                            <div class="h5">Attitude efficace</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="error-box">
                     {$error}
@@ -211,11 +216,9 @@ HTML;
         $listItemsContentHeader = Snippet::listItemsContentHeader($title);
 
         return <<<HTML
-        <div>
-            {$listItemsContentHeader}
-            {$error}
-            {$formContent}
-        </div>
+        {$listItemsContentHeader}
+        {$error}
+        {$formContent}
 HTML;
     }
 
@@ -228,14 +231,13 @@ HTML;
      */
     public static function createMotivationPlusVideoView($errors = null)
     {
-        $form = new Form();
         $notification = new Notification();
-        $formContent = $form->getForm("videos");
+        $formContent = Form::getForm("videos");
         $error = !empty($errors) ? $notification->errors($errors) : null;
-        $title = "Motivation + &#8250 nouvelle vidéo";
+        $contentHeader = Snippet::listItemsContentHeader("Motivation + &#8250 nouvelle vidéo");
 
         return <<<HTML
-        {self::listItemsContentHeader($title)}
+        {$contentHeader}
         {$error}
         {$formContent}
 HTML;
@@ -314,9 +316,13 @@ HTML;
 
         return <<<HTML
         {$listItemsContentHeader}
-        {$error}
-        {$notification}
-        {$list}
+        <div class="row">
+            <div class="col-12">
+                {$notification}
+                {$error}
+                {$list}
+            </div>
+        </div>
 HTML;
     }
 

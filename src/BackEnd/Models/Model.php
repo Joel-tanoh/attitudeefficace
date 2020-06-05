@@ -390,7 +390,7 @@ class Model
     {
         if (self::isParentCategorie($categorie)) {
             return new ItemParent($code);
-        } elseif (self::isChildCategorie($categorie)) {
+        } elseif (self::isChildCategorie($categorie) || $categorie === "motivation-plus") {
             return new ItemChild($code);
         } elseif ($categorie == "administrateurs") {
             return new Administrateur($code);
