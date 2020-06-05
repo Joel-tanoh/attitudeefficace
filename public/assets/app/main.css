@@ -13,9 +13,23 @@ a:hover {
 
 /* Les Utilities */
 
+/* Les Templates */
+/* Conteneur d'une Template avec une fixed sidebar et une navbar */
+#container-with-fixed-sidebar-and-navbar {
+	padding-left: 17.5rem; /* Une marge à gauche interne d'une taille supérieure ou égale à celle de la sidebar */
+	margin-top: 3.7rem; /* Une marge de haut externe d'une taille supérieure ou égale à celle de la navbar */
+}
+
+@media (max-width: 992px) {
+	#container-with-fixed-sidebar-and-navbar  {
+		padding-left: 1.5rem;
+		margin-top: 2.3rem;
+	}
+}
+
 /* Les barres de navigation */
 .navbar-red {
-  background-color: #a40000;
+  background-color: #331919;
   color: #fff;
 }
 .navbar-marron {
@@ -96,7 +110,7 @@ a:hover {
 	background-color: rgb(44, 0, 0);
 }
 
-/* LES MARGES AUQUELLES BOOTSTRAP NE DONNENT PAS ACCES */
+/* LES MARGES AUXQUELLES BOOTSTRAP NE DONNENT PAS ACCES */
 
 /* Marges sur tous les cotés */
 .m-4 {
@@ -278,14 +292,10 @@ button {
 /* barre de recherche */
 .app-search-bar {
 	border-radius: 1.5rem;
-	background-color: rgb(255, 255, 255);
 	overflow: hidden;
-	padding: 2px;
-	box-shadow: 0 0 1rem #2D3A4A;
 }
 .app-search-bar-input {
 	border: none;
-	border-radius: 1.5rem;
 }
 .app-search-bar-button {
 	background-color: transparent;

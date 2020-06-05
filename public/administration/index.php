@@ -38,12 +38,12 @@ try {
     elseif ($route->match("motivation-plus")) $controller->listMotivationPlusVideo();
     elseif ($route->match("motivation-plus/create")) $controller->createMotivationPlusVideo();
     elseif ($route->match("motivation-plus/delete")) $controller->deleteMotivationPlusVideo();
-    elseif ($route->match( [Model::getAllCategories()] ) ) $controller->listCategorieItems();
-    elseif ($route->match( [Model::getAllCategories(), "create"] ) ) $controller->createItem();
-    elseif ($route->match( [Model::getAllCategories(), "delete"] ) ) $controller->deleteManyItems();
-    elseif ($route->match( [Model::getAllCategories(), Model::getAllSlugs()] ) ) $controller->readItem();
-    elseif ($route->match( [Model::getAllCategories(), Model::getAllSlugs(), "edit"] ) ) $controller->editItem();
-    elseif ($route->match( [Model::getAllCategories(), Model::getAllSlugs(), "delete"] ) ) $controller->deleteItem();
+    elseif ($route->match([Model::getAllCategories()]) ) $controller->listCategorieItems();
+    elseif ($route->match([Model::getAllCategories(), "create"]) ) $controller->createItem();
+    elseif ($route->match([Model::getAllCategories(), "delete"]) ) $controller->deleteManyItems();
+    elseif ($route->match([Model::getAllCategories(), Model::getAllSlugs()]) ) $controller->readItem();
+    elseif ($route->match([Model::getAllCategories(), Model::getAllSlugs(), "edit"]) ) $controller->editItem();
+    elseif ($route->match([Model::getAllCategories(), Model::getAllSlugs(), "delete"]) ) $controller->deleteItem();
     
     else $controller->adminError404();
 

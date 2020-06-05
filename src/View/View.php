@@ -40,6 +40,7 @@ class View
         $admin_url = ADMIN_URL;
         $notificateur = new Notification();
         $error = null !== $error ? $notificateur->error($error) : null;
+        $activateSessionCheckBox = Snippet::activateSessionButton();
         
         return <<<HTML
         <div id="connexion">
@@ -64,7 +65,7 @@ class View
                         </div>
                         <div>
                         <div class="d-flex justify-content-between mb-2">
-                            {self::activateSessionButton()}
+                            {$activateSessionCheckBox}
                             {$form->submitButton("connexion", "Connexion")}
                         </div>
                     </div>
@@ -118,7 +119,7 @@ HTML;
             "categorie",
             Router::getUrlAsArray()[0]
         );
-        $contentHeader = Snippet::contentHeader($title, $number_of_items);
+        $listItemsContentHeader = Snippet::listItemsContentHeader($title, $number_of_items);
 
         if (empty($items)) {
             $notification = new Notification();
@@ -134,7 +135,7 @@ HTML;
 
         return <<<HTML
         <div class="">
-            {$contentHeader}
+            {$listItemsContentHeader}
         </div>
         <section class="row">
             {$content}
@@ -161,10 +162,10 @@ HTML;
                 $videos_list .= Card::card($video->get("thumbs_src"), $video->get("title"), $video->get("admin_url"), $video->get("day_creation"));
             }
         }
-        $contentHeader = Snippet::contentHeader("Motivation +", $number_of_videos);
+        $listItemsContentHeader = Snippet::listItemsContentHeader("Motivation +", $number_of_videos);
 
         return <<<HTML
-        {$contentHeader}
+        {$listItemsContentHeader}
         <section class="row">
             {$videos_list}
         </section>
@@ -203,16 +204,15 @@ HTML;
      */
     public static function createItemView(string $categorie = null, $errors = null)
     {
-        $form = new Form();
         $notification = new Notification();
-        $formContent = $form->getForm($categorie);
+        $formContent = Form::getForm($categorie);
         $error = !empty($errors) ? $notification->errors($errors) : null;
         $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
-        $contentHeader = Snippet::contentHeader($title);
+        $listItemsContentHeader = Snippet::listItemsContentHeader($title);
 
         return <<<HTML
         <div>
-            {$contentHeader}
+            {$listItemsContentHeader}
             {$error}
             {$formContent}
         </div>
@@ -235,7 +235,7 @@ HTML;
         $title = "Motivation + &#8250 nouvelle vidéo";
 
         return <<<HTML
-        {self::contentHeader($title)}
+        {self::listItemsContentHeader($title)}
         {$error}
         {$formContent}
 HTML;
@@ -251,11 +251,11 @@ HTML;
     public static function readItemView($item)
     {
         if ($item->isParent()) {
-            $parent_view = new ParentView();
-            return $parent_view->readParent($item);
+            $parent_view = new ParentView($item);
+            return $parent_view->readParent();
         } elseif ($item->isChild()) { 
-            $child_view = new ChildView();
-            return $child_view->readChild($item);
+            $child_view = new ChildView($item);
+            return $child_view->readChild();
         }
     }
 
@@ -272,15 +272,16 @@ HTML;
      */
     public static function editItemView($item, $categorie, $errors = null)
     {
-        $form = new Form();
+        $form = Form::getForm($categorie, $item);
+
         $notification = new Notification();
-        $form = $form->getForm($categorie, $item);
         $error = !empty($errors) ? $notification->errors($errors) : null;
+
         $title = $item->get('title') . " &#8250 éditer";
-        $contentHeader = Snippet::contentHeader($title);
+        $listItemsContentHeader = Snippet::listItemsContentHeader($title);
 
         return <<<HTML
-        {$contentHeader}
+        {$listItemsContentHeader}
         {$error}
         {$form}
 HTML;
@@ -309,10 +310,10 @@ HTML;
 
         $error = null !== $error ? $notifier->error($error) : null;
         $title = Model::getCategorieFormated($categorie, "puriel");
-        $contentHeader = Snippet::contentHeader($title);
+        $listItemsContentHeader = Snippet::listItemsContentHeader($title);
 
         return <<<HTML
-        {$contentHeader}
+        {$listItemsContentHeader}
         {$error}
         {$notification}
         {$list}

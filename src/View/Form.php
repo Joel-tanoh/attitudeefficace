@@ -41,12 +41,15 @@ class Form extends View
      */
     public static function getForm($categorie, $item = null)
     {
-        if ($categorie === "administrateurs") return self::addAdminUserForm($item);
-        elseif (Model::isParentCategorie($categorie)) return self::parentForm($item, $categorie);
-        elseif ($categorie === "videos") return self::addVideoForm($item);
-        elseif ($categorie === "minis-services") return self::addMiniserviceForm($item, $categorie);
-        elseif (Model::isChildCategorie($categorie)) return self::childForm($item, $categorie);
+        if ($categorie === "administrateurs") $formContent = self::addAdminUserForm($item);
+        elseif (Model::isParentCategorie($categorie)) $formContent = self::parentForm($item, $categorie);
+        elseif ($categorie === "videos") $formContent = self::addVideoForm($item);
+        elseif ($categorie === "minis-services") $formContent = self::addMiniserviceForm($item, $categorie);
+        elseif (Model::isChildCategorie($categorie)) $formContent = self::childForm($item, $categorie);
         else Utils::header(ADMIN_URL);
+        $submitButton = self::submitButton('enregistrement', 'Enregistrer');
+
+        return self::returnForm($formContent);
     }
 
     /**
@@ -185,17 +188,19 @@ HTML;
         $notifyUserBox = self::notifyUsersBox();
 
         return <<<HTML
-        <div class="col-md-7">
-            {$selectParent}
-            {$titleInput}
-            {$descriptionTextarea}
-            {$videoInput}
-        </div>
-        <div class="col-md-5">
-            {$prixInput}
-            {$rangInput}
-            {$imageInput}
-            {$notifyUserBox}
+        <div class="row">
+            <div class="col-md-7">
+                {$selectParent}
+                {$titleInput}
+                {$descriptionTextarea}
+                {$videoInput}
+            </div>
+            <div class="col-md-5">
+                {$prixInput}
+                {$rangInput}
+                {$imageInput}
+                {$notifyUserBox}
+            </div>
         </div>
 HTML;
     }
@@ -412,7 +417,7 @@ HTML;
      */
     public static function titleInput($item = null)
     {
-        $title = !is_null($item) ? $item->get("title") : "";
+        $title = null !== $item ? $item->get("title") : "";
 
         extract($_POST);
 
@@ -466,12 +471,16 @@ HTML;
 
         extract($_POST);
 
-        $labelAndInput = self::textarea('article_content', "summernote", null, $article_content, null);
+        $textarea = self::textarea('article_content', "summernote", null, $article_content);
 
         if (null !== $article_content) {
             return <<<HTML
-            <div class="form-group">
-                {$labelAndInput}
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        {$textarea}
+                    </div>
+                </div>
             </div>
 HTML;
         }
@@ -563,7 +572,7 @@ HTML;
 
         return <<<HTML
         <div class="form-group">
-            {$lablAndInput}
+            {$labelAndInput}
         </div>
 HTML;
     }
@@ -704,12 +713,21 @@ HTML;
         $submitButton = self::submitButton('enregistrement', 'Enregistrer');
         if ($form_content) {
             return <<<HTML
-            <div class="card">
-                <div class="card-body">
-                    <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
-                        {$form_content}
-                        {$submitButton}
-                    </form>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="myForm" method="post" enctype="multipart/form-data"
+                             action="{$_SERVER['REQUEST_URI']}">
+                                {$form_content}
+                                <div class="row">
+                                    <div class="col-12">
+                                        {$submitButton}
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
 HTML;

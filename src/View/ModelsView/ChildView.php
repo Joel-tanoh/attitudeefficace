@@ -15,6 +15,8 @@
 
 namespace App\View\ModelsView;
 
+use App\View\Snippet;
+
 /**
  * Gère tout ce qui concerne l'affichage au niveau des catégories
  * 
@@ -41,12 +43,12 @@ class ChildView extends \App\View\View
      */
     public function readChild()
     {
+        $readItemContentHeader = Snippet::readItemContentHeader($this->item);
+        $data = Snippet::showData($this->item);
+
         return <<<HTML
-        <div class="row">
-            <h2 class="col-12 col-md-6">{$this->item->get("title")}</h2>
-            {$view->manageButtons($this->item)}
-        </div>
-        {$view->showData($this->item)}
+        {$readItemContentHeader}
+        {$data}
         {$this->showArticle()}
 HTML;
     }
@@ -60,11 +62,14 @@ HTML;
     {
         if ($this->item->get("article_content")) {
             return <<<HTML
-            <div class="card">
-                <div class="card-header bg-white">Contenu de l'article
-                </div>
-                <div class="card-body">
-                    <article>{$this->item->get("article_content")}</article>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-white">Contenu de l'article</div>
+                        <div class="card-body">
+                            <article>{$this->item->get("article_content")}</article>
+                        </div>
+                    </div>
                 </div>
             </div>
 HTML;

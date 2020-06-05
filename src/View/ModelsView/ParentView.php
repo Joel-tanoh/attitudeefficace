@@ -20,6 +20,7 @@ use App\BackEnd\Models\Model;
 use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\ItemChild;
 use App\View\Card;
+use App\View\Snippet;
 
 /**
  * Gère tout ce qui concerne l'affichage au niveau des parents parents dans l'app.
@@ -48,13 +49,13 @@ class ParentView extends \App\View\View
      */
     public function readParent()
     {
+        $readItemContentHeader = Snippet::readItemContentHeader($this->item);
+        $data = Snippet::showData($this->item);
+
         return <<<HTML
-        <div class="row">
-            <h2 class="col-12 col-md-6">{$this->item->get("title")}</h2>
-            {$view->manageButtons($this->item)}
-        </div>
-        {$view->showData($this->item)}
-        {$this->showChildren($this->item)}
+        {$readItemContentHeader}
+        {$data}
+        {$this->showChildren()}
 HTML;
     }
     
@@ -66,52 +67,16 @@ HTML;
     private function showChildren()
     {
         return <<<HTML
-        <div class="row">
+        <div class="row mb-3">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-body pb-2">
-                        {$this->showChildrenItemsByType($this->item, 'articles')}
-                        {$this->showChildrenItemsByType($this->item, 'videos')}
-                        {$this->showChildrenItemsByType($this->item, 'ebooks')}
-                        {$this->showChildrenItemsByType($this->item, 'livres')}
+                    <div class="card-body">
+                        {$this->showChildrenItemsByType('articles')}
+                        {$this->showChildrenItemsByType('videos')}
+                        {$this->showChildrenItemsByType('ebooks')}
+                        {$this->showChildrenItemsByType('livres')}
                     </div>
                 </div>
-            </div>
-        </div>
-HTML;
-    }
-
-    /**
-     * Affiche les parents enfants en fonction de leur catégorie.
-     * 
-     * @param $children_type Le type des éléments qu'il faut qu'il faut afficher.
-     * 
-     * @return string
-     */
-    private function showChildrenItemsByType(string $children_type)
-    {
-        $children = BddManager::getchildrenOf($this->item->get("id"), $children_type);
-        $children_type = ucfirst($children_type);
-        $children_number = count($children);
-
-        if (empty($children)) {
-            $children_list = '<div class="col-12 text-italic text-muted">Vide</div>';
-        } else {
-            $children_list = null;
-            foreach ($children as $child) {
-                $child = Model::returnObject($children_type, $child["code"]);
-                $children_list .= Card::card(null, $child->get("title"), $child->get("admin_url"));
-            }
-        }
-
-        return <<<HTML
-        <div>
-            <h5 class="m-0">
-                {$children_type}
-                <span class="badge bg-primary text-white">{$children_number}</span>
-            </h5>
-            <div class="row">
-                {$children_list}
             </div>
         </div>
 HTML;
@@ -141,6 +106,42 @@ HTML;
         Vidéos ({$videos_number})
         Livres ({$livres_number})
         Ebooks ({$ebooks_number})
+HTML;
+    }
+
+    /**
+     * Affiche les parents enfants en fonction de leur catégorie.
+     * 
+     * @param $children_type Le type des éléments qu'il faut qu'il faut afficher.
+     * 
+     * @return string
+     */
+    private function showChildrenItemsByType(string $children_type)
+    {
+        $children = BddManager::getchildrenOf($this->item->get("id"), $children_type);
+        $children_type = ucfirst($children_type);
+        $children_number = count($children);
+
+        if (empty($children)) {
+            $children_list = '<div class="col-12 text-italic text-muted">Vide</div>';
+        } else {
+            $children_list = null;
+            foreach ($children as $child) {
+                $child = Model::returnObject($children_type, $child["code"]);
+                $children_list .= Card::card(null, $child->get("title"), $child->get("admin_url"));
+            }
+        }
+
+        return <<<HTML
+        <div>
+            <h5>
+                {$children_type}
+                <span class="badge bg-primary text-white">{$children_number}</span>
+            </h5>
+            <div class="row">
+                {$children_list}
+            </div>
+        </div>
 HTML;
     }
 

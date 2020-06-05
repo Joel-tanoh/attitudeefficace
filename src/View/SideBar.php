@@ -38,8 +38,9 @@ class SideBar extends View
      */
     public static function adminSidebar()
     {
-        return self::smallScreenSideBar() .
-        self::largeScreenSideBar();
+        return
+            self::smallScreenSideBar() .
+            self::largeScreenSideBar();
     }
 
     /**

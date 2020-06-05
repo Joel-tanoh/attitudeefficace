@@ -70,10 +70,8 @@ HTML;
         $buttons .= self::button($item->get("delete_url"), "Supprimer", "btn-danger mr-1", "far fa-trash-alt fa-lg");
         
         return <<<HTML
-        <div class="col-12 col-md-6">
-            <div class="float-md-right">
-                {$buttons}
-            </div>
+        <div class="float-sm-right">
+            {$buttons}
         </div>
 HTML;
     }
@@ -111,39 +109,67 @@ HTML;
         }
 
         return <<<HTML
-        <section>
-            {$result}
-        </section>
+        <div class="row mb-3">
+            <div class="col-12">
+                {$result}
+            </div>
+        </div>
 HTML;
     }
 
     /**
-     * Retourne un contentHeader.
+     * Retourne un listItemsContentHeader.
      * 
      * @param string $title
      * @param mixed  $number_of_items
      * 
      * @return string
      */
-    public static function contentHeader(string $title = null, $number_of_items = null)
+    public static function listItemsContentHeader(string $title = null, $number_of_items = null)
     {
         $title = ucfirst($title);
         $contextMenu = self::contextMenu();
 
         if ($number_of_items) {
-            $number_of_items = '<p>Vous avez actuellement ' . $number_of_items . ' élément(s).</p>';
+            $number_of_items = '<div class="badge bg-primary text-white px-2 py-1 rounded">' . $number_of_items . '</div>';
         } else {
             $number_of_items = null;
         }
         
         return <<<HTML
-        <div class="row">
-            <h3 class="col-12 col-md-6">{$title}</h1>
-            <div class="col-12 col-md-6">
-                {$contextMenu}
+        <div class="row mb-3">
+            <div class="col-6">
+                <div class="d-flex align-items-center">
+                    <h3 class="mr-2">{$title}</h3>
+                    {$number_of_items}
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="float-right">
+                    {$contextMenu}
+                </div>
             </div>
         </div>
-        {$number_of_items}
+HTML;
+    }
+
+    /**
+     * Retourne l'entête sur la page de lecture d'un item.
+     * 
+     * @param $item
+     * 
+     * @return string
+     */
+    public static function readItemContentHeader($item)
+    {
+        $manageButtons = Snippet::manageButtons($item);
+        return <<<HTML
+        <div class="row mb-3">
+            <h2 class="col-12 col-md-5">{$item->get("title")}</h2>
+            <div class="col-12 col-sm-7">
+                {$manageButtons}
+            </div>
+        </div>
 HTML;
     }
 
@@ -189,13 +215,13 @@ HTML;
     public static function showData($item)
     {
         $videoBox = self::showVideo($item->get("video_link"));
-        $data = self::data($item);
+        $bddData = self::data($item);
         $thumbs = self::showThumbs($item);
 
         return <<<HTML
-        <div class="row">
+        <div class="row mb-3">
             <div class="col-12 col-md-6">
-                {$data}
+                {$bddData}
             </div>
             <div class="col-12 col-md-6">
                 {$thumbs}
@@ -217,10 +243,8 @@ HTML;
         $deleteItemsButton = self::button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", null, "btn-danger", "fas fa-trash-alt");
 
         return <<<HTML
-        <div class="float-sm-right">
-            {$createButton}
-            {$deleteItemsButton}
-        </div>
+        {$createButton}
+        {$deleteItemsButton}
 HTML;
     }
 
@@ -234,8 +258,8 @@ HTML;
         $searchBar = Form::input("search", "recherche", "rechercheInput", null, "Rechercher", "app-search-bar-input p-1");
 
         return <<<HTML
-        <div class="app-search-bar m-3">
-            <form action="" method="post">
+        <div class="app-search-bar bg-white mx-3 my-2 pl-2">
+            <form action="" method="post" class="d-flex justify-content-between">
                 {$searchBar}
                 <button type="submit" class="app-search-bar-button">
                     <i class="fas fa-search"></i>
@@ -252,7 +276,7 @@ HTML;
      * 
      * @return string
      */
-    private static function youtubeIframe(string $video_link)
+    public static function youtubeIframe(string $video_link)
     {
         return <<<HTML
         <iframe src="https://www.youtube.com/embed/{$video_link}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
@@ -268,7 +292,7 @@ HTML;
      * 
      * @return string
      */
-    private static function data($item)
+    public static function data($item)
     {
         return <<<HTML
         <div class="card">
@@ -289,7 +313,7 @@ HTML;
      * 
      * @return string
      */
-    private static function activateSessionButton()
+    public static function activateSessionButton()
     {
         return <<<HTML
         <div class="custom-control custom-checkbox">
@@ -305,7 +329,7 @@ HTML;
      * 
      * @return string
      */
-    private static function connectBySocialsNetworks()
+    public static function connectBySocialsNetworks()
     {
         $googleFormButton = self::connexionFormGoogleButton();
         $facebookFormButton = self::connexionFormFacebookButton();
@@ -325,7 +349,7 @@ HTML;
      * 
      * @return string Code du bouton.
      */
-    private static function connexionFormFacebookButton()
+    public static function connexionFormFacebookButton()
     {
         return <<<HTML
         <a href="" class="d-block text-center bg-facebook text-white rounded p-2">
@@ -340,7 +364,7 @@ HTML;
      * 
      * @return string Code du bouton.
      */
-    private static function connexionFormGoogleButton()
+    public static function connexionFormGoogleButton()
     {
         return <<<HTML
         <a href="" class="d-block text-center bg-danger text-white rounded p-2">
@@ -359,7 +383,7 @@ HTML;
      *
      * @return string
      */
-    private static function button(string $href, string $text = null, string $btn_class = null, string $fa_icon_class = null)
+    public static function button(string $href, string $text = null, string $btn_class = null, string $fa_icon_class = null)
     {
         if (null !== $fa_icon_class) {
             $fa_icon_class = '<i class="' . $fa_icon_class. '"></i>';
@@ -380,7 +404,7 @@ HTML;
      * 
      * @return string
      */
-    private static function showThumbs($item)
+    public static function showThumbs($item)
     {
         $content = null !== $item->get("thumbs_src") ? self::thumbs($item) : self::noThumbsBox();
 
@@ -394,7 +418,7 @@ HTML;
      * 
      * @return string
      */
-    private static function thumbs($item)
+    public static function thumbs($item)
     {
         return <<<HTML
         <div class="card">
@@ -409,7 +433,7 @@ HTML;
      * 
      * @return string
      */
-    private static function noThumbsBox()
+    public static function noThumbsBox()
     {
         return <<<HTML
         <div class="card">
@@ -426,7 +450,7 @@ HTML;
      * 
      * @return string
      */
-    private static function noVideoBox()
+    public static function noVideoBox()
     {
         return <<<HTML
         <div class="card">
@@ -445,7 +469,7 @@ HTML;
      * 
      * @return string
      */
-    private static function voirAussiRow($item)
+    public static function voirAussiRow($item)
     {
         $title = ucfirst($item->get("title"));
         $thumbs_src = $item->get("thumbs_src");
@@ -470,7 +494,7 @@ HTML;
      * 
      * @return string
      */
-    private static function deleteItemsTableRow($item)
+    public static function deleteItemsTableRow($item)
     {
         return <<<HTML
         <tr>
