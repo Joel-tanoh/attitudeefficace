@@ -14,7 +14,7 @@
 
 namespace App\View\ModelsView;
 
-use App\BackEnd\Models\Personnes\Administrateur;
+use App\BackEnd\Models\Persons\Administrateur;
 use App\View\Form;
 
 /**

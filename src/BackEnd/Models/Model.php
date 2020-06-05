@@ -22,7 +22,7 @@ use App\BackEnd\Models\ItemChild;
 use App\BackEnd\Utils\Utils;
 use App\BackEnd\Files\Image;
 use App\BackEnd\Files\Pdf;
-use App\BackEnd\Models\Personnes\Administrateur;
+use App\BackEnd\Models\Persons\Administrateur;
 
 /**
  * Classe de gestion des données.
@@ -152,7 +152,7 @@ class Model
      * 
      * @param string $property La propriété à retourner.
      * 
-     * @return $property
+     * @return mixed
      */
     public function get(string $property)
     {

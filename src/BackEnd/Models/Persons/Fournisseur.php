@@ -6,14 +6,14 @@
  * PHP version 7.1.9
  * 
  * @category Category
- * @package  Personnes
+ * @package  Persons
  * @author   Joel <joel.developpeur@gmail.com>
  * @license  url.com License
  * @version  GIT: <joel_tanoh>
  * @link     Link
  */
 
-namespace App\BackEnd\Models\Personnes;
+namespace App\BackEnd\Models\Persons;
 
 use App\BackEnd\BddManager;
 
@@ -21,13 +21,13 @@ use App\BackEnd\BddManager;
  * Classe qui gère tout ce qui est en relation avec le fournisseur de service.
  * 
  * @category Category
- * @package  Personnes
+ * @package  Persons
  * @author   Joel <joel.developpeur@gmail.com>
  * @license  url.com License
  * @link     Link
  */
 
-class Fournisseur extends Personne
+class Fournisseur extends Person
 {
     /**
      * Permet de créer un nouveau fournisseur.

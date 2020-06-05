@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\BackEnd\Models\Personnes;
+namespace App\BackEnd\Models\Persons;
 
 /**
  * Classe qui gère tout ce qui est en relation avec le client.
@@ -28,7 +28,7 @@ namespace App\BackEnd\Models\Personnes;
  * @license  url.com license
  * @link     Link
  */
-class Client extends Personne
+class Client extends Person
 {
     /**
      * Retourne la liste des personnes qui sont enregistrées dans la base de données.

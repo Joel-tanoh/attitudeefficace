@@ -16,7 +16,7 @@
 namespace App\BackEnd\APIs;
 
 use App\BackEnd\BddManager;
-use App\BackEnd\Models\Personnes\Suscriber;
+use App\BackEnd\Models\Persons\Suscriber;
 
 /**
  * Gère les envois d'email.

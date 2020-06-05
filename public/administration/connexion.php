@@ -17,7 +17,7 @@ require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SE
 require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SEPARATOR . 'functions.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-use App\BackEnd\Models\Personnes\Administrateur;
+use App\BackEnd\Models\Persons\Administrateur;
 use App\View\Notification;
 use App\BackEnd\Utils\Utils;
 use App\View\View;

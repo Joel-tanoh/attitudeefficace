@@ -19,7 +19,7 @@ use App\BackEnd\APIs\SqlQueryFormater;
 use PDO;
 use PDOException;
 use App\BackEnd\Models\ItemChild;
-use App\BackEnd\Models\Personnes\Suscriber;
+use App\BackEnd\Models\Persons\Suscriber;
 
 /**
  * Gère la base de données.
@@ -133,7 +133,7 @@ class BddManager
                 $rep = self::connectToDb()->prepare($query);
                 $rep->execute([$col_value]);
             } else {
-                $rep->query($query);
+                $rep = self::connectToDb()->query($query);
             }
             return $rep->fetch()["item_number"];
         }

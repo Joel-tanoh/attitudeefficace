@@ -6,13 +6,13 @@
  * PHP version 7.1.9
  * 
  * @category Category
- * @package  Personnes
+ * @package  Persons
  * @author   Joel <joel.developpeur@gmail.com>
  * @license  url.com license
  * @link     link
  */
 
-namespace App\BackEnd\Models\Personnes;
+namespace App\BackEnd\Models\Persons;
 
 use App\BackEnd\Models\Model;
 
@@ -27,7 +27,7 @@ use App\BackEnd\Models\Model;
  * @license  url.com license
  * @link     link
  */
-class Personne extends Model
+class Person extends Model
 {
     /**
      * ID

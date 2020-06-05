@@ -12,7 +12,7 @@
  * @link     link
  */
 
-namespace App\BackEnd\Models\Personnes;
+namespace App\BackEnd\Models\Persons;
 
 use App\BackEnd\BddManager;
 use App\BackEnd\Files\Image;
@@ -29,7 +29,7 @@ use Exception;
  * @license  url.com license
  * @link     link
  */
-class Administrateur extends Personne
+class Administrateur extends Person
 {
     const TABLE_NAME = "administrateurs";
     const URL = ADMIN_URL . "/" . self::TABLE_NAME;
@@ -188,7 +188,7 @@ class Administrateur extends Personne
      * @param string $login [[Description]]
      * 
      * @author Joel
-     * @return array [[Description]]
+     * @return self
      */
     public static function getByLogin(string $login)
     {
