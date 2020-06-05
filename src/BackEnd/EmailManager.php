@@ -13,9 +13,9 @@
  * @link     Link
  */
 
-namespace App\BackEnd\APIs;
+namespace App\BackEnd;
 
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Persons\Suscriber;
 
 /**

@@ -16,7 +16,7 @@
 namespace App\BackEnd\Models;
 
 use Exception;
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\ItemChild;
 use App\BackEnd\Utils\Utils;

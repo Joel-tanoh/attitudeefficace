@@ -13,11 +13,11 @@
  * @link     Link
  */
 
-namespace App\BackEnd;
+namespace App\BackEnd\Bdd;
 
-use App\BackEnd\APIs\SqlQueryFormater;
 use PDO;
 use PDOException;
+use App\BackEnd\Bdd\SqlQueryFormater;
 use App\BackEnd\Models\ItemChild;
 use App\BackEnd\Models\Persons\Suscriber;
 

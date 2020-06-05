@@ -13,9 +13,9 @@
  * @link     Link
  */
 
-namespace App\BackEnd\APIs;
+namespace App\BackEnd\Bdd;
 
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 
 /**
  * Gère les requêtes SQL.

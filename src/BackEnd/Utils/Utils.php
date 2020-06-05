@@ -14,7 +14,7 @@
 
 namespace App\BackEnd\Utils;
 
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 use Cocur\Slugify\Slugify;
 use DateTime;
 

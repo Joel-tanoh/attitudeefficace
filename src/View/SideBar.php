@@ -15,7 +15,7 @@
 
 namespace App\View;
 
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Persons\Administrateur;
 use App\BackEnd\Models\Model;
 

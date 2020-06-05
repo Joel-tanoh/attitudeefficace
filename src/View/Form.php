@@ -14,7 +14,7 @@
 
 namespace App\View;
 
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Utils;

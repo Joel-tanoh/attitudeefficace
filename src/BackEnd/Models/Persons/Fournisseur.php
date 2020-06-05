@@ -15,7 +15,7 @@
 
 namespace App\BackEnd\Models\Persons;
 
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 
 /**
  * Classe qui gère tout ce qui est en relation avec le fournisseur de service.

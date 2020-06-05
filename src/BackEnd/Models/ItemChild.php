@@ -16,8 +16,8 @@
 namespace App\BackEnd\Models;
 
 use App\BackEnd\Models\Model;
-use App\BackEnd\BddManager;
-use App\BackEnd\APIs\SqlQueryFormater;
+use App\BackEnd\Bdd\BddManager;
+use App\BackEnd\Bdd\SqlQueryFormater;
 
 /**
  * Gère tout ce qui concerne les éléments.

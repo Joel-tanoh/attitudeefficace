@@ -15,8 +15,8 @@
 namespace App\BackEnd\Models;
 
 use App\BackEnd\Models\Model;
-use App\BackEnd\BddManager;
-use App\BackEnd\APIs\SqlQueryFormater;
+use App\BackEnd\Bdd\BddManager;
+use App\BackEnd\Bdd\SqlQueryFormater;
 
 /**
  * Gère une catégorie
@@ -110,6 +110,16 @@ class ItemParent extends Model
         $rep = $bdd->prepare($query);
         $rep->execute([$this->id]);
         $this->children = $rep->fetchAll();
+    }
+
+    /**
+     * Retourne les enfants de l'item courant.
+     * 
+     * @return array
+     */
+    public function getChildren()
+    {
+        return $this->children;
     }
 
     /**

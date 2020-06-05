@@ -9,7 +9,7 @@
 namespace App\View;
 
 use App\Router;
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Model;
 use App\View\Notification;
 use App\View\Form;

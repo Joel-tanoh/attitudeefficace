@@ -15,7 +15,7 @@
 
 namespace App\View\ModelsView;
 
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Models\ItemParent;
 use App\BackEnd\Models\ItemChild;
@@ -70,7 +70,7 @@ HTML;
         <div class="row mb-3">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-body pb-0">
                         {$this->showChildrenItemsByType('articles')}
                         {$this->showChildrenItemsByType('videos')}
                         {$this->showChildrenItemsByType('ebooks')}
@@ -118,8 +118,7 @@ HTML;
      */
     private function showChildrenItemsByType(string $children_type)
     {
-        $children = BddManager::getchildrenOf($this->item->get("id"), $children_type);
-        $children_type = ucfirst($children_type);
+        $children = $this->item->getChildren();
         $children_number = count($children);
 
         if (empty($children)) {
@@ -131,6 +130,7 @@ HTML;
                 $children_list .= Card::card(null, $child->get("title"), $child->get("admin_url"));
             }
         }
+        $children_type = ucfirst($children_type);
 
         return <<<HTML
         <div>

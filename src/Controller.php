@@ -8,7 +8,7 @@
 
 namespace App;
 
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Validator;
 use App\BackEnd\Utils\Utils;

@@ -8,7 +8,7 @@
 
 namespace App\View;
 
-use App\BackEnd\BddManager;
+use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Model;
 use App\Router;
 
@@ -300,6 +300,7 @@ HTML;
         <div class="card">
             <div class="card-header bg-white">Données</div>
             <div class="card-body">
+                <div>Catégorie : {$item->get("categorie")}</div>
                 <div>Description : {$item->get("description")}</div>
                 <div>Prix : {$item->get("prix")}</div>
                 <div>Date de création : {$item->get("date_creation")}</div>
