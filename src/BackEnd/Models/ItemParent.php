@@ -52,9 +52,8 @@ class ItemParent extends Model
      */
     public function __construct(string $code)
     {
-        $bdd = BddManager::connectToDb();
+        $pdo = self::connect();
         $sql_query1 = new SqlQueryFormater();
-
         $query = $sql_query1
             ->select("id, code, slug, categorie, title, description, price, rang, youtube_video_link, views")
             ->select("date_format(date_creation, '%d/%m/%Y') AS day_creation")
@@ -67,7 +66,7 @@ class ItemParent extends Model
             ->where("code = ?")
             ->returnQueryString();
 
-        $rep = $bdd->prepare($query);
+        $rep = $pdo->prepare($query);
         $rep->execute([$code]);
         $result = $rep->fetch();
 
@@ -107,7 +106,7 @@ class ItemParent extends Model
 
         // Children
         $query = "SELECT code FROM " . ItemChild::TABLE_NAME . " WHERE parent_id = ?";
-        $rep = $bdd->prepare($query);
+        $rep = $pdo->prepare($query);
         $rep->execute([$this->id]);
         $this->children = $rep->fetchAll();
     }
@@ -129,7 +128,7 @@ class ItemParent extends Model
      */
     public static function getSlugs()
     {
-        return BddManager::getSlugsFrom(self::TABLE_NAME);
+        return self::getSlugsFrom(self::TABLE_NAME);
     }
 
 }

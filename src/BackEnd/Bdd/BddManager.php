@@ -18,8 +18,6 @@ namespace App\BackEnd\Bdd;
 use PDO;
 use PDOException;
 use App\BackEnd\Bdd\SqlQueryFormater;
-use App\BackEnd\Models\ItemChild;
-use App\BackEnd\Models\Persons\Suscriber;
 
 /**
  * Gère la base de données.
@@ -34,24 +32,56 @@ use App\BackEnd\Models\Persons\Suscriber;
  */
 class BddManager
 {
+    private $sgbd;
+    private $db_address; 
+    private $db_name;
+    private $db_charset;
+    private $db_login;
+    private $db_password;
+    private $pdo;
+
+    /**
+     * Permet d'instanceier un BddManager.
+     * 
+     * @param string $db_name     Le nom de la base de données.
+     * @param string $db_login    Le login pour se connecter à la base de données.
+     * @param string $db_password Le mot de passe pour se connecter à la base de données.
+     * @param string $db_address  L'adresse ip du serveur.
+     * @param string $sgbd        Le système de gestion de la base de données.
+     * @param string $db_charset  L'encodage des caractères.
+     * 
+     */
+    public function __construct(
+        string $db_name,
+        string $db_login,
+        string $db_password,
+        string $db_address = "127.0.0.1",
+        string $sgbd = "mysql",
+        string $db_charset = "utf8"
+    ) {
+        $this->db_name = $db_name;
+        $this->db_login = $db_login;
+        $this->db_password = $db_password;
+        $this->db_address = $db_address;
+        $this->sgbd = $sgbd;
+        $this->db_charset = $db_charset;
+        $this->pdo = $this->connect();
+    }
+
     /**
      * Méthode de connexion à la base de données. Retourne l'instance de connexion.
      * 
      * @return PDOInstance
      */
-    public static function connectToDb()
-    {
+    public function connect() {
         try {
-            $charset = "utf8";
-            $sgbd = 'mysql';
-            $bdd = new PDO(
-                $sgbd. ':host=' . DB_ADDRESS . '; dbname=' . DB_NAME . '; charset=' . $charset, DB_LOGIN, DB_PASSWORD,
+            return new PDO(
+                $this->sgbd. ':host=' .$this->db_address. '; dbname=' .$this->db_name. '; charset=' .$this->db_charset, $this->db_login, $this->db_password,
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 ]
             );
-            return $bdd;
 
         } catch (PDOException $e) {
             echo '<h1>Erreur de connexion à la base de données, veuillez contacter votre administrateur !</h1>';
@@ -60,15 +90,53 @@ class BddManager
     }
 
     /**
+     * Retourne l'instance PDO.
+     * 
+     * @return PDOInstance
+     */
+    public function getPDO()
+    {
+        return $this->pdo;
+    }
+   
+    /**
+     * Récupère toutes les occurences de la table passée en paramètre. Prend en
+     * paramètre le nom d'une table et optionnellement la catégorie de données à 
+     * retourner.
+     * 
+     * @param string $table     Le nom de la table de laquelle récupérer les
+     *                          occurences.
+     * @param string $categorie Une clause de spécification de la catégorie des
+     *                          données à renvoyer.
+     * @param string $order_by  Le nom de la colonne par rapport à laquelle ordonner
+     *                          les résultats de la requette.
+     * 
+     * @return array Tableau qui contient les occurences de la table passée en param.
+     */
+    public function getAllFrom(string $table, string $categorie = null)
+    {
+        $query = "SELECT code, slug FROM $table";
+        if (null !== $categorie) {
+            $query .= " WHERE categorie = ?";
+            $rep = $this->pdo->prepare($query);
+            $rep->execute([$categorie]);
+        } else {
+            $rep = $this->pdo->query($query);
+        }
+        return $rep->fetchAll();
+    }
+
+    /**
      * Retourne le code d'un item dont les paramètres sont passés en paramètres.
      * 
-     * @param string $col 
-     * @param string $col_value 
-     * @param string $table 
+     * @param string $col       La colonne sur laquelle on fait la clause where.
+     * @param string $col_value La valeur de la clause pour spécifier l'élément qu'on veut
+     *                          précisement.
+     * @param string $table     La table de laquelle on récupère la donnée.
      * 
      * @return string Code de l'item.
      */
-    public static function getItemBy(string $col = null, string $col_value = null, string $table = null)
+    public function getItemBy(string $col = null, string $col_value = null, string $table = null)
     {
         $sql_query = new SqlQueryFormater();
         $query = $sql_query
@@ -76,44 +144,26 @@ class BddManager
             ->from($table)
             ->where($col . "= ?")
             ->returnQueryString();
-        $rep = self::connectToDb()->prepare($query);
+        $rep = $this->pdo->prepare($query);
         $rep->execute([$col_value]);
         return $rep->fetch()["code"];
     }
 
-    /**
-     * Retourne tous les slugs de la table passée en paramètre.
-     * 
-     * @param string $table Le nom de la table de laquelle on récupère le slug.
-     * 
-     * @return array
-     */
-    public static function getSlugsFrom(string $table)
-    {
-        $slugs = [];
-        foreach (self::getAllFrom($table) as $row) {
-            $slugs[] = $row["slug"];
-        }
-        return $slugs;
-    }
-
-    /**
-     * Retourne les items enfants en prenant en paramètre l'id du parent et la
-     * catégorie des items enfants à retourner.
-     *
-     * @param string $parent_id   
-     * @param string $children_categorie La catégorie des éléments qu'on veut prendre
-     *                                   de la base de données.
-     *
-     * @return array
-     */
-    public static function getchildrenOf($parent_id, $children_categorie)
-    {
-        $query = "SELECT code FROM " . ItemChild::TABLE_NAME . " WHERE parent_id = ? AND categorie = ?";
-        $rep = self::connectToDb()->prepare($query);
-        $rep->execute([$parent_id, $children_categorie]);
-        return $rep->fetchAll();
-    }
+    // /**
+    //  * Retourne tous les slugs de la table passée en paramètre.
+    //  * 
+    //  * @param string $table Le nom de la table de laquelle on récupère le slug.
+    //  * 
+    //  * @return array
+    //  */
+    // public function getSlugsFrom(string $table)
+    // {
+    //     $slugs = [];
+    //     foreach ($this->getAllFrom($table) as $row) {
+    //         $slugs[] = $row["slug"];
+    //     }
+    //     return $slugs;
+    // }
 
     /**
      * Compte toutes les occurences d'une table.
@@ -124,18 +174,18 @@ class BddManager
      * 
      * @return string|int
      */
-    public static function countTableItems(string $table = null, string $col = null, $col_value = null)
+    public function countTableItems(string $table = null, string $col = null, $col_value = null)
     {
         if (null !== $table) {
-            $query = "SELECT COUNT(id) AS item_number FROM $table";
+            $query = "SELECT COUNT(id) AS items_number FROM $table";
             if (null !== $col) {
                 $query .= " WHERE $col = ?";
-                $rep = self::connectToDb()->prepare($query);
+                $rep = $this->pdo->prepare($query);
                 $rep->execute([$col_value]);
             } else {
-                $rep = self::connectToDb()->query($query);
+                $rep = $this->pdo->query($query);
             }
-            return $rep->fetch()["item_number"];
+            return $rep->fetch()["items_number"];
         }
     }
 
@@ -148,9 +198,9 @@ class BddManager
      * 
      * @return bool
      */
-    public static function dataIsset(string $table, string $col, string $col_value)
+    public function checkIsset(string $table, string $col, string $col_value)
     {
-        return self::countTableItems($table, $col, $col_value) != 0;
+        return $this->countTableItems($table, $col, $col_value) !== 0;
     }
 
     /**
@@ -163,9 +213,9 @@ class BddManager
      * 
      * @return array
      */
-    public static function getAllFromTableWithout(string $table, $exclu_id, string $categorie = null)
+    public function getAllFromTableExcepted(string $table, $exclu_id, string $categorie = null)
     {
-        $bdd = self::connectToDb();
+        $bdd = $this->pdo;
         $query = "SELECT code FROM $table WHERE id !== ?";
         if (null !== $categorie) {
             $query .= " AND categorie = ?";
@@ -189,13 +239,8 @@ class BddManager
      * 
      * @return array
      */
-    public static function getMaxValueOf(
-        string $col,
-        string $table,
-        string $group_by = null,
-        string $having = null,
-        string $having_value = null
-    ) {
+    public function getMaxValueOf(string $col, string $table, string $group_by = null, string $having = null, string $having_value = null)
+    {
         $alias = $col."_max";
         $query = "SELECT MAX($col) as $alias FROM $table";
         if (null !== $group_by) {
@@ -204,7 +249,7 @@ class BddManager
         if (null !== $having) {
             $query .= " HAVING $having = '$having_value'";
         }
-        $rep = self::connectToDb()->query($query);
+        $rep = $this->pdo->query($query);
         return (int)$rep->fetch()[$alias];
     }
     
@@ -220,40 +265,12 @@ class BddManager
      * 
      * @return array
      */
-    public static function getItemsOfColValueMoreOrEqualTo(
-        string $table = null,
-        string $col = null,
-        int $col_value = null,
-        string $categorie = null
-    ) {
+    public function getItemsOfColValueMoreOrEqualTo(string $table = null, string $col = null, int $col_value = null, string $categorie = null)
+    {
         $query = "SELECT code FROM $table WHERE $col >= ? AND categorie = ?";
-        $rep = self::connectToDb()->prepare($query);
+        $rep = $this->pdo->prepare($query);
         $rep->execute([$col_value, $categorie,]);
         return $rep->fetchAll();
-    }
-    
-    /**
-     * Permet d'insérer les données principale d'un item parent ou enfant.
-     * 
-     * @param string $table       La catégorie de l'item
-     * @param string $code        Le code de l'item
-     * @param string $title       Le titre de l'item
-     * @param string $description La description de l'item
-     * @param string $categorie   La catégorie de l'item
-     * 
-     * @return bool True si les données ont été bien insérées.
-     */
-    public static function insertPincipalsData(
-        string $table = null,
-        string $code = null,
-        string $title = null,
-        string $description = null,
-        string $categorie = null
-    ) {
-        $query = "INSERT INTO $table(code, title, description, categorie) VALUES(?, ?, ?, ?)";
-        $rep = self::connectToDb()->prepare($query);
-        $rep->execute([$code, $title, $description, $categorie]);
-        return true;
     }
 
     /**
@@ -266,12 +283,12 @@ class BddManager
      * 
      * @return bool
      */
-    public static function incOrDecColValue(string $action, string $col, string $table, $id)
+    public function incOrDecColValue(string $action, string $col, string $table, $id)
     {
         $query = "UPDATE $table SET $col = ";
         $query .= $action == "increment" ? "$col+1" : "$col-1";
         $query .= " WHERE id = " . $id;
-        self::connectToDb()->query($query);
+        $this->pdo->query($query);
         return true;
     }
 
@@ -284,10 +301,10 @@ class BddManager
      * 
      * @return array
      */
-    public static function verifyDateVisitIsset(string $year, string $month, string $day)
+    public function verifyDateVisitIsset(string $year, string $month, string $day)
     {
         $query = "SELECT id, COUNT(id) as date_isset FROM compteur_visites WHERE year = :year AND month = :month AND day = :day";
-        $rep = self::connectToDb()->prepare($query);
+        $rep = $this->pdo->prepare($query);
         $rep->execute([
             "year" => $year,
             "month" => $month,
@@ -306,11 +323,11 @@ class BddManager
      * 
      * @return bool
      */
-    public static function insertNewVisit(string $year, string $month, string $day, int $nombre_visite = 1)
+    public function insertNewVisit(string $year, string $month, string $day, int $nombre_visite = 1)
     {
         $query = "INSERT INTO compteur_visites(year, month, day, nombre_visite)
             VALUES(:year, :month, :day, :nombre_visite)";
-        $rep = self::connectToDb()->prepare($query);
+        $rep = $this->pdo->prepare($query);
         $rep->execute([
             "year" => $year,
             "month" => $month,
@@ -330,10 +347,10 @@ class BddManager
      * 
      * @return bool
      */
-    public static function set($col, $value, $table, $id)
+    public function set($col, $value, $table, $id)
     {
         $query = "UPDATE $table SET $col = :col_value WHERE id = :id";
-        $rep = self::connectToDb()->prepare($query);
+        $rep = $this->pdo->prepare($query);
         $rep->execute(
             [
                 "col_value" => $value,
@@ -351,24 +368,12 @@ class BddManager
      * 
      * @return bool
      */
-    public static function deleteById(string $table, $id)
+    public function deleteById(string $table, $id)
     {
         $query = "DELETE FROM $table WHERE id = ?";
-        $rep = self::connectToDb()->prepare($query);
+        $rep = $this->pdo->prepare($query);
         $rep->execute([$id]);
         return true;
-    }
-
-    /**
-     * Retourne toutes adresses emails enregistrées dans le base de données.
-     * 
-     * @return array
-     */
-    public static function getAllEmails()
-    {
-        $newsletter_mails = self::select("adresse_email", "newsletters");
-        $suscribers_mails = self::select("adresse_email", Suscriber::TABLE_NAME);
-        return array_merge($newsletter_mails, $suscribers_mails);
     }
 
     /**
@@ -384,9 +389,9 @@ class BddManager
      * 
      * @return array Un tableau qui contient les données retournées.
      */
-    public static function select(string $to_select, string $table, string $clause = null, string $clause_value = null) 
+    public function select(string $to_select, string $table, string $clause = null, string $clause_value = null) 
     {
-        $bdd = self::connectToDb();
+        $bdd = $this->pdo;
         $query = "SELECT $to_select FROM $table";
         if (null !== $clause) {
             $query .= " WHERE $clause = ?";
@@ -394,33 +399,6 @@ class BddManager
             $rep->execute([$clause_value]);
         } else {
             $rep = $bdd->query($query);
-        }
-        return $rep->fetchAll();
-    }
-   
-    /**
-     * Récupère toutes les occurences de la table passée en paramètre. Prend en
-     * paramètre le nom d'une table et optionnellement la catégorie de données à 
-     * retourner.
-     * 
-     * @param string $table     Le nom de la table de laquelle récupérer les
-     *                          occurences.
-     * @param string $categorie Une clause de spécification de la catégorie des
-     *                          données à renvoyer.
-     * @param string $order_by  Le nom de la colonne par rapport à laquelle ordonner
-     *                          les résultats de la requette.
-     * 
-     * @return array Tableau qui contient les occurences de la table passée en param.
-     */
-    public static function getAllFrom(string $table, string $categorie = null)
-    {
-        $query = "SELECT code, slug FROM $table";
-        if (null !== $categorie) {
-            $query .= " WHERE categorie = ?";
-            $rep = self::connectToDb()->prepare($query);
-            $rep->execute([$categorie]);
-        } else {
-            $rep = self::connectToDb()->query($query);
         }
         return $rep->fetchAll();
     }

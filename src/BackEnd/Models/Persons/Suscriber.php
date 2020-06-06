@@ -33,7 +33,7 @@ class Suscriber
      * 
      * @return array
      */
-    public function getSuscribers()
+    public function getAll()
     {
         
     }

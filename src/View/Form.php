@@ -529,7 +529,8 @@ HTML;
             <p class="notice"> Cet élément apparaîtra : {$rang_actuel}</p>
 HTML;
         } else {
-            $rang = BddManager::getMaxValueOf("rang", Model::getTableNameFrom( $categorie ), "categorie", "categorie", $categorie ) + 1;
+            $bdd_manager = Model::bddManager();
+            $rang = $bdd_manager->getMaxValueOf("rang", Model::getTableNameFrom( $categorie ), "categorie", "categorie", $categorie ) + 1;
             $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
             $label = <<<HTML
             Donnez un rang à cet élément :
@@ -746,7 +747,8 @@ HTML;
     private static function parentList($categorie = null, $label = null)
     {
         $options = null;
-        $items = BddManager::getAllFrom(ItemParent::TABLE_NAME);
+        $bdd_manager = Model::bddManager();
+        $items = $bdd_manager->getAllFrom(ItemParent::TABLE_NAME);
         foreach ($items as $i) {
             $item = Model::returnObject($categorie, $i["code"]);
             $options .= '<option value="'. $item->get("id") . '">';

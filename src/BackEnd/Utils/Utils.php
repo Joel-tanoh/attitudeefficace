@@ -14,9 +14,8 @@
 
 namespace App\BackEnd\Utils;
 
-use App\BackEnd\Bdd\BddManager;
+use App\BackEnd\Models\Model;
 use Cocur\Slugify\Slugify;
-use DateTime;
 
 /**
  * Gère toutes les fonctions de l'application.
@@ -99,16 +98,17 @@ class Utils
      */
     public static function appVisitCounter()
     {
+        $bdd_manager = Model::bddManager();
         $year = date("Y");
         $month = date("m");
         $day = date("d");
-        $visite = BddManager::verifyDateVisitIsset($year, $month, $day);
+        $visite = $bdd_manager->verifyDateVisitIsset($year, $month, $day);
 
         if (self::isNewVisit()) {
             if ($visite["date_isset"]) {
-                BddManager::incOrDecColValue("increment", "nombre_visite", "compteur_visites", $visite["id"]);
+                $bdd_manager->incOrDecColValue("increment", "nombre_visite", "compteur_visites", $visite["id"]);
             } else {
-                BddManager::insertNewVisit($year, $month, $day, 1);
+                $bdd_manager->insertNewVisit($year, $month, $day, 1);
             }
         }
     }

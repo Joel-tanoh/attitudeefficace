@@ -186,8 +186,9 @@ HTML;
      */
     public static function voirAussi($exclu)
     {
+        $bdd_manager = Model::bddManager();
         $table = Model::getTableNameFrom($exclu->get("categorie"));
-        $items = BddManager::getAllFromTableWithout($table, $exclu->get("id"), $exclu->get("categorie"));
+        $items = $bdd_manager->getAllFromTableExcepted($table, $exclu->get("id"), $exclu->get("categorie"));
         $list = '';
         foreach ($items as $item) {
             $item = Model::returnObject($exclu->get("categorie"), $item["code"]);

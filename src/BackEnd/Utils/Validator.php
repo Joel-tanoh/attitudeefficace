@@ -119,6 +119,21 @@ class Validator
     }
 
     /**
+     * Effectue les validations sur un id d'item parent.
+     * 
+     * @param string $parent_id Id provenant du formulaire
+     * 
+     * @return string|null
+     */
+    public function validateParentId(string $parent_id = null)
+    {
+        $this->to_validate["parent_id"] = $parent_id;
+        if (!is_int((int)$parent_id)) {
+            $this->errors["parent_id"] = "Le choix de catégorie que vous avez fait est invalide.";
+        }
+    }
+    
+    /**
      * Valide le titre de l'item qu'on veut créer.
      * 
      * @param string $title Le titre de l'item à valider.
@@ -334,21 +349,6 @@ class Validator
         }
     }
 
-    /**
-     * Effectue les validations sur un id d'item parent.
-     * 
-     * @param string $parent_id Id provenant du formulaire
-     * 
-     * @return string|null
-     */
-    public function validateParentId(string $parent_id = null)
-    {
-        $this->to_validate["parent_id"] = $parent_id;
-        if (!is_int((int)$parent_id)) {
-            $this->errors["parent_id"] = "Le choix de catégorie que vous avez fait est invalide.";
-        }
-    }
-    
     /**
      * Retourne true si la chaîne de caractère passée en paramètre contient du code
      * HTML.

@@ -9,15 +9,5 @@ namespace App\View;
  */
 class BootstrapView extends View
 {
-    /**
-     * Retourne une carte Bootstrap.
-     * 
-     * @param mixed $item
-     * 
-     * @return string Code de la carte bootstrap.
-     */
-    public function bootstrapCard($item)
-    {
-        
-    }
+   
 }

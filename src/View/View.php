@@ -118,8 +118,9 @@ HTML;
      */
     public static function listItemsView(array $items, string $class_name)
     {
+        $bdd_manager = Model::bddManager();
         $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-        $number_of_items = BddManager::countTableItems(
+        $number_of_items = $bdd_manager->countTableItems(
             Model::getTableNameFrom(Router::getUrlAsArray()[0]),
             "categorie",
             Router::getUrlAsArray()[0]
@@ -157,7 +158,8 @@ HTML;
      */
     public static function listMotivationPlusVideosView(array $videos)
     {
-        $number_of_videos = BddManager::countTableItems("item_childs", "categorie", "videos");
+        $bdd_manager = Model::bddManager();
+        $number_of_videos = $bdd_manager->countTableItems("item_childs", "categorie", "videos");
         if (empty($videos)) {
             $videos_list = null;
         } else {

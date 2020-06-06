@@ -89,16 +89,16 @@ HTML;
      */
     public function parentchildrenNumber()
     {
-        $articles = BddManager::getchildrenOf($this->item->get("id"), "articles");
+        $articles = Model::getchildrenOf($this->item->get("id"), "articles");
         $articles_number = count($articles);
 
-        $videos = BddManager::getchildrenOf($this->item->get("id"), "videos");
+        $videos = Model::getchildrenOf($this->item->get("id"), "videos");
         $videos_number = count($videos);
 
-        $livres = BddManager::getchildrenOf($this->item->get("id"), "livres");
+        $livres = Model::getchildrenOf($this->item->get("id"), "livres");
         $livres_number = count($livres);
 
-        $ebooks = BddManager::getchildrenOf($this->item->get("id"), "ebooks");
+        $ebooks = Model::getchildrenOf($this->item->get("id"), "ebooks");
         $ebooks_number = count($ebooks);
         
         return <<<HTML

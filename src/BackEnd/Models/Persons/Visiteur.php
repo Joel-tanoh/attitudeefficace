@@ -33,7 +33,7 @@ class Visiteur extends Person
      * 
      * @return array
      */
-    public function getVisitors()
+    public function getAll()
     {
         
     }

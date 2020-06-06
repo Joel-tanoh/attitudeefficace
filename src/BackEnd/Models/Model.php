@@ -23,6 +23,7 @@ use App\BackEnd\Utils\Utils;
 use App\BackEnd\Files\Image;
 use App\BackEnd\Files\Pdf;
 use App\BackEnd\Models\Persons\Administrateur;
+use App\BackEnd\Models\Persons\Suscriber;
 
 /**
  * Classe de gestion des données.
@@ -146,6 +147,26 @@ class Model
      * @var string
      */
     public $table;
+
+    /**
+     * Retourne une instance BddManager.
+     * 
+     * @return BddManager
+     */
+    public static function bddManager()
+    {
+        return new BddManager(DB_NAME, DB_LOGIN, DB_PASSWORD);
+    }
+
+    /**
+     * Permet de se connecter à la base de données et retourne l'instance PDO.
+     * 
+     * @return PDOInstance
+     */
+    public static function connect()
+    {
+        return self::bddManager()->getPDO();
+    }
 
     /**
      * Retourne une propriéte en fonction de son nom passé en paramètre.
@@ -326,6 +347,22 @@ class Model
     }
 
     /**
+     * Retourne tous les slugs de la table passée en paramètre.
+     * 
+     * @param string $table Le nom de la table de laquelle on récupère le slug.
+     * 
+     * @return array
+     */
+    public static function getSlugsFrom(string $table)
+    {
+        $slugs = [];
+        foreach (self::bddManager()->getAllFrom($table) as $row) {
+            $slugs[] = $row["slug"];
+        }
+        return $slugs;
+    }
+
+    /**
      * Retourne tous les slugs.
      * 
      * @return array
@@ -344,7 +381,7 @@ class Model
      */
     public static function isParentSlug(string $slug)
     {
-        return in_array($slug, BddManager::getSlugsFrom(ItemParent::TABLE_NAME));
+        return in_array($slug, self::getSlugsFrom(ItemParent::TABLE_NAME));
     }
 
     /**
@@ -356,7 +393,7 @@ class Model
      */
     public static function isChildSlug(string $slug)
     {
-        return in_array($slug, BddManager::getSlugsFrom(ItemChild::TABLE_NAME));
+        return in_array($slug, self::getSlugsFrom(ItemChild::TABLE_NAME));
     }
 
     /**
@@ -372,7 +409,7 @@ class Model
      */
     public static function getObjectBy(string $col = null, string $col_value = null, string $table = null, string $categorie = null)
     {
-        $code = BddManager::getItemBy($col, $col_value, $table);
+        $code = self::bddManager()->getItemBy($col, $col_value, $table);
         return self::returnObject($categorie, $code);
     }
 
@@ -488,6 +525,36 @@ class Model
     }
     
     /**
+     * Retourne toutes adresses emails enregistrées dans le base de données.
+     * 
+     * @return array
+     */
+    public static function getAllEmails()
+    {
+        $newsletter_mails = self::bddManager()->select("adresse_email", "newsletters");
+        $suscribers_mails = self::bddManager()->select("adresse_email", Suscriber::TABLE_NAME);
+        return array_merge($newsletter_mails, $suscribers_mails);
+    }
+
+    /**
+     * Retourne les items enfants en prenant en paramètre l'id du parent et la
+     * catégorie des items enfants à retourner.
+     *
+     * @param string $parent_id   
+     * @param string $children_categorie La catégorie des éléments qu'on veut prendre
+     *                                   de la base de données.
+     *
+     * @return array
+     */
+    public static function getchildrenOf($parent_id, $children_categorie)
+    {
+        $query = "SELECT code FROM " . ItemChild::TABLE_NAME . " WHERE parent_id = ? AND categorie = ?";
+        $rep = self::connect()->prepare($query);
+        $rep->execute([$parent_id, $children_categorie]);
+        return $rep->fetchAll();
+    }
+
+    /**
      * Permet de modifier une propriété de l'instance appelant la méthode.
      * 
      * @param string $col   Le champ de la table dans laquelle on insère la
@@ -500,7 +567,7 @@ class Model
      */
     public function set(string $col, $value, $table)
     {
-        BddManager::set($col, $value, $table, $this->id);
+        self::bddManager()->set($col, $value, $table, $this->id);
         $this->modified($table);
         return true;
     }
@@ -631,7 +698,7 @@ class Model
     {
         $this->unsetRang();
         $this->deleteImage();
-        BddManager::deleteById($this->table, $this->id);
+        self::bddManager()->deleteById($this->table, $this->id);
         return true;
     }
 
@@ -656,11 +723,11 @@ class Model
     public function setRang(int $rang)
     {
         $table = $this->table;
-        if ($rang !== 0 && BddManager::dataIsset($table, "rang", $rang)) {
-            $items = BddManager::getItemsOfColValueMoreOrEqualTo( $table, "rang", $rang, $this->categorie );
+        if ($rang !== 0 && self::bddManager()->checkIsset($table, "rang", $rang)) {
+            $items = self::bddManager()->getItemsOfColValueMoreOrEqualTo( $table, "rang", $rang, $this->categorie );
             foreach ($items as $item) {
                 $obj = self::returnObject($this->categorie, $item["code"]);
-                BddManager::incOrDecColValue("increment", "rang", $table, $obj->id);
+                self::bddManager()->incOrDecColValue("increment", "rang", $table, $obj->id);
             }
         }
         $this->set("rang", (int)$rang, $table);
@@ -674,10 +741,10 @@ class Model
     public function unsetRang()
     {
         $table = $this->table;
-        $items = BddManager::getItemsOfColValueMoreOrEqualTo($table, "rang", $this->rang, $this->categorie);
+        $items = self::bddManager()->getItemsOfColValueMoreOrEqualTo($table, "rang", $this->rang, $this->categorie);
         foreach ($items as $item) {
             $item = self::returnObject($this->categorie, $item["code"]);
-            BddManager::incOrDecColValue("decrement", "rang", $table, $item->get("id"));
+            self::bddManager()->incOrDecColValue("decrement", "rang", $table, $item->get("id"));
         }
         return true;
     }
@@ -696,7 +763,7 @@ class Model
         extract($data);
         $table = self::getTableNameFrom($categorie);
 
-        if (BddManager::insertPincipalsData($table, $code, $title, $description, $categorie)) {
+        if (self::insertPincipalsData($table, $code, $title, $description, $categorie)) {
             $new_item = self::returnObject($categorie, $code);
             
             $slug = Utils::slugify($new_item->get("title")) . '-' . $new_item->get("id");
@@ -748,6 +815,30 @@ class Model
             throw new Exception("Echec de l'enregistrement des données");
         }
     }
+    
+    /**
+     * Permet d'insérer les données principale d'un item parent ou enfant.
+     * 
+     * @param string $table       La catégorie de l'item
+     * @param string $code        Le code de l'item
+     * @param string $title       Le titre de l'item
+     * @param string $description La description de l'item
+     * @param string $categorie   La catégorie de l'item
+     * 
+     * @return bool True si les données ont été bien insérées.
+     */
+    public static function insertPincipalsData(
+        string $table = null,
+        string $code = null,
+        string $title = null,
+        string $description = null,
+        string $categorie = null
+    ) {
+        $query = "INSERT INTO $table(code, title, description, categorie) VALUES(?, ?, ?, ?)";
+        $rep = self::connect()->prepare($query);
+        $rep->execute([$code, $title, $description, $categorie]);
+        return true;
+    }
 
     /**
      * Mets à jour la date de modification de la catégorie.
@@ -756,7 +847,7 @@ class Model
      */
     private function modified() : bool
     {
-        BddManager::set("date_modification", date("Y-m-d H:i:s"), $this->table, $this->id);
+        self::bddManager()->set("date_modification", date("Y-m-d H:i:s"), $this->table, $this->id);
         return true;
     }
 

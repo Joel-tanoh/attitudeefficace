@@ -70,8 +70,9 @@ class Controller{
      */
     public function listCategorieItems()
     {
+        $bdd_manager = Model::bddManager();
         $meta_title = "Mes " . Model::getCategorieFormated($this->categorie, "pluriel");
-        $items = BddManager::getAllFrom(Model::getTableNameFrom($this->categorie), $this->categorie);
+        $items = $bdd_manager->getAllFrom(Model::getTableNameFrom($this->categorie), $this->categorie);
         $page = new Page($meta_title, View::listItemsView($items, $this->categorie));
         echo $page->adminPage();
     }
@@ -83,8 +84,9 @@ class Controller{
      */
     public function listAdminUsersAccounts()
     {
+        $bdd_manager = Model::bddManager();
         $meta_title = "Utilisateurs";
-        $accounts = BddManager::getAllFrom(Model::getTableNameFrom( $this->categorie ), "utilisateur");
+        $accounts = $bdd_manager->getAllFrom(Model::getTableNameFrom( $this->categorie ), "utilisateur");
         $page = new Page($meta_title, View::listAccountsView($accounts));
         echo $page->adminPage();
     }
@@ -97,7 +99,7 @@ class Controller{
     public function listMotivationPlusVideo()
     {
         $meta_title = "Motivation plus";
-        $videos = BddManager::getchildrenOf("-1", "videos");
+        $videos = Model::getchildrenOf("-1", "videos");
         $page = new Page($meta_title, View::listMotivationPlusVideosView($videos));
         echo $page->adminPage();
     }
@@ -204,13 +206,13 @@ class Controller{
     public function deleteItems()
     {
         $error = null;
-
+        $bdd_manager = Model::bddManager();
         if ($this->categorie === "motivation-plus") {
             $meta_title = "Motivation plus &#8250 supprimer";
-            $to_delete = BddManager::getchildrenOf("-1", "videos");
+            $to_delete = Model::getchildrenOf("-1", "videos");
         } else {
             $meta_title = "Supprimer des " . Model::getCategorieFormated($this->categorie, "pluriel");
-            $to_delete = BddManager::getAllFrom(Model::getTableNameFrom($this->categorie), $this->categorie);
+            $to_delete = $bdd_manager->getAllFrom(Model::getTableNameFrom($this->categorie), $this->categorie);
         }
 
         if (isset($_POST["suppression"])) {

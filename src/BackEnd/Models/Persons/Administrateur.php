@@ -14,7 +14,6 @@
 
 namespace App\BackEnd\Models\Persons;
 
-use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Files\Image;
 use App\BackEnd\Bdd\SqlQueryFormater;
 use App\BackEnd\Utils\Utils;
@@ -43,7 +42,7 @@ class Administrateur extends Person
      */
     public function __construct(string $code)
     {
-        $bdd = BddManager::connectToDb();
+        $pdo = self::connect();
         $sql_query = new SqlQueryFormater();
 
         $query = $sql_query
@@ -56,7 +55,7 @@ class Administrateur extends Person
             ->where("code = ?")
             ->returnQueryString();
 
-        $rep = $bdd->prepare($query);
+        $rep = $pdo->prepare($query);
         $rep->execute([$code]);
         $result = $rep->fetch();
 
@@ -139,8 +138,8 @@ class Administrateur extends Person
      */
     public function changeStatut($new_statut)
     {
-        $bdd = BddManager::connectToDb();
-        $query = $bdd->prepare('UPDATE administrateurs SET statut = ? WHERE id = ?');
+        $pdo = self::connect();
+        $query = $pdo->prepare('UPDATE administrateurs SET statut = ? WHERE id = ?');
         $query->execute([$new_statut, $this->id]);
         return true;
     }
@@ -152,9 +151,9 @@ class Administrateur extends Person
      */
     public function delete()
     {
-        $bdd = BddManager::connectToDb();
+        $pdo = self::connect();
         $query = 'DELETE FROM administrateurs WHERE id = ?';
-        $rep = $bdd->prepare($query);
+        $rep = $pdo->prepare($query);
         $rep->execute([$this->id]);
         Utils::header(self::URL);
     }
@@ -168,14 +167,14 @@ class Administrateur extends Person
      */
     static function loginIsset(string $login) : bool
     {
-        $bdd = BddManager::connectToDb();
+        $pdo = self::connect();
         $sql_query = new SqlQueryFormater();
         $query = $sql_query
             ->select("COUNT(id) AS administrateur")
             ->from(self::TABLE_NAME)
             ->where("login = ?")
             ->returnQueryString();
-        $rep = $bdd->prepare($query);
+        $rep = $pdo->prepare($query);
         $rep->execute([$login]);
         $counter = $rep->fetch();
         return $counter['administrateur'] == 1;
@@ -192,7 +191,7 @@ class Administrateur extends Person
      */
     public static function getByLogin(string $login)
     {
-        $bdd = BddManager::connectToDb();
+        $pdo = self::connect();
         $sql_query = new SqlQueryFormater();
 
         $query = $sql_query
@@ -201,7 +200,7 @@ class Administrateur extends Person
             ->where("login = ?")
             ->returnQueryString();
         
-        $rep = $bdd->prepare($query);
+        $rep = $pdo->prepare($query);
         $rep->execute([mb_strtolower($login)]);
         $result = $rep->fetch();
         return new self($result["code"]);
@@ -218,11 +217,11 @@ class Administrateur extends Person
      */
     private static function insertPrincipalData($code, $login, $password)
     {
-        $bdd = BddManager::connectToDb();
+        $pdo = self::connect();
         $query = "INSERT INTO " . self::TABLE_NAME
             . "(code, login, password)"
             . " VALUES(?, ?, ?)";
-        $rep = $bdd->prepare($query);
+        $rep = $pdo->prepare($query);
         $rep->execute([$code,$login,$password]);
         return true;
     }
