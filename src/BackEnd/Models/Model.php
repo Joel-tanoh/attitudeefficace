@@ -169,7 +169,8 @@ class Model
     }
 
     /**
-     * Retourne une propriéte en fonction de son nom passé en paramètre.
+     * Retourne une propriéte de l'objet en fonction du nom de la prpriété passée
+     * en paramètre.
      * 
      * @param string $property La propriété à retourner.
      * 
@@ -234,22 +235,6 @@ class Model
         if ($property == "original_image_path") return $this->original_image_path;
         if ($property == "original_image_src")  return file_exists($this->original_image_path) ? $this->original_image_src : null;
         if ($property == "avatar_src") return file_exists($this->avatar_path) ? $this->avatar_src : DEFAULT_AVATAR;
-
-    }
-
-    /**
-     * Retourne certains caractères de la description.
-     * 
-     * @param int $length Le nombre de caractères qu'on veut.
-     * 
-     * @return string
-     */
-    public function getDescriptionExtrait($length)
-    {
-        $description_length = strlen($this->get("description"));
-        return $description_length > $length
-            ? substr($this->get("description"), 0, $length) . '...'
-            : $this->get("description");
     }
 
     /**
@@ -356,7 +341,7 @@ class Model
     public static function getSlugsFrom(string $table)
     {
         $slugs = [];
-        foreach (self::bddManager()->getAllFrom($table) as $row) {
+        foreach (self::bddManager()->get("slug", $table) as $row) {
             $slugs[] = $row["slug"];
         }
         return $slugs;
@@ -409,7 +394,7 @@ class Model
      */
     public static function getObjectBy(string $col = null, string $col_value = null, string $table = null, string $categorie = null)
     {
-        $code = self::bddManager()->getItemBy($col, $col_value, $table);
+        $code = self::bddManager()->getItemBy("code", $col, $col_value, $table);
         return self::returnObject($categorie, $code);
     }
 
@@ -428,12 +413,10 @@ class Model
             return new ItemParent($code);
         } elseif (self::isChildCategorie($categorie) || $categorie === "motivation-plus") {
             return new ItemChild($code);
-        } elseif ($categorie == "administrateurs") {
+        } elseif ($categorie === "administrateurs") {
             return new Administrateur($code);
         } else {
-            throw new Exception(
-                "La classe $categorie n'existe pas encore ou n'est pas bien géré."
-            );
+            throw new Exception("La classe $categorie n'existe pas encore ou n'est pas bien géré.");
         }
     }
      
@@ -531,8 +514,8 @@ class Model
      */
     public static function getAllEmails()
     {
-        $newsletter_mails = self::bddManager()->select("adresse_email", "newsletters");
-        $suscribers_mails = self::bddManager()->select("adresse_email", Suscriber::TABLE_NAME);
+        $newsletter_mails = self::bddManager()->get("adresse_email", "newsletters");
+        $suscribers_mails = self::bddManager()->get("adresse_email", Suscriber::TABLE_NAME);
         return array_merge($newsletter_mails, $suscribers_mails);
     }
 
@@ -562,12 +545,14 @@ class Model
      * @param mixed  $value Le contenu à insérer dans le nouveau champ
      * @param string $table Le nom de la table dans laquelle on insère la nouvelle
      *                      propriété.
+     * @param string $where_col_name
+     * @param string $where_col_value
      * 
      * @return bool
      */
-    public function set(string $col, $value, $table)
+    public function update(string $col, $value, string $table, string $where_col_name, $where_col_value)
     {
-        self::bddManager()->set($col, $value, $table, $this->id);
+        self::bddManager()->update($col, $value, $table, $where_col_name, $where_col_value);
         $this->modified($table);
         return true;
     }
@@ -640,19 +625,19 @@ class Model
         }
 
         if (isset($title)) {
-            $this->set("title", $title, $table);
+            $this->update("title", $title, $table, "id", $this->id);
         }
 
         if (isset($description)) {
-            $this->set("description", $description, $table);
+            $this->update("description", $description, $table, "id", $this->id);
         }
 
         if (isset($article_content)) {
-            $this->set("article_content", $article_content, $table);
+            $this->update("article_content", $article_content, $table, "id", $this->id);
         }
 
         if (isset($prix)) {
-            $this->set("price", (int)$prix, $table);
+            $this->update("price", (int)$prix, $table, "id", $this->id);
         }
 
         if (isset($rang)) {
@@ -660,11 +645,11 @@ class Model
         }
 
         if (isset($youtube_video_link)){
-            $this->set("youtube_video_link", $youtube_video_link, $table);
+            $this->update("youtube_video_link", $youtube_video_link, $table, "id", $this->id);
         }
 
         if (isset($slug)) {
-            $this->set("slug", $slug, $table);
+            $this->update("slug", $slug, $table, "id", $this->id);
         }
 
         $item = self::returnObject($categorie, $this->code);
@@ -698,7 +683,7 @@ class Model
     {
         $this->unsetRang();
         $this->deleteImage();
-        self::bddManager()->deleteById($this->table, $this->id);
+        self::bddManager()->delete($this->table, "id", $this->id);
         return true;
     }
 
@@ -730,7 +715,7 @@ class Model
                 self::bddManager()->incOrDecColValue("increment", "rang", $table, $obj->id);
             }
         }
-        $this->set("rang", (int)$rang, $table);
+        $this->update("rang", (int)$rang, $table, "id", $this->id);
     }
 
     /**
@@ -767,46 +752,46 @@ class Model
             $new_item = self::returnObject($categorie, $code);
             
             $slug = Utils::slugify($new_item->get("title")) . '-' . $new_item->get("id");
-            $new_item->set("slug", $slug, $table);
+            $new_item->update("slug", $slug, $table);
 
             if (!empty($rang)) {
                 $new_item->setRang((int)$rang);
             }
            
             if (isset($parent_id)) {
-                $new_item->set("parent_id", (int)$parent_id, $table);
+                $new_item->update("parent_id", (int)$parent_id, $table);
             }
 
             if (!empty($prix)) {
-                $new_item->set("price", (int)$prix, $table);
+                $new_item->update("price", (int)$prix, $table);
             }
 
             if (!empty($article_content)) {
-                $new_item->set("article_content", htmlspecialchars($article_content), $table);
+                $new_item->update("article_content", htmlspecialchars($article_content), $table);
             }
 
             if (!empty($autheur_livre)) {
-                $new_item->set("autheur", $autheur, $table);
+                $new_item->update("autheur", $autheur, $table);
             }
 
             if (!empty($fournisseur)) {
-                $new_item->set("fournisseur", $fournisseur, $table);
+                $new_item->update("fournisseur", $fournisseur, $table);
             }
 
             if (!empty($nombre_pages)) {
-                $new_item->set("nombre_pages", $nombre_pages, $table);
+                $new_item->update("nombre_pages", $nombre_pages, $table);
             }
 
             if (!empty($edition_home)) {
-                $new_item->set("edition_home", $edition_home, $table);
+                $new_item->update("edition_home", $edition_home, $table);
             }
 
             if (!empty($parution_year)) {
-                $new_item->set("parution_year", $parution_year, $table);
+                $new_item->update("parution_year", $parution_year, $table);
             }
 
             if (!empty($youtube_video_link)) {
-                $new_item->set("youtube_video_link", $youtube_video_link, $table);
+                $new_item->update("youtube_video_link", $youtube_video_link, $table);
             }
 
             return self::returnObject($categorie, $code);
@@ -847,7 +832,7 @@ class Model
      */
     private function modified() : bool
     {
-        self::bddManager()->set("date_modification", date("Y-m-d H:i:s"), $this->table, $this->id);
+        self::bddManager()->update("date_modification", date("Y-m-d H:i:s"), $this->table, "id", $this->id);
         return true;
     }
 

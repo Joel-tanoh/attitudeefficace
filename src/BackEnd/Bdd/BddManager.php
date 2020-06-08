@@ -84,8 +84,7 @@ class BddManager
             );
 
         } catch (PDOException $e) {
-            echo '<h1>Erreur de connexion à la base de données, veuillez contacter votre administrateur !</h1>';
-            die();
+            die('<h1>Erreur de connexion à la base de données, veuillez contacter votre administrateur !</h1>');
         }
     }
 
@@ -104,22 +103,26 @@ class BddManager
      * paramètre le nom d'une table et optionnellement la catégorie de données à 
      * retourner.
      * 
-     * @param string $table     Le nom de la table de laquelle récupérer les
-     *                          occurences.
-     * @param string $categorie Une clause de spécification de la catégorie des
-     *                          données à renvoyer.
-     * @param string $order_by  Le nom de la colonne par rapport à laquelle ordonner
-     *                          les résultats de la requette.
+     * @param string $to_get          La ou les noms des colonnes qu'on veut récupérer.
+     *                                Si vous voulez récupérer plusieurs colonnes, vous passez les noms
+     *                                des colonnes dans la même chaîne de caractères en les séparant par
+     *                                une virgule.
+     * @param string $table_name      Le nom de la table de laquelle récupérer les
+     *                                occurences.
+     * @param string $where_col_name  La colonne sur laquelle on fait la clause where
+     *                                spécifier l'élément à retourner.
+     * @param string $where_col_value La valeur de la clause pour spécifier l'élément qu'on veut
+     *                                précisement.
      * 
      * @return array Tableau qui contient les occurences de la table passée en param.
      */
-    public function getAllFrom(string $table, string $categorie = null)
+    public function get(string $to_get, string $table_name, string $where_col_name = null, $where_col_value = null)
     {
-        $query = "SELECT code, slug FROM $table";
-        if (null !== $categorie) {
-            $query .= " WHERE categorie = ?";
+        $query = "SELECT $to_get FROM $table_name";
+        if (null !== $where_col_name) {
+            $query .= " WHERE $where_col_name = ?";
             $rep = $this->pdo->prepare($query);
-            $rep->execute([$categorie]);
+            $rep->execute([$where_col_value]);
         } else {
             $rep = $this->pdo->query($query);
         }
@@ -129,64 +132,49 @@ class BddManager
     /**
      * Retourne le code d'un item dont les paramètres sont passés en paramètres.
      * 
-     * @param string $col       La colonne sur laquelle on fait la clause where.
-     * @param string $col_value La valeur de la clause pour spécifier l'élément qu'on veut
-     *                          précisement.
-     * @param string $table     La table de laquelle on récupère la donnée.
+     * @param string $to_get          Le nom de la colonne dont on veut récupére la valeur.
+     * @param string $where_col_name  La colonne sur laquelle on fait la clause where
+     *                                spécifier l'élément à retourner.
+     * @param string $where_col_value La valeur de la clause pour spécifier l'élément qu'on veut
+     *                                précisement.
+     * @param string $table           La table de laquelle on récupère la donnée.
      * 
      * @return string Code de l'item.
      */
-    public function getItemBy(string $col = null, string $col_value = null, string $table = null)
+    public function getItemBy(string $to_get, string $where_col_name = null, string $where_col_value = null, string $table = null)
     {
         $sql_query = new SqlQueryFormater();
         $query = $sql_query
-            ->select("code")
+            ->select($to_get)
             ->from($table)
-            ->where($col . "= ?")
+            ->where($where_col_name . " = ?")
             ->returnQueryString();
         $rep = $this->pdo->prepare($query);
-        $rep->execute([$col_value]);
+        $rep->execute([$where_col_value]);
         return $rep->fetch()["code"];
     }
-
-    // /**
-    //  * Retourne tous les slugs de la table passée en paramètre.
-    //  * 
-    //  * @param string $table Le nom de la table de laquelle on récupère le slug.
-    //  * 
-    //  * @return array
-    //  */
-    // public function getSlugsFrom(string $table)
-    // {
-    //     $slugs = [];
-    //     foreach ($this->getAllFrom($table) as $row) {
-    //         $slugs[] = $row["slug"];
-    //     }
-    //     return $slugs;
-    // }
 
     /**
      * Compte toutes les occurences d'une table.
      * 
-     * @param string $table     Le nom de table.
-     * @param string $col       Une clause sur les éléments à compter.
-     * @param mixed  $col_value La valeur de la colonne.
+     * @param string $to_count       La colonne à compter.
+     * @param string $table          Le nom de table.
+     * @param string $where_col_name Une clause sur les éléments à compter.
+     * @param mixed  $where_col_value    La valeur de la colonne.
      * 
      * @return string|int
      */
-    public function countTableItems(string $table = null, string $col = null, $col_value = null)
+    public function count(string $to_count, string $table = null, string $where_col_name = null, $where_col_value = null)
     {
-        if (null !== $table) {
-            $query = "SELECT COUNT(id) AS items_number FROM $table";
-            if (null !== $col) {
-                $query .= " WHERE $col = ?";
-                $rep = $this->pdo->prepare($query);
-                $rep->execute([$col_value]);
-            } else {
-                $rep = $this->pdo->query($query);
-            }
-            return $rep->fetch()["items_number"];
+        $query = "SELECT COUNT(" . $to_count . ") AS count FROM " . $table;
+        if (null !== $where_col_name) {
+            $query .= " WHERE $where_col_name = ?";
+            $rep = $this->pdo->prepare($query);
+            $rep->execute([$where_col_value]);
+        } else {
+            $rep = $this->pdo->query($query);
         }
+        return $rep->fetch()["count"];
     }
 
     /**
@@ -200,7 +188,7 @@ class BddManager
      */
     public function checkIsset(string $table, string $col, string $col_value)
     {
-        return $this->countTableItems($table, $col, $col_value) !== 0;
+        return $this->count("id", $table, $col, $col_value) != 0;
     }
 
     /**
@@ -208,22 +196,23 @@ class BddManager
      * paramètre.
      * 
      * @param string $table 
-     * @param string $exclu_id 
-     * @param string $categorie 
+     * @param string $excepted_id Id de l'élément à exclure de la liste des résultats.
+     * @param string $categorie_value   On passe cette variable si on veut donner une clause
+     *                            where sur le champ catégorie.
      * 
      * @return array
      */
-    public function getAllFromTableExcepted(string $table, $exclu_id, string $categorie = null)
+    public function getTableExcepted(string $table, $excepted_id, string $categorie_value = null)
     {
         $bdd = $this->pdo;
         $query = "SELECT code FROM $table WHERE id !== ?";
-        if (null !== $categorie) {
+        if (null !== $categorie_value) {
             $query .= " AND categorie = ?";
             $rep = $bdd->prepare($query);
-            $rep->execute([(int)$exclu_id, $categorie]);
+            $rep->execute([(int)$excepted_id, $categorie_value]);
         } else {
             $rep = $bdd->prepare($query);
-            $rep->execute([$exclu_id]);
+            $rep->execute([$excepted_id]);
         }
         return $rep->fetchAll();
     }
@@ -294,6 +283,8 @@ class BddManager
 
     /**
      * Vérifie si une date est déjà dans la table qui compte les visites sur l'app.
+     * Cette méthode dépend fortement du format de la table comptant les visites dans
+     * la base de données.
      * 
      * @param string $year
      * @param string $month
@@ -314,8 +305,10 @@ class BddManager
     }
 
     /**
-     * Insère une nouvelle date de visite dans la table compteur_visite.
+     * Insère une nouvelle date de visite dans la table compteur_visite. Cette méthode
+     * dépend fortement du format de la table dans la base de données.
      * 
+     * @param string $table_name Le nom de la table ou on insère le compteur de visite.
      * @param string $year
      * @param string $month
      * @param string $day
@@ -340,22 +333,20 @@ class BddManager
     /**
      * Modifie la valeur du champ d'une table.
      * 
-     * @param string $col 
+     * @param string $col   Le nom de la colonne à mettre à jour.
      * @param string $value 
      * @param string $table 
-     * @param $id   
+     * @param string $where_col_name 
+     * @param $where_col_value
      * 
      * @return bool
      */
-    public function set($col, $value, $table, $id)
+    public function update(string $col, $value, string $table, string $where_col_name, $where_col_value)
     {
-        $query = "UPDATE $table SET $col = :col_value WHERE id = :id";
+        $query = "UPDATE $table SET $col = ? WHERE $where_col_name = ?";
         $rep = $this->pdo->prepare($query);
         $rep->execute(
-            [
-                "col_value" => $value,
-                "id" => $id
-            ]
+            [$value, $where_col_value]
         );
         return true;
     }
@@ -363,44 +354,19 @@ class BddManager
     /**
      * Supprime un item de la base de données.
      * 
-     * @param string $table 
-     * @param $id 
+     * @param string $table           La table de laquelle on supprime la donnée.
+     * @param string $where_col_name  Le nom dela colonne à prendre en compte pour supprimer
+     *                                la données.
+     * @param string $where_col_value Le contenu que la colonne à checker pour supprimer la donnée.
      * 
      * @return bool
      */
-    public function deleteById(string $table, $id)
+    public function delete(string $table, string $where_col_name, $where_col_value)
     {
-        $query = "DELETE FROM $table WHERE id = ?";
+        $query = "DELETE FROM $table WHERE $where_col_name = ?";
         $rep = $this->pdo->prepare($query);
-        $rep->execute([$id]);
+        $rep->execute([$where_col_value]);
         return true;
-    }
-
-    /**
-     * Récupère les données spécifiés de la table spécifiée selon les clauses
-     * spécifiées en paramètre.
-     * 
-     * @param string $to_select    Les colonnes à prendre dans la même chaîne de
-     *                             caractère séparée. Les champs doivent être séparés
-     *                             par une virgule.
-     * @param string $table        La table.
-     * @param string $clause 
-     * @param string $clause_value 
-     * 
-     * @return array Un tableau qui contient les données retournées.
-     */
-    public function select(string $to_select, string $table, string $clause = null, string $clause_value = null) 
-    {
-        $bdd = $this->pdo;
-        $query = "SELECT $to_select FROM $table";
-        if (null !== $clause) {
-            $query .= " WHERE $clause = ?";
-            $rep = $bdd->prepare($query);
-            $rep->execute([$clause_value]);
-        } else {
-            $rep = $bdd->query($query);
-        }
-        return $rep->fetchAll();
     }
 
 }

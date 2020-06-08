@@ -21,7 +21,7 @@ use App\BackEnd\Models\Persons\Administrateur;
 use App\View\Notification;
 use App\BackEnd\Utils\Utils;
 use App\View\View;
-use App\View\Page;
+use App\View\PageBuilder;
 
 try {
     $notification = new Notification();
@@ -62,7 +62,7 @@ try {
         }
         
         $view = new View();
-        $page = new Page($meta_title, $view->connexionFormView($admin_login, $admin_password, $error));
+        $page = new PageBuilder($meta_title, $view->connexionFormView($admin_login, $admin_password, $error));
         echo $page->connexionPage();
 
     } else {

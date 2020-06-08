@@ -64,10 +64,10 @@ HTML;
      */
     public static function manageButtons($item)
     {
-        $buttons = self::button($item->get("edit_url"), "Editer", "btn-primary mr-1", "d-none d-md-inline", "far fa-edit fa-lg");
+        $buttons = self::button($item->get("edit_url"), null, "btn-primary mr-1", "d-none d-md-inline", "far fa-edit fa-lg");
         $buttons .= self::button($item->get("post_url"), "Poster", "btn-success mr-1", "d-none d-md-inline", "fas fa-reply fa-lg");
         $buttons .= self::button($item->get("share_url"), "Partager", "btn-success mr-1", "d-none d-md-inline", "fas fa-share fa-lg");
-        $buttons .= self::button($item->get("delete_url"), "Supprimer", "btn-danger mr-1", "d-none d-md-inline", "far fa-trash-alt fa-lg");
+        $buttons .= self::button($item->get("delete_url"), null, "btn-danger mr-1", "d-none d-md-inline", "far fa-trash-alt fa-lg");
         
         return <<<HTML
         <div class="float-sm-right">
@@ -108,13 +108,7 @@ HTML;
             $result = self::noVideoBox();
         }
 
-        return <<<HTML
-        <div class="row mb-3">
-            <div class="col-12">
-                {$result}
-            </div>
-        </div>
-HTML;
+        return $result;
     }
 
     /**
@@ -188,7 +182,7 @@ HTML;
     {
         $bdd_manager = Model::bddManager();
         $table = Model::getTableNameFrom($exclu->get("categorie"));
-        $items = $bdd_manager->getAllFromTableExcepted($table, $exclu->get("id"), $exclu->get("categorie"));
+        $items = $bdd_manager->getTableExcepted($table, $exclu->get("id"), $exclu->get("categorie"));
         $list = '';
         foreach ($items as $item) {
             $item = Model::returnObject($exclu->get("categorie"), $item["code"]);
@@ -209,6 +203,17 @@ HTML;
     }
 
     /**
+     * Affiche le résumé des commandes de minis services. Les nouvelles commandes,
+     * les commandes en attentes et toutes les commandes.
+     * 
+     * @return string
+     */
+    public static function miniServicesCommandsResume()
+    {
+        
+    }
+
+    /**
      * Affiche les données.
      * 
      * @param $item L'item dont on affiche les données.
@@ -224,13 +229,13 @@ HTML;
         return <<<HTML
         <div class="row mb-3">
             <div class="col-12 col-md-6 mb-3">
-                {$bddData}
-            </div>
-            <div class="col-12 col-md-6">
                 {$thumbs}
             </div>
+            <div class="col-12 col-md-6">
+                {$bddData}
+                {$videoBox}
+            </div>
         </div>
-        {$videoBox}
 HTML;
     }
 
@@ -248,6 +253,30 @@ HTML;
         return <<<HTML
         {$createButton}
         {$deleteItemsButton}
+HTML;
+    }
+
+    /**
+     * Retourne une vue qui affiche l'ensemble des données principales
+     * pour l'item passé en paramètre.
+     * 
+     * @param $item 
+     * 
+     * @return string
+     */
+    public static function bddData($item)
+    {
+        return <<<HTML
+        <div class="card mb-3">
+            <div class="card-header bg-white">Données</div>
+            <div class="card-body">
+                <div>Catégorie : {$item->get("categorie")}</div>
+                <div>Description : {$item->get("description")}</div>
+                <div>Prix : {$item->get("prix")}</div>
+                <div>Date de création : {$item->get("date_creation")}</div>
+                <div>Date de mise à jour : {$item->get("date_modification")}</div>
+            </div>
+        </div>
 HTML;
     }
 
@@ -283,31 +312,7 @@ HTML;
     {
         return <<<HTML
         <iframe src="https://www.youtube.com/embed/{$youtube_video_link}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen class="w-100 video" style="height:30rem"></iframe>
-HTML;
-    }
-
-    /**
-     * Retourne une vue qui affiche l'ensemble des données principales
-     * pour l'item passé en paramètre.
-     * 
-     * @param $item 
-     * 
-     * @return string
-     */
-    public static function bddData($item)
-    {
-        return <<<HTML
-        <div class="card">
-            <div class="card-header bg-white">Données</div>
-            <div class="card-body">
-                <div>Catégorie : {$item->get("categorie")}</div>
-                <div>Description : {$item->get("description")}</div>
-                <div>Prix : {$item->get("prix")}</div>
-                <div>Date de création : {$item->get("date_creation")}</div>
-                <div>Date de mise à jour : {$item->get("date_modification")}</div>
-            </div>
-        </div>
+            allowfullscreen class="w-100 video" style="height:20rem"></iframe>
 HTML;
     }
 
@@ -426,10 +431,8 @@ HTML;
     public static function thumbs($item)
     {
         return <<<HTML
-        <div class="card">
-            <div class="card-header bg-white">Image de couverture</div>
-            <img src="{$item->get('thumbs_src')}" alt="{$item->get('image_name')}" class="img-fluid"/>
-        </div>
+        <img src="{$item->get('thumbs_src')}" alt="{$item->get('image_name')}" class="img-fluid"/>
+        <p class="text-muted p-3 bg-white">Image de couverture</p>
 HTML;
     }
 

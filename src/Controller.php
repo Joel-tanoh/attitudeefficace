@@ -8,11 +8,10 @@
 
 namespace App;
 
-use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Model;
 use App\BackEnd\Utils\Validator;
 use App\BackEnd\Utils\Utils;
-use App\View\Page;
+use App\View\PageBuilder;
 use App\View\View;
 use App\View\Notification;
 
@@ -22,13 +21,14 @@ use App\View\Notification;
  * @author Joel <joel.developpeur@gmail.com>
  */
 class Controller{
+
     private $url;
     private $categorie;
 
     /**
      * Permet d'instancier un controlleur.
      * 
-     * @param array $this->url 
+     * @param array $url 
      * 
      * @return void
      */
@@ -46,7 +46,7 @@ class Controller{
     public function publicAccueilPage()
     {
         $meta_title = "Bienvenu sur " . APP_NAME;
-        $page = new Page($meta_title, View::publicAccueilView());
+        $page = new PageBuilder($meta_title, View::publicAccueilView());
         Utils::appVisitCounter();
         echo $page->publicPage();
     }
@@ -59,7 +59,7 @@ class Controller{
     public function dashboard()
     {
         $meta_title = "Tableau de bord";
-        $page = new Page($meta_title, View::adminDashboardView());
+        $page = new PageBuilder($meta_title, View::adminDashboardView());
         echo $page->adminPage();
     }
       
@@ -72,8 +72,15 @@ class Controller{
     {
         $bdd_manager = Model::bddManager();
         $meta_title = "Mes " . Model::getCategorieFormated($this->categorie, "pluriel");
-        $items = $bdd_manager->getAllFrom(Model::getTableNameFrom($this->categorie), $this->categorie);
-        $page = new Page($meta_title, View::listItemsView($items, $this->categorie));
+        $items = $bdd_manager->get("code", Model::getTableNameFrom($this->categorie), "categorie", $this->categorie);
+        
+        if ($this->categorie === "minis-services") {
+            $view = View::listMiniservicesView($items);
+        } else {
+            $view = View::listItemsView($items, $this->categorie);
+        }
+
+        $page = new PageBuilder($meta_title, $view);
         echo $page->adminPage();
     }
 
@@ -86,8 +93,8 @@ class Controller{
     {
         $bdd_manager = Model::bddManager();
         $meta_title = "Utilisateurs";
-        $accounts = $bdd_manager->getAllFrom(Model::getTableNameFrom( $this->categorie ), "utilisateur");
-        $page = new Page($meta_title, View::listAccountsView($accounts));
+        $accounts = $bdd_manager->get("code", Model::getTableNameFrom( $this->categorie ), "categorie", "utilisateur");
+        $page = new PageBuilder($meta_title, View::listAccountsView($accounts));
         echo $page->adminPage();
     }
 
@@ -100,7 +107,7 @@ class Controller{
     {
         $meta_title = "Motivation plus";
         $videos = Model::getchildrenOf("-1", "videos");
-        $page = new Page($meta_title, View::listMotivationPlusVideosView($videos));
+        $page = new PageBuilder($meta_title, View::listMotivationPlusVideosView($videos));
         echo $page->adminPage();
     }
 
@@ -134,9 +141,9 @@ class Controller{
         }
 
         if ($this->categorie === "motivation-plus") {
-            $page = new Page($meta_title, View::createMotivationPlusVideoView($errors));
+            $page = new PageBuilder($meta_title, View::createMotivationPlusVideoView($errors));
         } else {
-            $page = new Page($meta_title, View::createItemView($this->categorie, $errors));
+            $page = new PageBuilder($meta_title, View::createItemView($this->categorie, $errors));
         }
 
         echo $page->adminPage();
@@ -158,7 +165,7 @@ class Controller{
                 Model::createItem("videos", $_POST);
             }
         }
-        $page = new Page($meta_title, View::createMotivationPlusVideoView($errors));
+        $page = new PageBuilder($meta_title, View::createMotivationPlusVideoView($errors));
         echo $page->adminPage();
     }
 
@@ -171,7 +178,7 @@ class Controller{
     {
         $item = Model::getObjectBy("slug", $this->url[1], Model::getTableNameFrom($this->categorie), $this->categorie);
         $meta_title = ucfirst($item->get("categorie")) . ' &#8250; ' . ucfirst($item->get("title"));
-        $page = new Page($meta_title, View::readItemView($item));
+        $page = new PageBuilder($meta_title, View::readItemView($item));
         echo $page->adminPage();
     }
 
@@ -194,7 +201,7 @@ class Controller{
             }
         }
 
-        $page = new Page($meta_title, View::editItemView($item, $this->categorie, $errors));
+        $page = new PageBuilder($meta_title, View::editItemView($item, $this->categorie, $errors));
         echo $page->adminPage();
     }
 
@@ -212,7 +219,7 @@ class Controller{
             $to_delete = Model::getchildrenOf("-1", "videos");
         } else {
             $meta_title = "Supprimer des " . Model::getCategorieFormated($this->categorie, "pluriel");
-            $to_delete = $bdd_manager->getAllFrom(Model::getTableNameFrom($this->categorie), $this->categorie);
+            $to_delete = $bdd_manager->get("code", Model::getTableNameFrom($this->categorie), "categorie", $this->categorie);
         }
 
         if (isset($_POST["suppression"])) {
@@ -225,7 +232,7 @@ class Controller{
             }
         }
 
-        $page = new Page($meta_title, View::deleteItemsView($to_delete, $this->categorie, $error));
+        $page = new PageBuilder($meta_title, View::deleteItemsView($to_delete, $this->categorie, $error));
         echo $page->adminPage();
     }
 
@@ -251,7 +258,7 @@ class Controller{
     function adminError404()
     {
         $meta_title = "Page non trouvée";
-        $page = new Page($meta_title, View::adminError404View());
+        $page = new PageBuilder($meta_title, View::adminError404View());
         echo $page->adminPage();
     }
 
@@ -264,7 +271,7 @@ class Controller{
     function publicError404()
     {
         $meta_title = "Page non trouvée";
-        $page = new Page($meta_title, View::publicError404View());
+        $page = new PageBuilder($meta_title, View::publicError404View());
         echo $page->publicPage();
     }
 

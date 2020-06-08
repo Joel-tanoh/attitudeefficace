@@ -9,7 +9,6 @@
 namespace App\View;
 
 use App\Router;
-use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Model;
 use App\View\Notification;
 use App\View\Form;
@@ -120,7 +119,8 @@ HTML;
     {
         $bdd_manager = Model::bddManager();
         $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-        $number_of_items = $bdd_manager->countTableItems(
+        $number_of_items = $bdd_manager->count(
+            "id",
             Model::getTableNameFrom(Router::getUrlAsArray()[0]),
             "categorie",
             Router::getUrlAsArray()[0]
@@ -140,9 +140,7 @@ HTML;
         }
 
         return <<<HTML
-        <div class="">
-            {$listItemsContentHeader}
-        </div>
+        {$listItemsContentHeader}
         <section class="row">
             {$content}
         </section>
@@ -159,7 +157,7 @@ HTML;
     public static function listMotivationPlusVideosView(array $videos)
     {
         $bdd_manager = Model::bddManager();
-        $number_of_videos = $bdd_manager->countTableItems("item_childs", "categorie", "videos");
+        $number_of_videos = $bdd_manager->count("id", "item_childs", "categorie", "videos");
         if (empty($videos)) {
             $videos_list = null;
         } else {
@@ -180,7 +178,56 @@ HTML;
     }
 
     /**
-     * Page de listing des comptes administrateurs et utilisateurs.
+     * La vue qui liste les minis services et affiche le résumé des commandes de minis
+     * service.
+     * 
+     * @param array $items      La liste des items à lister.
+     * 
+     * @return string Code HTML de la page qui liste les mini services.
+     */
+    public static function listMiniservicesView(array $items)
+    {
+        $bdd_manager = Model::bddManager();
+        $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
+        $number_of_items = $bdd_manager->count(
+            "id",
+            Model::getTableNameFrom(Router::getUrlAsArray()[0]),
+            "categorie",
+            Router::getUrlAsArray()[0]
+        );
+
+        $listItemsContentHeader = Snippet::listItemsContentHeader($title, $number_of_items);
+        $miniServiceCommandsResume = 'Ici vous aurez le résumé des vos commandes de minis services';
+
+        if (empty($items)) {
+            $notification = new Notification();
+            $content = '<div class="col-12">'. $notification->info($notification->noItems("minis-services")) .'</div>';
+        } else {
+            $list = "";
+            foreach ($items as $item) {
+                $object = Model::returnObject("minis-services", $item["code"]);
+                $list .= Card::card($object->get("thumbs_src"), $object->get("title"), $object->get("admin_url"), $object->get("day_creation"));
+            }
+            $content = $list;
+        }
+
+        return <<<HTML
+        {$listItemsContentHeader}
+        <section class="row mb-3">
+            <section class="col-12 col-md-9 mb-3">
+                <div class="row pl-2">
+                    {$content}
+                </div>
+            </section>
+            <section class="col-12 col-md-3">
+                {$miniServiceCommandsResume}
+            </section>
+        </section>
+HTML;
+    }
+
+    /**
+     * Vue de listing des comptes administrateurs et utilisateurs.
      * 
      * @param $accounts Un tableau qui contient les variables qui viennent de la base
      *                  de données.
@@ -329,7 +376,7 @@ HTML;
     }
 
     /**
-     * Page 404 de la partie publique.
+     * Vue 404 de la partie publique.
      * 
      * @return string
      */
@@ -342,7 +389,7 @@ HTML;
             <h2 class="text-warning">404</h2>
             <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page non trouvée.</h3>
             <p>
-                Nous n'avons pas retrouvé la page que vous cherchez. Elle n'a peut être pas encore été développée.
+                Nous n'avons pas retrouvé la page que vous cherchez.
                 Retour à la <a href="{$public_url}">page d'acceuil</a>.
             </p>
         </section>
@@ -350,7 +397,7 @@ HTML;
     }
 
     /**
-     * Page 404 de la partie administration.
+     * Vue 404 de la partie administration.
      * 
      * @return string
      */

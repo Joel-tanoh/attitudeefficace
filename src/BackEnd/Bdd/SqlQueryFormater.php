@@ -210,6 +210,18 @@ class SqlQueryFormater
     }
 
     /**
+     * Retourne une requête pour compter les entrées d'une table.
+     * 
+     * @param string $to_count La colonne sur laquelle on veut compter les entrées.
+     * 
+     * @return self
+     */
+    public function count(string $to_count)
+    {
+        $this->select("count($to_count)");
+    }
+
+    /**
      * Retourne la requête finale sous forme de chaîne de caractère.
      * 
      * @return string
@@ -258,40 +270,5 @@ class SqlQueryFormater
         }
 
         return $this->query;
-    }
-
-    /**
-     * Permet de compter le nombre d'entrée dans une table.
-     * 
-     * @param string $table_name [[Description]]
-     * 
-     * @return [[Type]] [[Description]]
-     */
-    public static function countTableItem($table_name)
-    {
-        $bdd = BddManager::connectToDb();
-        $query = $bdd->prepare("SELECT COUNT(*) FROM $table_name");
-        $query->execute(
-            ["table_name" => $table_name]
-        );
-        return $query->fetch();
-    }
-    
-    /**
-     * Remet l'auto_increment d'une table à 1 si elle ne contient pas d'occurrences.
-     * 
-     * @param string $table_name [[Description]]
-     * 
-     * @return bool
-     */
-    public static function autoIncrementTo1($table_name)
-    {
-        $bdd = BddManager::connectToDb();
-        if (self::countTableItem($table_name) == 0) {
-            $query = $bdd->prepare("ALTER TABLE $table_name auto_increment = 1");
-            $query->execute(
-                ["table_name" => $table_name]
-            );
-        }
     }
 }

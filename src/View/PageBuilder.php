@@ -16,7 +16,6 @@
 namespace App\View;
 
 use App\View\Template;
-use App\View\View;
 
 /**
  * Classe qui gère tout ce qui est en rapport à une page.
@@ -28,7 +27,7 @@ use App\View\View;
  * @version  Release: 1
  * @link     Link
  */
-class Page
+class PageBuilder extends View
 {
     private $meta_title;
     private $description;

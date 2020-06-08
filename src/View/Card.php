@@ -40,8 +40,8 @@ HTML;
 
         if (null !== $date_created) {
             $date_created = <<<HTML
-            <div>
-                <i class="far fa-clock mr-2"></i><span>Ajoutée le {$date_created} </span>
+            <div class="text-small">
+                <i class="far fa-clock"></i> <span>Ajoutée le {$date_created} </span>
             </div>
 HTML;
         }
@@ -57,6 +57,40 @@ HTML;
                     </div>
                 </div>
             </a>
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne une box pour les informations de types chillres avec un
+     * petit texte.
+     * 
+     * @param mixed  $number     Le chiffre à afficher. Peut être une chaine de
+     *                           caractère ou un nombre.
+     * @param string $small_text Le petit texte à afficher en dessous du chiffre.
+     * @param string $href       Le lien vers lequel l'on est dirigé en cliquant sur
+     *                           la box.
+     * 
+     * @return string
+     */
+    public static function boxInfo($number, string $small_text, string $href = null)
+    {
+        $href = null !== $href 
+            ? '<a href="' . $href. '" class="small-box-footer">Plus d\'info <i class="fas fa-arrow-circle-right"></i></a>'
+            : null
+        ;
+        return <<<HTML
+        <div class="small-box bg-info">
+            <div class="inner">
+            <h3>{$number}</h3>
+
+            <p>{$small_text}</p>
+            </div>
+            <div class="icon">
+            <i class="ion ion-bag"></i>
+            </div>
+            {$href}
+        </div>
         </div>
 HTML;
     }

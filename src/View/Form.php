@@ -740,17 +740,16 @@ HTML;
      * l'item enfant que l'utlisateur veut créer.
      * 
      * @param string $categorie 
-     * @param string $label  
      * 
      * @return string
      */
-    private static function parentList($categorie = null, $label = null)
+    private static function parentList($categorie = null)
     {
         $options = null;
         $bdd_manager = Model::bddManager();
-        $items = $bdd_manager->getAllFrom(ItemParent::TABLE_NAME);
-        foreach ($items as $i) {
-            $item = Model::returnObject($categorie, $i["code"]);
+        $items = $bdd_manager->get("code", ItemParent::TABLE_NAME);
+        foreach ($items as $item) {
+            $item = Model::returnObject($categorie, $item["code"]);
             $options .= '<option value="'. $item->get("id") . '">';
             $options .= ucfirst($item->get("title"));
             $options .= ' - ';
