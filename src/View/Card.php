@@ -70,27 +70,26 @@ HTML;
      * @param string $small_text Le petit texte à afficher en dessous du chiffre.
      * @param string $href       Le lien vers lequel l'on est dirigé en cliquant sur
      *                           la box.
+     * @param string $bg_color   La couleur d'arrière plan de la box.
      * 
      * @return string
      */
-    public static function boxInfo($number, string $small_text, string $href = null)
+    public static function boxInfo($number, string $small_text, string $href = null, string $bg_color = "info")
     {
         $href = null !== $href 
-            ? '<a href="' . $href. '" class="small-box-footer">Plus d\'info <i class="fas fa-arrow-circle-right"></i></a>'
+            ? '<a href="' . $href. '" class="small-box-footer text-white">Plus d\'info <i class="fas fa-arrow-circle-right"></i></a>'
             : null
         ;
         return <<<HTML
-        <div class="small-box bg-info">
-            <div class="inner">
-            <h3>{$number}</h3>
+        <div class="col-6 mb-3">
+            <div class="small-box text-small text-white bg-{$bg_color} rounded p-2">
+                <div class="inner">
+                    <h3>{$number}</h3>
 
-            <p>{$small_text}</p>
+                    <p>{$small_text}</p>
+                    {$href}
+                </div>
             </div>
-            <div class="icon">
-            <i class="ion ion-bag"></i>
-            </div>
-            {$href}
-        </div>
         </div>
 HTML;
     }

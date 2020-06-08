@@ -197,7 +197,7 @@ HTML;
         );
 
         $listItemsContentHeader = Snippet::listItemsContentHeader($title, $number_of_items);
-        $miniServiceCommandsResume = 'Ici vous aurez le résumé des vos commandes de minis services';
+        $miniServiceCommandsResume = Snippet::miniServicesCommandsResume();
 
         if (empty($items)) {
             $notification = new Notification();
@@ -215,7 +215,7 @@ HTML;
         {$listItemsContentHeader}
         <section class="row mb-3">
             <section class="col-12 col-md-9 mb-3">
-                <div class="row pl-2">
+                <div class="row px-2">
                     {$content}
                 </div>
             </section>

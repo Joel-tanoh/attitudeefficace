@@ -210,7 +210,24 @@ HTML;
      */
     public static function miniServicesCommandsResume()
     {
+        $bdd_manager = Model::bddManager();
+
+        $new_commands = $bdd_manager->count("id", "commands_miniservices", "statut", "nouvelle");
+        $newCommandsBoxInfo = Card::boxInfo($new_commands, "Nouvelles commandes", ADMIN_URL . "/minis-services/commands/new", "success");
         
+        $waiting_commands = $bdd_manager->count("id", "commands_miniservices", "statut", "en attente");
+        $waitingCommandsBoxInfo = Card::boxInfo($new_commands, "Commandes en attente", ADMIN_URL . "/minis-services/commands/en_attente", "warning");
+        
+        $all_commands = $bdd_manager->count("id", "commands_miniservices");
+        $allCommandsBoxInfo = Card::boxInfo($new_commands, "Commandes totales", ADMIN_URL . "/minis-services/commands", "primary");
+
+        return <<<HTML
+        <div class="row px-2">
+            {$newCommandsBoxInfo}
+            {$waitingCommandsBoxInfo}
+            {$allCommandsBoxInfo}
+        </div>
+HTML;
     }
 
     /**
