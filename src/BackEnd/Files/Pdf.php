@@ -37,19 +37,19 @@ class Pdf extends File
      */
     public function isPDF()
     {
-        return $this->extension == 'pdf';
+        return $this->extension === 'pdf';
     }
 
     /**
      * Permet de sauvegarder un fichier pdf qui vient d'être uploadé.
      * 
-     * @param string $pdf_name 
+     * @param string $pdfName 
      * 
      * @return true
      */
-    public function savePdfFile($pdf_name)
+    public function savePdfFile($pdfName)
     {
-        $destination = PDF_PATH . $pdf_name . PDF_EXTENSION;
+        $destination = PDF_PATH . $pdfName . PDF_EXTENSION;
         if (!empty($_FILES["pdf_uploaded"]["name"])) {
             if (!move_uploaded_file($_FILES["pdf_uploaded"]["tmp_name"], $destination)) {
                 throw new Exception("Echec de l'enregistrement du fichier Pdf");

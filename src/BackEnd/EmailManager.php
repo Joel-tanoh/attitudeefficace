@@ -16,7 +16,7 @@
 namespace App\BackEnd;
 
 use App\BackEnd\Bdd\BddManager;
-use App\BackEnd\Models\Persons\Suscriber;
+use App\BackEnd\Models\Users\Suscriber;
 
 /**
  * Gère les envois d'email.
@@ -36,7 +36,7 @@ class EmailManager
     private $subject;
     private $message;
     private $from;
-    private $joined_file;
+    private $joinFile;
 
     /**
      * Constructeur de EmailManager
@@ -45,17 +45,17 @@ class EmailManager
      * @param mixed  $subject      Le sujet du mail.
      * @param string $message      Le message à envoyer.
      * @param string $from         L'email d'envoie qui apparaitra dans le mail.
-     * @param bool   $joined_file  True si le mail contient des fichiers joints.
+     * @param bool   $joinFile  True si le mail contient des fichiers joints.
      * 
      * @return void
      */
-    public function __construct($destinataires, string $subject, string $message, string $from, bool $joined_file)
+    public function __construct($destinataires, string $subject, string $message, string $from = null, bool $joinFile = null)
     {
         $this->destinataires = $destinataires;
         $this->subject = $subject;
         $this->message = $message;
         $this->from = $from;
-        $this->joined_file = $joined_file;
+        $this->joinFile = $joinFile;
     }
 
     /**
@@ -63,7 +63,7 @@ class EmailManager
      * 
      * @return bool
      */
-    public function sendMail()
+    public function send()
     {
         if (!empty($this->destinataires)) {
             $send_mail_counter = 0;
@@ -86,7 +86,7 @@ class EmailManager
         $headers = "MIME-Version: 1.0" . $separator;
         $headers .= "Content-type:text/html;charset=UTF-8" . $separator;
         $headers .= "From: " . $this->from . $separator;
-        if ($this->joined_file) {}
+        if ($this->joinFile) {}
         return $headers;
     }
 

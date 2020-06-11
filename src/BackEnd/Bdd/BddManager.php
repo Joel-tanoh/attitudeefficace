@@ -33,38 +33,38 @@ use App\BackEnd\Bdd\SqlQueryFormater;
 class BddManager
 {
     private $sgbd;
-    private $db_address; 
-    private $db_name;
-    private $db_charset;
-    private $db_login;
-    private $db_password;
+    private $dbAddress; 
+    private $dbName;
+    private $dbCharset;
+    private $dbLogin;
+    private $dbPassword;
     private $pdo;
 
     /**
      * Permet d'instanceier un BddManager.
      * 
-     * @param string $db_name     Le nom de la base de données.
-     * @param string $db_login    Le login pour se connecter à la base de données.
-     * @param string $db_password Le mot de passe pour se connecter à la base de données.
-     * @param string $db_address  L'adresse ip du serveur.
-     * @param string $sgbd        Le système de gestion de la base de données.
-     * @param string $db_charset  L'encodage des caractères.
+     * @param string $dbName     Le nom de la base de données.
+     * @param string $dbLogin    Le login pour se connecter à la base de données.
+     * @param string $dbPassword Le mot de passe pour se connecter à la base de données.
+     * @param string $dbAddress  L'adresse ip du serveur.
+     * @param string $sgbd       Le système de gestion de la base de données.
+     * @param string $dbCharset  L'encodage des caractères.
      * 
      */
     public function __construct(
-        string $db_name,
-        string $db_login,
-        string $db_password,
-        string $db_address = "127.0.0.1",
+        string $dbName = null,
+        string $dbLogin = null ,
+        string $dbPassword = null ,
+        string $dbAddress = "127.0.0.1",
         string $sgbd = "mysql",
-        string $db_charset = "utf8"
+        string $dbCharset = "utf8"
     ) {
-        $this->db_name = $db_name;
-        $this->db_login = $db_login;
-        $this->db_password = $db_password;
-        $this->db_address = $db_address;
+        $this->dbName = null !== DB_NAME ? DB_NAME : $dbName;
+        $this->dbLogin = null !== DB_LOGIN ? DB_LOGIN : $dbLogin;
+        $this->dbPassword = null !== DB_PASSWORD ? DB_PASSWORD : $dbPassword;
+        $this->dbAddress = null !== DB_ADDRESS ? DB_ADDRESS : $dbAddress;
         $this->sgbd = $sgbd;
-        $this->db_charset = $db_charset;
+        $this->dbCharset = $dbCharset;
         $this->pdo = $this->connect();
     }
 
@@ -76,7 +76,7 @@ class BddManager
     public function connect() {
         try {
             return new PDO(
-                $this->sgbd. ':host=' .$this->db_address. '; dbname=' .$this->db_name. '; charset=' .$this->db_charset, $this->db_login, $this->db_password,
+                $this->sgbd.':host='.$this->dbAddress.';dbname='.$this->dbName.'; charset='.$this->dbCharset, $this->dbLogin, $this->dbPassword,
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -103,231 +103,57 @@ class BddManager
      * paramètre le nom d'une table et optionnellement la catégorie de données à 
      * retourner.
      * 
-     * @param string $to_get          La ou les noms des colonnes qu'on veut récupérer.
-     *                                Si vous voulez récupérer plusieurs colonnes, vous passez les noms
-     *                                des colonnes dans la même chaîne de caractères en les séparant par
-     *                                une virgule.
-     * @param string $table_name      Le nom de la table de laquelle récupérer les
-     *                                occurences.
-     * @param string $where_col_name  La colonne sur laquelle on fait la clause where
-     *                                spécifier l'élément à retourner.
-     * @param string $where_col_value La valeur de la clause pour spécifier l'élément qu'on veut
-     *                                précisement.
+     * @param string $toGet         La ou les noms des colonnes qu'on veut récupérer.
+     *                              Si vous voulez récupérer plusieurs colonnes, vous passez les noms
+     *                              des colonnes dans la même chaîne de caractères en les séparant par
+     *                              une virgule.
+     * @param string $tableName     Le nom de la table de laquelle récupérer les
+     *                              occurences.
+     * @param string $whereColName  La colonne sur laquelle on fait la clause where
+     *                              spécifier l'élément à retourner.
+     * @param string $whereColValue La valeur de la clause pour spécifier l'élément qu'on veut
+     *                              précisement.
      * 
-     * @return array Tableau qui contient les occurences de la table passée en param.
+     * @return array Tableau qui contient les occurences demandées.
      */
-    public function get(string $to_get, string $table_name, string $where_col_name = null, $where_col_value = null)
+    public function get(string $toGet, string $tableName, string $whereColName = null, $whereColValue = null)
     {
-        $query = "SELECT $to_get FROM $table_name";
-        if (null !== $where_col_name) {
-            $query .= " WHERE $where_col_name = ?";
+        $query = "SELECT $toGet FROM $tableName";
+
+        if (null !== $whereColName) {
+            $query .= " WHERE $whereColName = ?";
             $rep = $this->pdo->prepare($query);
-            $rep->execute([$where_col_value]);
+            $rep->execute([$whereColValue]);
         } else {
             $rep = $this->pdo->query($query);
         }
+
         return $rep->fetchAll();
     }
 
     /**
-     * Retourne le code d'un item dont les paramètres sont passés en paramètres.
+     * Compte toutes les occurences d'une table. On peut lui passer une clause where
      * 
-     * @param string $to_get          Le nom de la colonne dont on veut récupére la valeur.
-     * @param string $where_col_name  La colonne sur laquelle on fait la clause where
-     *                                spécifier l'élément à retourner.
-     * @param string $where_col_value La valeur de la clause pour spécifier l'élément qu'on veut
-     *                                précisement.
-     * @param string $table           La table de laquelle on récupère la donnée.
-     * 
-     * @return string Code de l'item.
-     */
-    public function getItemBy(string $to_get, string $where_col_name = null, string $where_col_value = null, string $table = null)
-    {
-        $sql_query = new SqlQueryFormater();
-        $query = $sql_query
-            ->select($to_get)
-            ->from($table)
-            ->where($where_col_name . " = ?")
-            ->returnQueryString();
-        $rep = $this->pdo->prepare($query);
-        $rep->execute([$where_col_value]);
-        return $rep->fetch()["code"];
-    }
-
-    /**
-     * Compte toutes les occurences d'une table.
-     * 
-     * @param string $to_count       La colonne à compter.
-     * @param string $table          Le nom de table.
-     * @param string $where_col_name Une clause sur les éléments à compter.
-     * @param mixed  $where_col_value    La valeur de la colonne.
+     * @param string $colToCount    La colonne à compter.
+     * @param string $tableName     Le nom de table.
+     * @param string $whereColName  Une clause sur les éléments à compter.
+     * @param mixed  $whereColValue La valeur de la colonne.
      * 
      * @return string|int
      */
-    public function count(string $to_count, string $table = null, string $where_col_name = null, $where_col_value = null)
+    public function count(string $colToCount, string $tableName = null, string $whereColName = null, $whereColValue = null)
     {
-        $query = "SELECT COUNT(" . $to_count . ") AS count FROM " . $table;
-        if (null !== $where_col_name) {
-            $query .= " WHERE $where_col_name = ?";
+        $query = "SELECT COUNT(" . $colToCount . ") AS count FROM " . $tableName;
+
+        if (null !== $whereColName) {
+            $query .= " WHERE $whereColName = ?";
             $rep = $this->pdo->prepare($query);
-            $rep->execute([$where_col_value]);
+            $rep->execute([$whereColValue]);
         } else {
             $rep = $this->pdo->query($query);
         }
+        
         return $rep->fetch()["count"];
-    }
-
-    /**
-     * Permet de vérifier qu'une donnée existe dans le base de données.
-     * 
-     * @param string $table 
-     * @param string $col 
-     * @param string $col_value 
-     * 
-     * @return bool
-     */
-    public function checkIsset(string $table, string $col, string $col_value)
-    {
-        return $this->count("id", $table, $col, $col_value) != 0;
-    }
-
-    /**
-     * Retourne les occurences d'une table en excluant celui dont l'id est passé en
-     * paramètre.
-     * 
-     * @param string $table 
-     * @param string $excepted_id Id de l'élément à exclure de la liste des résultats.
-     * @param string $categorie_value   On passe cette variable si on veut donner une clause
-     *                            where sur le champ catégorie.
-     * 
-     * @return array
-     */
-    public function getTableExcepted(string $table, $excepted_id, string $categorie_value = null)
-    {
-        $bdd = $this->pdo;
-        $query = "SELECT code FROM $table WHERE id !== ?";
-        if (null !== $categorie_value) {
-            $query .= " AND categorie = ?";
-            $rep = $bdd->prepare($query);
-            $rep->execute([(int)$excepted_id, $categorie_value]);
-        } else {
-            $rep = $bdd->prepare($query);
-            $rep->execute([$excepted_id]);
-        }
-        return $rep->fetchAll();
-    }
-    
-    /**
-     * Retourne la valeur maximale d'un champ.
-     * 
-     * @param string $col          La colonne.
-     * @param string $table        La table
-     * @param string $group_by     La colonne sur laquelle on fait un regroupement.
-     * @param string $having       La colonne de la clause HAVING
-     * @param string $having_value La valeur de triage de la clause HAVING
-     * 
-     * @return array
-     */
-    public function getMaxValueOf(string $col, string $table, string $group_by = null, string $having = null, string $having_value = null)
-    {
-        $alias = $col."_max";
-        $query = "SELECT MAX($col) as $alias FROM $table";
-        if (null !== $group_by) {
-            $query .= " GROUP BY $group_by";
-        }
-        if (null !== $having) {
-            $query .= " HAVING $having = '$having_value'";
-        }
-        $rep = $this->pdo->query($query);
-        return (int)$rep->fetch()[$alias];
-    }
-    
-    /**
-     * Retourne les items qui ont une valeur supérieure ou égale à la valeur passée
-     * en paramètre.
-     * 
-     * @param string $table     Le nom de la table où on doit récupérer les items.
-     * @param string $col       Un nom de champ dont les valeurs doivent être des
-     *                          entiers.
-     * @param int    $col_value La valeur de comparaison.
-     * @param string $categorie      
-     * 
-     * @return array
-     */
-    public function getItemsOfColValueMoreOrEqualTo(string $table = null, string $col = null, int $col_value = null, string $categorie = null)
-    {
-        $query = "SELECT code FROM $table WHERE $col >= ? AND categorie = ?";
-        $rep = $this->pdo->prepare($query);
-        $rep->execute([$col_value, $categorie,]);
-        return $rep->fetchAll();
-    }
-
-    /**
-     * Incrémente ou décrémente une propriété dont la valeur est un entier.
-     * 
-     * @param string $action Increment ou decrement.
-     * @param string $col    La colonne dont on veut incrémenter ou décrémenter la valeur.
-     * @param string $table  Le nom de la table de l'item à modifier.
-     * @param $id     Id L'item dont on veut incrémenter ou décrémenter la valeur.
-     * 
-     * @return bool
-     */
-    public function incOrDecColValue(string $action, string $col, string $table, $id)
-    {
-        $query = "UPDATE $table SET $col = ";
-        $query .= $action == "increment" ? "$col+1" : "$col-1";
-        $query .= " WHERE id = " . $id;
-        $this->pdo->query($query);
-        return true;
-    }
-
-    /**
-     * Vérifie si une date est déjà dans la table qui compte les visites sur l'app.
-     * Cette méthode dépend fortement du format de la table comptant les visites dans
-     * la base de données.
-     * 
-     * @param string $year
-     * @param string $month
-     * @param string $day
-     * 
-     * @return array
-     */
-    public function verifyDateVisitIsset(string $year, string $month, string $day)
-    {
-        $query = "SELECT id, COUNT(id) as date_isset FROM compteur_visites WHERE year = :year AND month = :month AND day = :day";
-        $rep = $this->pdo->prepare($query);
-        $rep->execute([
-            "year" => $year,
-            "month" => $month,
-            "day" => $day
-        ]);
-        return $rep->fetch();
-    }
-
-    /**
-     * Insère une nouvelle date de visite dans la table compteur_visite. Cette méthode
-     * dépend fortement du format de la table dans la base de données.
-     * 
-     * @param string $table_name Le nom de la table ou on insère le compteur de visite.
-     * @param string $year
-     * @param string $month
-     * @param string $day
-     * @param int    $nombre_visite
-     * 
-     * @return bool
-     */
-    public function insertNewVisit(string $year, string $month, string $day, int $nombre_visite = 1)
-    {
-        $query = "INSERT INTO compteur_visites(year, month, day, nombre_visite)
-            VALUES(:year, :month, :day, :nombre_visite)";
-        $rep = $this->pdo->prepare($query);
-        $rep->execute([
-            "year" => $year,
-            "month" => $month,
-            "day" => $day,
-            "nombre_visite" => $nombre_visite,
-        ]);
-        return true;
     }
 
     /**
@@ -335,18 +161,18 @@ class BddManager
      * 
      * @param string $col   Le nom de la colonne à mettre à jour.
      * @param string $value 
-     * @param string $table 
-     * @param string $where_col_name 
-     * @param $where_col_value
+     * @param string $tableName 
+     * @param string $whereColName 
+     * @param $whereColValue
      * 
      * @return bool
      */
-    public function update(string $col, $value, string $table, string $where_col_name, $where_col_value)
+    public function update(string $col, $value, string $tableName, string $whereColName, $whereColValue)
     {
-        $query = "UPDATE $table SET $col = ? WHERE $where_col_name = ?";
+        $query = "UPDATE $tableName SET $col = ? WHERE $whereColName = ?";
         $rep = $this->pdo->prepare($query);
         $rep->execute(
-            [$value, $where_col_value]
+            [$value, $whereColValue]
         );
         return true;
     }
@@ -354,18 +180,150 @@ class BddManager
     /**
      * Supprime un item de la base de données.
      * 
-     * @param string $table           La table de laquelle on supprime la donnée.
-     * @param string $where_col_name  Le nom dela colonne à prendre en compte pour supprimer
+     * @param string $tableName           La table de laquelle on supprime la donnée.
+     * @param string $whereColName  Le nom dela colonne à prendre en compte pour supprimer
      *                                la données.
-     * @param string $where_col_value Le contenu que la colonne à checker pour supprimer la donnée.
+     * @param string $whereColValue Le contenu que la colonne à checker pour supprimer la donnée.
      * 
      * @return bool
      */
-    public function delete(string $table, string $where_col_name, $where_col_value)
+    public function delete(string $tableName, string $whereColName, $whereColValue)
     {
-        $query = "DELETE FROM $table WHERE $where_col_name = ?";
+        $query = "DELETE FROM $tableName WHERE $whereColName = ?";
         $rep = $this->pdo->prepare($query);
-        $rep->execute([$where_col_value]);
+        $rep->execute([$whereColValue]);
+        return true;
+    }
+
+    /**
+     * Permet de vérifier qu'une donnée existe dans le base de données. On peut lui
+     * passer une clause wher
+     * 
+     * @param string $colCheck      La colonne à vérifier.
+     * @param string $tableName     Le nom de la table.
+     * @param string $whereColName  Une clause where sur cette colonne pour spécifier
+     *                              quelle occurennce on veut checker.
+     * @param string $whereColValue La valeur qui permet de donner l spécification.
+     * 
+     * @return bool
+     */
+    public function checkIsset(string $colToCheck, string $tableName, string $whereColName = null, $whereColValue = null)
+    {
+        return $this->count($colToCheck, $tableName, $whereColName, $whereColValue) != 0;
+    }
+
+    /**
+     * Retourne les occurences d'une table en excluant celui dont la valeur de propriété
+     * est passée en paramètre.
+     * 
+     * @param string $colToGet      La ou les colonnes qu'on veut récupérer.
+     * @param string $tableName     Le nom de la table.
+     * @param string $colForExcept  C'est le nom de la colonne à prendre en compte pour rétirer
+     *                              l'élémént.
+     * @param string $exceptedValue Id de l'élément à exclure de la liste des résultats.
+     * @param string $whereColName  Une colonne sur laquelle on peut passer une clause pour
+     *                              spécifier les occurences
+     *                              à retourner.
+     * @param string $whereColValue On passe cette variable si on veut donner une clause
+     *                              where sur le champ catégorie.
+     * 
+     * @return array
+     */
+    public function getTableOccurencesExecepted(string $colToGet, string $tableName, string $colForExcept, $exceptedValue, string $whereColName, string $whereColValue = null)
+    {
+        $pdo = $this->pdo;
+        $query = "SELECT $colToGet FROM $tableName WHERE $colForExcept !== ?";
+
+        if (null !== $whereColName) {
+            $query .= " AND $whereColName = ?";
+            $rep = $pdo->prepare($query);
+            $rep->execute([$exceptedValue, $whereColValue]);
+        } else {
+            $rep = $pdo->prepare($query);
+            $rep->execute([$exceptedValue]);
+        }
+
+        return $rep->fetchAll();
+    }
+    
+    /**
+     * Retourne la valeur maximale d'un champ.
+     * 
+     * @param string $colName       Le nom de la colonne.
+     * @param string $tableName     Le nom de la table.
+     * @param string $groupBy       La colonne sur laquelle on fait un regroupement.
+     * @param string $havingColName La colonne de la clause HAVING
+     * @param string $valueToHave   La valeur de triage de la clause HAVING
+     * 
+     * @return int
+     */
+    public function getMaxValueOf(string $colName, string $tableName, string $groupBy = null, string $havingColName = null, string $valueToHave = null)
+    {
+        $alias = $colName."_max";
+        $query = "SELECT MAX($colName) as $alias FROM $tableName";
+
+        if (null !== $groupBy) {
+            $query .= " GROUP BY $groupBy";
+        }
+
+        if (null !== $havingColName) {
+            $query .= " HAVING $havingColName = '$valueToHave'";
+        }
+
+        $rep = $this->pdo->query($query);
+        return (int)$rep->fetch()[$alias];
+    }
+    
+    /**
+     * Retourne les occurrences qui ont une valeur supérieure ou égale à la valeur passée
+     * en paramètre.
+     * 
+     * @param string $colToGet             Le nom de la colonne à récupérer.
+     * @param string $tableName            Le nom de la table où on doit récupérer les occurrences.
+     * @param string $colToCompare         Un nom de champ. Les valeurs de ce champ doivent être des
+     *                                     entiers ou des dates.
+     * @param int|\Date $colToCompareValue La valeur de comparaison.
+     * 
+     * @return array
+     */
+    public function getItemsOfValueMoreOrEqualTo(string $colToGet, string $tableName = null, string $colToCompare = null, $colToCompareValue = null, string $whereColName, string $whereColValue = null)
+    {
+        $query = "SELECT $colToGet FROM $tableName WHERE $colToCompare >= ?";
+
+        if (null !== $whereColName) {
+            $query .= " AND $whereColName = ?";
+            $rep = $this->pdo->prepare($query);
+            $rep->execute([$colToCompareValue, $whereColValue]);
+        } else {
+            $rep = $this->pdo->prepare($query);
+            $rep->execute([$colToCompareValue]);
+        }
+
+        return $rep->fetchAll();
+    }
+
+    /**
+     * Incrémente ou décrémente une propriété dont la valeur est un entier.
+     * 
+     * @param string $action        Increment ou decrement.
+     * @param string $colName       La colonne dont on veut incrémenter ou décrémenter la valeur.
+     * @param string $tableName     Le nom de la table de l'item à modifier.
+     * @param string $whereColName  Une clause where sur cette colonne pour donner une précision sur
+     *                              les résultats.
+     * @param mixed  $whereColValue Id L'item dont on veut incrémenter ou décrémenter la valeur.
+     * 
+     * @return bool
+     */
+    public function incOrDecColValue(string $action, string $colName, string $tableName, string $whereColName = null, $whereColValue = null)
+    {
+        $query = "UPDATE $tableName SET $colName = ";
+        $query .= $action === "increment" ? "$colName+1" : "$colName-1";
+
+        if (null !== $whereColName) {
+            $query .= " WHERE $whereColName = " . $whereColValue;
+        }
+
+        $this->pdo->query($query);
         return true;
     }
 

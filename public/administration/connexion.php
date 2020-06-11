@@ -17,7 +17,7 @@ require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SE
 require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SEPARATOR . 'functions.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-use App\BackEnd\Models\Persons\Administrateur;
+use App\BackEnd\Models\Users\User;
 use App\View\Notification;
 use App\BackEnd\Utils\Utils;
 use App\View\View;
@@ -42,12 +42,12 @@ try {
                 $error = $notification->inputsEmpty();
             } else {
                 $admin_login = mb_strtolower($admin_login);
-                if (Administrateur::loginIsset($admin_login)) {
-                    $admin = Administrateur::getByLogin($admin_login);
+                if (User::loginIsset($admin_login)) {
+                    $admin = User::getByLogin($admin_login);
                     if ($admin->isAuthentified($admin_login, $admin_password)) {
                         $admin->setSession("admin_login");
                         if ($activate_cookie == "oui") {
-                            $admin->setCookie("admin_login", $admin->get("login"));
+                            $admin->setCookie("admin_login", $admin->getLogin());
                         }
                         Utils::header(ADMIN_URL);
                     } else {

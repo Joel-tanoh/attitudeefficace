@@ -23,7 +23,22 @@ $(document).ready(function(){
     placeholder: 'Commencez à écrire...',
     tabsize: 2,
     height: 600,
-    lang: 'fr-FR'
+    lang: 'fr-FR',
+    toolbar: [
+      // [groupName, [list of button]]
+      ['fontname', ['fontname'] ],
+      ['fontsize', ['fontsize'] ],
+      ['style', ['bold', 'italic', 'underline', 'clear'] ],
+      ['font', ['strikethrough', 'superscript', 'subscript'] ],
+      ['color', ['color'] ],
+      ['height', ['height'] ],
+      ['para', ['ul', 'ol', 'paragraph']],
+      ['table', ['table'] ],
+      ['insert', ['link',] ],
+      ['view', ['code', 'help'] ],
+      ['undo', ['undo'] ],
+      ['redo', ['redo'] ],
+    ],
   });
 
 });

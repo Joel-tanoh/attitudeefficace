@@ -25,10 +25,10 @@
 .btn-administrateur {
     position: relative;
 }
-#btnAdministrateurContent {
+#btnUserContent {
     display: none;
 }
-#btnAdministrateurIcon:hover {
+#btnUserIcon:hover {
     cursor: pointer;
 }
 .btn-administrateur .content {

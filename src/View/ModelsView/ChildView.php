@@ -60,14 +60,14 @@ HTML;
      */
     private function showArticle()
     {
-        if ($this->item->get("article_content")) {
+        if ($this->item->getArticleContent()) {
             return <<<HTML
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header bg-white">Contenu de l'article</div>
                         <div class="card-body">
-                            <article>{$this->item->get("article_content")}</article>
+                            <article>{$this->item->getArticleContent()}</article>
                         </div>
                     </div>
                 </div>

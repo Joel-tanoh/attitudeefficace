@@ -14,7 +14,7 @@
 
 namespace App\BackEnd\Utils;
 
-use App\BackEnd\Models\Model;
+use App\BackEnd\Models\Entity;
 use Cocur\Slugify\Slugify;
 
 /**
@@ -88,28 +88,6 @@ class Utils
             return true;
         } else {
             return false;
-        }
-    }
-
-    /**
-     * Permet de mettre à jour le compteur de visite de l'app.
-     * 
-     * @return bool 
-     */
-    public static function appVisitCounter()
-    {
-        $bdd_manager = Model::bddManager();
-        $year = date("Y");
-        $month = date("m");
-        $day = date("d");
-        $visite = $bdd_manager->verifyDateVisitIsset($year, $month, $day);
-
-        if (self::isNewVisit()) {
-            if ($visite["date_isset"]) {
-                $bdd_manager->incOrDecColValue("increment", "nombre_visite", "compteur_visites", $visite["id"]);
-            } else {
-                $bdd_manager->insertNewVisit($year, $month, $day, 1);
-            }
         }
     }
 

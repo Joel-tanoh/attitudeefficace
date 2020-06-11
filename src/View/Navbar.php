@@ -14,7 +14,7 @@
 
 namespace App\View;
 
-use App\BackEnd\Models\Persons\Administrateur;
+use App\BackEnd\Models\Users\User;
 
 /**
  * Perlet de gérer tout ce qui concerne la barre de navigation supérieure.
@@ -99,7 +99,7 @@ HTML;
      */
     public static function addItemsLinksView()
     {
-        $admin_url = ADMIN_URL;
+        $adminurl = ADMIN_URL;
         return <<<HTML
         <li id="addButton" class="mr-3">
             <a class="add-button-icon">
@@ -107,19 +107,19 @@ HTML;
             </a>
             <ul class="add-button-content list-unstyled">
                 <li>
-                    <a href="{$admin_url}/formations/create" class="text-primary">Formation</a>
+                    <a href="{$adminurl}/formations/create" class="text-primary">Formation</a>
                 </li>
                 <li>
-                    <a href="{$admin_url}/articles/create" class="text-primary">Article</a>
+                    <a href="{$adminurl}/articles/create" class="text-primary">Article</a>
                 </li>
                 <li>
-                    <a href="{$admin_url}/videos/create" class="text-primary">Vidéo</a>
+                    <a href="{$adminurl}/videos/create" class="text-primary">Vidéo</a>
                 </li>
                 <li>
-                    <a href="{$admin_url}/livres/create" class="text-primary">Livre</a>
+                    <a href="{$adminurl}/livres/create" class="text-primary">Livre</a>
                 </li>
                 <li>
-                    <a href="{$admin_url}/ebooks/create" class="text-primary">Ebook</a>
+                    <a href="{$adminurl}/ebooks/create" class="text-primary">Ebook</a>
                 </li>
             </ul>
         <li>
@@ -134,24 +134,24 @@ HTML;
      */
     public static function getAdminManagementButtonsView()
     {
-        $admin_url = ADMIN_URL;
-        $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
-        $private_buttons = $admin_user->get("categorie") === "administrateur" ? self::administrateurReservedActions() : null;
-        $navbarUserAvatar = self::navbarUserAvatar($admin_user->get("avatar_src"), $admin_user->get("login"));
+        $adminurl = ADMIN_URL;
+        $adminUser = User::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
+        $private_buttons = $adminUser->getCategorie() === "administrateur" ? self::administrateurReservedActions() : null;
+        $navbarUserAvatar = self::navbarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
 
         return <<<HTML
         <li class="btn-administrateur">
-            <a id="btnAdministrateurIcon" class="nav-link d-flex align-items-center">
+            <a id="btnUserIcon" class="nav-link d-flex align-items-center">
                 {$navbarUserAvatar}
                 <span class="fas fa-caret-down"></span>
             </a>
-            <ul id="btnAdministrateurContent" class="content border list-unstyled">
+            <ul id="btnUserContent" class="content border list-unstyled">
                 <li>
-                    <a href="{$admin_url}/administrateurs/me" class="text-primary">Mon profil</a>
+                    <a href="{$adminurl}/administrateurs/me" class="text-primary">Mon profil</a>
                 </li>
                 {$private_buttons}
                 <li>
-                    <a class="bg-danger text-white" href="{$admin_url}/deconnexion">Déconnexion</a>
+                    <a class="bg-danger text-white" href="{$adminurl}/deconnexion">Déconnexion</a>
                 </li>
             </ul>
         </li>
@@ -185,16 +185,16 @@ HTML;
      */
     private static function administrateurReservedActions()
     {
-        $admin_url = ADMIN_URL;
+        $adminurl = ADMIN_URL;
         return <<<HTML
         <li>
-            <a href="{$admin_url}/administrateurs" class="text-primary">Liste</a>
+            <a href="{$adminurl}/administrateurs" class="text-primary">Liste</a>
         </li>
         <li>
-            <a href="{$admin_url}/administrateurs/create" class="text-primary">Ajouter</a>
+            <a href="{$adminurl}/administrateurs/create" class="text-primary">Ajouter</a>
         </li>
         <li>
-            <a href="{$admin_url}/administrateurs/delete" class="text-primary">Supprimer</a>
+            <a href="{$adminurl}/administrateurs/delete" class="text-primary">Supprimer</a>
         </li>
 HTML;
     }

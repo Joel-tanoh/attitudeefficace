@@ -28,21 +28,21 @@ namespace App;
 class Router
 {
     private $url;
-    private $url_as_array;
+    private $urlAsArray;
     private $categorie;
 
     /**
      * Constructeur du routeur, prend en paramètre l'url.
      * 
-     * @param $url 
+     * @param string $url 
      * 
      * @return void
      */
-    public function __construct($url)
+    public function __construct(string $url)
     {
         $this->url = $url;
-        $this->url_as_array = explode('/', $url);
-        $this->categorie = !empty($this->url_as_array[0]) ? $this->url_as_array[0] : null;
+        $this->urlAsArray = explode('/', $this->url);
+        $this->categorie = !empty($this->urlAsArray[0]) ? $this->urlAsArray[0] : null;
     }
 
     /**
@@ -52,7 +52,7 @@ class Router
      * 
      * @return void
      */
-    public function setUrl($url)
+    public function setUrl(string $url)
     {
         $this->url = $url;
     }
@@ -70,12 +70,12 @@ class Router
             return self::getUrl() === $route;
         } elseif (is_array($route)) {
 
-            $url_offsets = count(self::getUrlAsArray());
-            $route_offsets = count($route);
+            $urlOffsets = count(self::getUrlAsArray());
+            $routeOffsets = count($route);
 
-            if ($url_offsets === $route_offsets) {
+            if ($urlOffsets === $routeOffsets) {
                 $counter = 0;
-                for ($i = 0; $i <= $route_offsets - 1; $i++) {
+                for ($i = 0; $i <= $routeOffsets - 1; $i++) {
                     if (is_string($route[$i])) {
                         if (self::getUrlAsArray()[$i] === $route[$i]) $counter++;
                     } elseif (is_array($route[$i])) {
@@ -83,7 +83,7 @@ class Router
                     }
                 }
 
-                if ($counter === $route_offsets) return true;
+                if ($counter === $routeOffsets) return true;
                 else return false;
 
             } else {
@@ -111,13 +111,13 @@ class Router
      */
     public static function getUrlAsArray()
     {
-        $url_as_array = explode("/", self::getUrl());
-        $last_url_as_array_key = array_key_last($url_as_array);
-        if (empty($url_as_array[$last_url_as_array_key])) {
-            array_pop($url_as_array);
+        $urlAsArray = explode("/", self::getUrl());
+        $last_urlAsArray_key = array_key_last($urlAsArray);
+        if (empty($urlAsArray[$last_urlAsArray_key])) {
+            array_pop($urlAsArray);
         }
 
-        return $url_as_array;
+        return $urlAsArray;
     }
 
     /**

@@ -9,10 +9,11 @@
 namespace App\View;
 
 use App\Router;
-use App\BackEnd\Models\Model;
+use App\BackEnd\Models\Entity;
+use App\BackEnd\Models\Items\ItemChild;
 use App\View\Notification;
 use App\View\Form;
-use App\View\ModelsView\AdministrateurView;
+use App\View\ModelsView\UserView;
 use App\View\ModelsView\ParentView;
 use App\View\ModelsView\ChildView;
 
@@ -36,7 +37,7 @@ class View
     {
         $form = new Form();
         $logo_dir = LOGOS_DIR_URL;
-        $admin_url = ADMIN_URL;
+        $adminurl = ADMIN_URL;
         $notificateur = new Notification();
         $error = null !== $error ? $notificateur->error($error) : null;
         $activateSessionCheckBox = Snippet::activateSessionButton();
@@ -74,7 +75,7 @@ class View
                         </div>
                     </div>
                     <footer>
-                        <a href="{$admin_url}/password-forgotten">Mot de passe oublié ?</a>
+                        <a href="{$adminurl}/password-forgotten">Mot de passe oublié ?</a>
                     </footer>
                 </form>
             </div>
@@ -117,33 +118,33 @@ HTML;
      */
     public static function listItemsView(array $items, string $class_name)
     {
-        $bdd_manager = Model::bddManager();
-        $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-        $number_of_items = $bdd_manager->count(
+        $bddManager = Entity::bddManager();
+        $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
+        $number_of_items = $bddManager->count(
             "id",
-            Model::getTableNameFrom(Router::getUrlAsArray()[0]),
+            Entity::getTableName(Router::getUrlAsArray()[0]),
             "categorie",
             Router::getUrlAsArray()[0]
         );
+
         $listItemsContentHeader = Snippet::listItemsContentHeader($title, $number_of_items);
 
         if (empty($items)) {
             $notification = new Notification();
-            $content = '<div class="col-12">'. $notification->info($notification->noItems($class_name)) .'</div>';
+            $content =
+                '<div class="row">'
+                    . '<div class="col-12">'
+                        . $notification->info($notification->noItems($class_name))
+                    .'</div>'
+                .'</div>'
+            ;
         } else {
-            $list = "";
-            foreach ($items as $item) {
-                $object = Model::returnObject($class_name, $item["code"]);
-                $list .= Card::card($object->get("thumbs_src"), $object->get("title"), $object->get("admin_url"), $object->get("day_creation"));
-            }
-            $content = $list;
+            $content = Template::gridOfCards($items, $class_name);
         }
 
         return <<<HTML
         {$listItemsContentHeader}
-        <section class="row">
-            {$content}
-        </section>
+        {$content}
 HTML;
     }
 
@@ -156,24 +157,26 @@ HTML;
      */
     public static function listMotivationPlusVideosView(array $videos)
     {
-        $bdd_manager = Model::bddManager();
-        $number_of_videos = $bdd_manager->count("id", "item_childs", "categorie", "videos");
+        $bddManager = Entity::bddManager();
+        $number_of_videos = $bddManager->count("id", ItemChild::TABLE_NAME, "categorie", "videos");
         if (empty($videos)) {
-            $videos_list = null;
+            $notification = new Notification();
+            $content = 
+            '<div class="row">'
+                . '<div class="col-12">'
+                    . $notification->info($notification->noItems("motivation-plus"))
+                .'</div>'
+            .'</div>'
+        ;
         } else {
-            $videos_list = "";
-            foreach($videos as $video) {
-                $video = Model::returnObject("videos", $video["code"]);
-                $videos_list .= Card::card($video->get("thumbs_src"), $video->get("title"), $video->get("admin_url"), $video->get("day_creation"));
-            }
+            $content = Template::gridOfCards($videos, "videos");
         }
+
         $listItemsContentHeader = Snippet::listItemsContentHeader("Motivation +", $number_of_videos);
 
         return <<<HTML
         {$listItemsContentHeader}
-        <section class="row">
-            {$videos_list}
-        </section>
+        {$content}
 HTML;
     }
 
@@ -187,13 +190,13 @@ HTML;
      */
     public static function listMiniservicesView(array $items)
     {
-        $bdd_manager = Model::bddManager();
-        $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-        $number_of_items = $bdd_manager->count(
-            "id",
-            Model::getTableNameFrom(Router::getUrlAsArray()[0]),
-            "categorie",
-            Router::getUrlAsArray()[0]
+        $bddManager = Entity::bddManager();
+        $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
+        $number_of_items = $bddManager->count(
+            "id"
+            , Entity::getTableName(Router::getUrlAsArray()[0])
+            , "categorie"
+            , "mini-services"
         );
 
         $listItemsContentHeader = Snippet::listItemsContentHeader($title, $number_of_items);
@@ -201,27 +204,34 @@ HTML;
 
         if (empty($items)) {
             $notification = new Notification();
-            $content = '<div class="col-12">'. $notification->info($notification->noItems("minis-services")) .'</div>';
+            $content = '<div>'. $notification->info($notification->noItems("mini-services")) .'</div>';
         } else {
-            $list = "";
-            foreach ($items as $item) {
-                $object = Model::returnObject("minis-services", $item["code"]);
-                $list .= Card::card($object->get("thumbs_src"), $object->get("title"), $object->get("admin_url"), $object->get("day_creation"));
-            }
-            $content = $list;
+            $content = Template::gridOfCards($items, "mini-services", "px-2");
         }
 
         return <<<HTML
         {$listItemsContentHeader}
         <section class="row mb-3">
             <section class="col-12 col-md-9 mb-3">
-                <div class="row px-2">
-                    {$content}
-                </div>
+                {$content}
             </section>
             <section class="col-12 col-md-3">
                 {$miniServiceCommandsResume}
             </section>
+        </section>
+HTML;
+    }
+
+    /**
+     * Vue qui affiche toutes les commandes.
+     * 
+     * @return string
+     */
+    public static function listMiniservicesCommandsView($commands = null)
+    {
+        return <<<HTML
+        <section>
+            Commandes
         </section>
 HTML;
     }
@@ -240,8 +250,8 @@ HTML;
             $notification = new Notification();
             $to_return = $notification->info( $notification->noAccounts() );
         } else {
-            $admin_template = new AdministrateurView();
-            $to_return = $admin_template->listAccounts($accounts);
+            $adminTemplate = new UserView();
+            $to_return = $adminTemplate->listUsers($accounts);
         }
 
         return $to_return;
@@ -261,7 +271,7 @@ HTML;
         $notification = new Notification();
         $formContent = Form::getForm($categorie);
         $error = !empty($errors) ? $notification->errors($errors) : null;
-        $title = ucfirst(Model::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
+        $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
         $listItemsContentHeader = Snippet::listItemsContentHeader($title);
 
         return <<<HTML
@@ -328,7 +338,7 @@ HTML;
         $notification = new Notification();
         $error = !empty($errors) ? $notification->errors($errors) : null;
 
-        $title = $item->get('title') . " &#8250 éditer";
+        $title = $item->getTilte() . " &#8250 éditer";
         $listItemsContentHeader = Snippet::listItemsContentHeader($title);
 
         return <<<HTML
@@ -341,7 +351,7 @@ HTML;
     /**
      * Retourne la page de suppression de plusieurs items selon la catégorie.
      * 
-     * @param Model  $items     La liste des items qu'on veut supprimer.
+     * @param Entity  $items     La liste des items qu'on veut supprimer.
      * @param string $categorie La catégorie des items à supprimer.
      * @param string $error     Au cas où il y'a une erreur à afficher.
      * 
@@ -354,13 +364,13 @@ HTML;
         $list = null;
 
         if (empty($items)) {
-            $notification = $notifier->info( $notifier->nothingToDelete( Model::getCategorieFormated($categorie, "pluriel") ) );
+            $notification = $notifier->info( $notifier->nothingToDelete( Entity::getCategorieFormated($categorie, "pluriel") ) );
         } else {
             $list = Snippet::deleteItemsTable($items, $categorie);
         }
 
         $error = null !== $error ? $notifier->error($error) : null;
-        $title = Model::getCategorieFormated($categorie, "puriel");
+        $title = Entity::getCategorieFormated($categorie, "puriel");
         $listItemsContentHeader = Snippet::listItemsContentHeader($title);
 
         return <<<HTML
@@ -403,7 +413,7 @@ HTML;
      */
     public static function adminError404View()
     {
-        $admin_url = ADMIN_URL;
+        $adminurl = ADMIN_URL;
 
         return <<<HTML
         <section class="text-center">
@@ -411,7 +421,7 @@ HTML;
             <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page non trouvée.</h3>
             <p>
                 Nous n'avons pas retrouvé la page que vous cherchez. Elle n'a peut être pas encore été développée.
-                Retour au <a href="{$admin_url}">Tableau de bord</a>.
+                Retour au <a href="{$adminurl}">Tableau de bord</a>.
             </p>
         </section>
 HTML;

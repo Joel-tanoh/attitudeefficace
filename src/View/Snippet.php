@@ -8,9 +8,9 @@
 
 namespace App\View;
 
-use App\BackEnd\Bdd\BddManager;
-use App\BackEnd\Models\Model;
 use App\Router;
+use App\BackEnd\Models\Entity;
+use App\BackEnd\Models\MiniserviceOrder;
 
 /**
  * Gère les fragments de code.
@@ -33,7 +33,7 @@ class Snippet extends View
         $submitButton = Form::submitButton("suppression", "Supprimer");
 
         foreach($items as $item) {
-            $item = Model::returnObject($categorie, $item["code"]);
+            $item = Entity::returnObjectByCategorie($categorie, $item["code"]);
             $tableRows .= self::deleteItemsTableRow($item);
         }
 
@@ -48,31 +48,6 @@ class Snippet extends View
             </table>
             {$submitButton}
         </form>
-HTML;
-    }
-
-    /**
-     * Retourne les boutons pour publier, supprimer ou modifier l'instance.
-     * 
-     * @param $item          L'objet pour lequel on doit afficher le bouton.
-     * @param bool $edit_button   
-     * @param bool $post_button   
-     * @param bool $share_button  
-     * @param bool $delete_button 
-     * 
-     * @return string
-     */
-    public static function manageButtons($item)
-    {
-        $buttons = self::button($item->get("edit_url"), null, "btn-primary mr-1", "d-none d-md-inline", "far fa-edit fa-lg");
-        $buttons .= self::button($item->get("post_url"), "Poster", "btn-success mr-1", "d-none d-md-inline", "fas fa-reply fa-lg");
-        $buttons .= self::button($item->get("share_url"), "Partager", "btn-success mr-1", "d-none d-md-inline", "fas fa-share fa-lg");
-        $buttons .= self::button($item->get("delete_url"), null, "btn-danger mr-1", "d-none d-md-inline", "far fa-trash-alt fa-lg");
-        
-        return <<<HTML
-        <div class="float-sm-right">
-            {$buttons}
-        </div>
 HTML;
     }
 
@@ -161,7 +136,7 @@ HTML;
         <div class="row mb-3">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2>{$item->get("title")}</h2>
+                    <h2>{$item->getTitle()}</h2>
                     {$manageButtons}
                 </div>
             </div>
@@ -170,37 +145,62 @@ HTML;
     }
 
     /**
-     * Retourne une liste "voir aussi" pour afficher les autres items de la même
-     * catégorie que l'item courant en excluant l'item courant.
+     * Retourne les boutons pour publier, supprimer ou modifier l'instance.
      * 
-     * @param $exclu Le titre de la méthode qu'on ne veut pas
-     *                      afficher. 
+     * @param $item          L'objet pour lequel on doit afficher le bouton.
+     * @param bool $edit_button   
+     * @param bool $post_button   
+     * @param bool $share_button  
+     * @param bool $delete_button 
      * 
-     * @return $array
+     * @return string
      */
-    public static function voirAussi($exclu)
+    public static function manageButtons($item)
     {
-        $bdd_manager = Model::bddManager();
-        $table = Model::getTableNameFrom($exclu->get("categorie"));
-        $items = $bdd_manager->getTableExcepted($table, $exclu->get("id"), $exclu->get("categorie"));
-        $list = '';
-        foreach ($items as $item) {
-            $item = Model::returnObject($exclu->get("categorie"), $item["code"]);
-            $list .= self::voirAussiRow($item);
-        }
-        if (empty($list)) $list = '<div>Vide</div>';
-
+        $buttons = self::button($item->getUrl("edit"), null, "btn-primary mr-1", "d-none d-md-inline", "far fa-edit fa-lg");
+        $buttons .= self::button($item->getUrl("post"), "Poster", "btn-success mr-1", "d-none d-md-inline", "fas fa-reply fa-lg");
+        $buttons .= self::button($item->getUrl("share"), "Partager", "btn-success mr-1", "d-none d-md-inline", "fas fa-share fa-lg");
+        $buttons .= self::button($item->getUrl("delete"), null, "btn-danger mr-1", "d-none d-md-inline", "far fa-trash-alt fa-lg");
+        
         return <<<HTML
-        <div class="col-md-3">
-            <div class="card">
-                <h6 class="card-header bg-white">Voir aussi</h6>
-                <div class="card-body">
-                    {$list}
-                </div>
-            </div>
+        <div class="float-sm-right">
+            {$buttons}
         </div>
 HTML;
     }
+
+//     /**
+//      * Retourne une liste "voir aussi" pour afficher les autres items de la même
+//      * catégorie que l'item courant en excluant l'item courant.
+//      * 
+//      * @param $exclu Le titre de la méthode qu'on ne veut pas
+//      *                      afficher. 
+//      * 
+//      * @return $array
+//      */
+//     public static function voirAussi($exclu)
+//     {
+//         $bddManager = Entity::bddManager();
+//         $table = Entity::getTableName($exclu->getCategorie());
+//         $items = $bddManager->getTableOccurencesExecepted($table, $exclu->getID(), $exclu->getCategorie());
+//         $list = '';
+//         foreach ($items as $item) {
+//             $item = Entity::returnObjectByCategorie($exclu->getCategorie(), $item["code"]);
+//             $list .= self::voirAussiRow($item);
+//         }
+//         if (empty($list)) $list = '<div>Vide</div>';
+
+//         return <<<HTML
+//         <div class="col-md-3">
+//             <div class="card">
+//                 <h6 class="card-header bg-white">Voir aussi</h6>
+//                 <div class="card-body">
+//                     {$list}
+//                 </div>
+//             </div>
+//         </div>
+// HTML;
+//     }
 
     /**
      * Affiche le résumé des commandes de minis services. Les nouvelles commandes,
@@ -210,16 +210,16 @@ HTML;
      */
     public static function miniServicesCommandsResume()
     {
-        $bdd_manager = Model::bddManager();
+        $bddManager = Entity::bddManager();
 
-        $new_commands = $bdd_manager->count("id", "commands_miniservices", "statut", "nouvelle");
-        $newCommandsBoxInfo = Card::boxInfo($new_commands, "Nouvelles commandes", ADMIN_URL . "/minis-services/commands/new", "success");
+        $new_commands_nbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME, "state", "nouvelle");
+        $newCommandsBoxInfo = Card::boxInfo($new_commands_nbr, "Nouvelles commandes", ADMIN_URL . "/mini-services/commands/new", "success");
         
-        $waiting_commands = $bdd_manager->count("id", "commands_miniservices", "statut", "en attente");
-        $waitingCommandsBoxInfo = Card::boxInfo($new_commands, "Commandes en attente", ADMIN_URL . "/minis-services/commands/en_attente", "warning");
+        $waiting_commands_nbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME, "state", "en attente");
+        $waitingCommandsBoxInfo = Card::boxInfo($waiting_commands_nbr, "Commandes en attente", ADMIN_URL . "/mini-services/commands/en_attente", "warning");
         
-        $all_commands = $bdd_manager->count("id", "commands_miniservices");
-        $allCommandsBoxInfo = Card::boxInfo($new_commands, "Commandes totales", ADMIN_URL . "/minis-services/commands", "primary");
+        $all_commands_nbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME);
+        $allCommandsBoxInfo = Card::boxInfo($all_commands_nbr, "Commandes totales", ADMIN_URL . "/mini-services/commands", "primary");
 
         return <<<HTML
         <div class="row px-2">
@@ -239,7 +239,7 @@ HTML;
      */
     public static function showData($item)
     {
-        $videoBox = self::showVideo($item->get("youtube_video_link"));
+        $videoBox = self::showVideo($item->getVideoLink("youtube"));
         $bddData = self::bddData($item);
         $thumbs = self::showThumbs($item);
 
@@ -264,8 +264,8 @@ HTML;
      */
     public static function contextMenu()
     {
-        $createButton = self::button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", null, "btn-success",  "fas fa-plus");
-        $deleteItemsButton = self::button(Model::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", null, "btn-danger", "fas fa-trash-alt");
+        $createButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", null, "btn-success",  "fas fa-plus");
+        $deleteItemsButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", null, "btn-danger", "fas fa-trash-alt");
 
         return <<<HTML
         {$createButton}
@@ -287,11 +287,11 @@ HTML;
         <div class="card mb-3">
             <div class="card-header bg-white">Données</div>
             <div class="card-body">
-                <div>Catégorie : {$item->get("categorie")}</div>
-                <div>Description : {$item->get("description")}</div>
-                <div>Prix : {$item->get("prix")}</div>
-                <div>Date de création : {$item->get("date_creation")}</div>
-                <div>Date de mise à jour : {$item->get("date_modification")}</div>
+                <div>Catégorie : {$item->getCategorie()}</div>
+                <div>Description : {$item->getDescription()}</div>
+                <div>Prix : {$item->getPrice()}</div>
+                <div>Date de création : {$item->getCreatedAt()}</div>
+                <div>Date de mise à jour : {$item->getUpdatedAt()}</div>
             </div>
         </div>
 HTML;
@@ -433,7 +433,7 @@ HTML;
      */
     public static function showThumbs($item)
     {
-        $content = null !== $item->get("thumbs_src") ? self::thumbs($item) : self::noThumbsBox();
+        $content = null !== $item->getThumbsSrc() ? self::thumbs($item) : self::noThumbsBox();
 
         return $content;
     }
@@ -448,7 +448,7 @@ HTML;
     public static function thumbs($item)
     {
         return <<<HTML
-        <img src="{$item->get('thumbs_src')}" alt="{$item->get('image_name')}" class="img-fluid"/>
+        <img src="{$item->getThumbsSrc()}" alt="{$item->getTitle()}" class="img-fluid"/>
         <p class="text-muted p-3 bg-white">Image de couverture</p>
 HTML;
     }
@@ -486,31 +486,31 @@ HTML;
 HTML;
     }
 
-    /**
-     * Retourne une vue pour afficher les autres items de même type
-     * que celui passé en paramètre.
-     *  
-     * @param $item La catégorie qu'on veut afficher.
-     * 
-     * @return string
-     */
-    public static function voirAussiRow($item)
-    {
-        $title = ucfirst($item->get("title"));
-        $thumbs_src = $item->get("thumbs_src");
+//     /**
+//      * Retourne une vue pour afficher les autres items de même type
+//      * que celui passé en paramètre.
+//      *  
+//      * @param $item La catégorie qu'on veut afficher.
+//      * 
+//      * @return string
+//      */
+//     public static function voirAussiRow($item)
+//     {
+//         $title = ucfirst($item->getTitle());
+//         $thumbsSrc = $item->getThumbsSrc();
 
-        return <<<HTML
-        <div class="d-flex p-2">
-            <div class="mr-2" style="width:5rem">
-                <img src="{$thumbs_src}" alt="{$item->get('slug')}" class="img-fluid">
-            </div>
-            <div>
-                <h5><a href="{$item->get('public_url')}">{$title}</a></h5>
-                <span class="text-muted float-right text-small">{$item->get("day_creation")}</span>
-            </div>
-        </div>
-HTML;
-    }
+//         return <<<HTML
+//         <div class="d-flex p-2">
+//             <div class="mr-2" style="width:5rem">
+//                 <img src="{$thumbsSrc}" alt="{$item->getThumbsSrc()}" class="img-fluid">
+//             </div>
+//             <div>
+//                 <h5><a href="{$item->getUrl('public')}">{$title}</a></h5>
+//                 <span class="text-muted float-right text-small">{$item->getThumbsSrc()("day_created_at")}</span>
+//             </div>
+//         </div>
+// HTML;
+//     }
 
     /**
      * Retourne une ligne dans le tableau de suppression des éléments.
@@ -523,8 +523,8 @@ HTML;
     {
         return <<<HTML
         <tr>
-            <td><input type="checkbox" name="codes[]" id="{$item->get('slug')}" value="{$item->get('code')}"></td>
-            <td><label for="{$item->get('slug')}">{$item->get("title")}</label></td>
+            <td><input type="checkbox" name="codes[]" id="{$item->getSlug()}" value="{$item->getCode()}"></td>
+            <td><label for="{$item->getSlug()}">{$item->getTitle()}</label></td>
         </tr>
 HTML;
     }

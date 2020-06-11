@@ -14,7 +14,7 @@
 
 namespace App\View\ModelsView;
 
-use App\BackEnd\Models\Persons\Administrateur;
+use App\BackEnd\Models\Users\User;
 use App\View\Form;
 
 /**
@@ -26,7 +26,7 @@ use App\View\Form;
  * @license  url.com license
  * @link     link
  */
-class AdministrateurView extends \App\View\View
+class UserView extends \App\View\View
 {
     private $admin_user;
 
@@ -42,12 +42,12 @@ class AdministrateurView extends \App\View\View
      * 
      * @return string
      */
-    public function listAccounts($users)
+    public function listUsers($users)
     {
         $accounts_list = null;
         if (!empty($users)) {
             foreach ($users as $user) {
-                $user = new Administrateur($user['code']);
+                $user = new User($user['code']);
                 $accounts_list .= $this->listRow($user);
             }
         }
@@ -79,9 +79,9 @@ HTML;
     {
         return <<<HTML
         <tr>
-            <td>{$user->get("login")}</td>
-            <td>{$user->get("statut")}</td>
-            <td>{$user->get("email")}</td>
+            <td>{$user->getLogin()}</td>
+            <td>{$user->getRole()}</td>
+            <td>{$user->getEmail()}</td>
         </tr>
 HTML;
     }

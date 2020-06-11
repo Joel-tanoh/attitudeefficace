@@ -30,37 +30,30 @@ use Intervention\Image\ImageManager;
 class Image extends File
 {
     /**
-     * Date à la quelle l'image a été enregistrée sur l'application.
-     * 
-     * @var string
-     */
-    private $_date_creation;
-
-    /**
      * Permet de sauvegarder l'image dans les fichiers du serveur dans le dossier des
      * images et des miniatures.
      * 
-     * @param string $image_name Le nom de l'image.
+     * @param string $imageName Le nom de l'image.
      * 
      * @return bool
      */
-    public function saveImages(string $image_name)
+    public function saveImages(string $imageName)
     {
-        $this->save($image_name, THUMBS_PATH, 1280, 720);
-        $this->save($image_name, ORIGINALS_IMAGES_PATH);
+        $this->save($imageName, THUMBS_PATH, 1280, 720);
+        $this->save($imageName, ORIGINALS_THUMBS_PATH);
         return true;
     }
 
     /**
      * Créer une miniature et la sauvegarde.
      * 
-     * @param $avatar_name Le nom du fichier
+     * @param $avatarName Le nom du fichier
      * 
      * @return void
      */
-    public function saveAvatar($avatar_name)
+    public function saveAvatar($avatarName)
     {
-        $this->save($avatar_name, AVATARS_PATH, 150, 150);
+        $this->save($avatarName, AVATARS_PATH, 150, 150);
         return true;
     }
 
@@ -68,41 +61,41 @@ class Image extends File
      * Enregistre une image en prenant en paramètre le nom et le dossier de
      * sauvegarde.
      * 
-     * @param string $image_name 
-     * @param string $dir_path     Le dossier où on doit déposer l'image.
-     * @param int    $image_width 
-     * @param int    $image_height 
+     * @param string $imageName 
+     * @param string $dirPath     Le dossier où on doit déposer l'image.
+     * @param int    $imageWidth 
+     * @param int    $imageHeight 
      * 
      * @return bool
      */
-    private function save(string $image_name, string $dir_path, int $image_width = null, int $image_height = null)
+    private function save(string $imageName, string $dirPath, int $imageWidth = null, int $imageHeight = null)
     {
-        if (!file_exists($dir_path)) {
-            mkdir($dir_path);
+        if (!file_exists($dirPath)) {
+            mkdir($dirPath);
         }
         $manager = new ImageManager();
         $manager = $manager->make($_FILES['image_uploaded']['tmp_name']);
-        if (null !== $image_width && null !== $image_height){
-            $manager->fit($image_width, $image_height);
+        if (null !== $imageWidth && null !== $imageHeight){
+            $manager->fit($imageWidth, $imageHeight);
         }
-        $manager->save($dir_path . $image_name . IMAGES_EXTENSION);
+        $manager->save($dirPath . $imageName . IMAGES_EXTENSION);
         return true;
     }
 
     /**
      * Renomme l'image de couverture et l'image miniature d'un item.
      * 
-     * @param string $old_name L'ancien nom de l'image.
-     * @param string $new_name Le nouveau nom de l'image.
+     * @param string $oldName L'ancien nom de l'image.
+     * @param string $newName Le nouveau nom de l'image.
      * 
      * @return bool
      */
-    public function renameImages($old_name, $new_name)
+    public function renameImages($oldName, $newName)
     {
-        $old_thumbs = THUMBS_PATH . $old_name;
-        $new_thumbs = THUMBS_PATH . $new_name . IMAGES_EXTENSION;
+        $oldThumbs = THUMBS_PATH . $oldName;
+        $newThumbs = THUMBS_PATH . $newName . IMAGES_EXTENSION;
 
-        if (rename($old_thumbs, $new_thumbs)) {
+        if (rename($oldThumbs, $newThumbs)) {
             return true;
         } else {
             throw new Exception("Echec du renommage de l'image de couverture.");
@@ -112,19 +105,20 @@ class Image extends File
     /**
      * Supprime les images de couverture et miniatures
      * 
-     * @param string $image_name Le nom de l'image.
+     * @param string $imageName Le nom de l'image.
      * 
      * @return bool
      */
-    public function deleteImages($image_name)
+    public function deleteImages($imageName)
     {
-        $old_thumbs_path = THUMBS_PATH . $image_name;
-        if (file_exists($old_thumbs_path)) {
-            unlink($old_thumbs_path);
+        $oldThumbsPath = THUMBS_PATH . $imageName;
+        if (file_exists($oldThumbsPath)) {
+            unlink($oldThumbsPath);
         }
-        $old_original_image_path = ORIGINALS_IMAGES_PATH . $image_name;
-        if (file_exists($old_original_image_path)) {
-            unlink($old_original_image_path);
+        
+        $oldOrgImgPath = ORIGINALS_THUMBS_PATH . $imageName;
+        if (file_exists($oldOrgImgPath)) {
+            unlink($oldOrgImgPath);
         }
     }
 

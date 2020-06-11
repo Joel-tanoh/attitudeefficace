@@ -178,7 +178,7 @@ HTML;
         <meta name="description" content="{$this->description}">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <!-- <meta http-equiv="refresh" content="300"> -->
+        <meta http-equiv="refresh" content="60">
         <title>{$this->meta_title}</title>
         {$this->appIcon()}
 HTML;

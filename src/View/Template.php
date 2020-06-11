@@ -15,6 +15,8 @@
 
 namespace App\View;
 
+use App\BackEnd\Models\Entity;
+
 /**
  * Une template est un type de disposition du contenu d'une page.
  * Le contenu de la page est une template, et à cette template, on passera
@@ -138,13 +140,26 @@ HTML;
     /**
      * Template de liste de cartes.
      * 
-     * @param array $cards Un tableau contenant des cartes.
+     * @param array  $itemsForCards Un tableau contenant des cartes.
+     * @param string $className     La classe ou la catégorie des éléments passées permettant
+     *                              d'instancier des objets.
+     * @param string $cssClass      Classe css.
      * 
      * @return string
      */
-    public static function gridOfCards($cards = null)
+    public static function gridOfCards(array $itemsForCards = null, string $className = null, string $cssClass = null)
     {
+        $cards = "";
+        foreach ($itemsForCards as $item) {
+            $object = Entity::returnObjectByCategorie($className, $item["code"]);
+            $cards .= Card::card($object->getThumbsSrc(), $object->getTitle(), $object->getUrl("administration"), $object->getCreatedAt());
+        }
 
+        return <<<HTML
+        <div class="row {$cssClass}">
+            {$cards}
+        </div>
+HTML;
     }
 
 }

@@ -23,7 +23,7 @@ require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 use App\Router;
 use App\Controller;
 use App\BackEnd\Utils\Utils;
-use App\BackEnd\Models\Model;
+use App\BackEnd\Models\Entity;
 use App\View\Notification;
 
 try {
@@ -31,20 +31,35 @@ try {
     if (!someoneIsConnected()) { Utils::header(ADMIN_URL . "/connexion"); }
 
     $route = new Router(Router::getUrl());
+
     $controller = new Controller(Router::getUrlAsArray());
 
     if ($route->match("")) $controller->dashboard();
+
     elseif ($route->match("administrateurs")) $controller->listAdminUsersAccounts();
+
     elseif ($route->match("motivation-plus")) $controller->listMotivationPlusVideo();
+
     elseif ($route->match("motivation-plus/create")) $controller->createMotivationPlusVideo();
+
     elseif ($route->match("motivation-plus/delete")) $controller->deleteItems();
-    elseif ($route->match([Model::getAllCategories()]) ) $controller->listCategorieItems();
-    elseif ($route->match([Model::getAllCategories(), "create"]) ) $controller->createItem();
-    elseif ($route->match([Model::getAllCategories(), "delete"]) ) $controller->deleteItems();
-    elseif ($route->match([Model::getAllCategories(), Model::getAllSlugs()]) ) $controller->readItem();
-    elseif ($route->match([Model::getAllCategories(), Model::getAllSlugs(), "edit"]) ) $controller->editItem();
-    elseif ($route->match([Model::getAllCategories(), Model::getAllSlugs(), "delete"]) ) $controller->deleteItem();
-    
+
+    elseif ($route->match("mini-services/commands")) $controller->listMiniservicesCommands();
+
+    elseif ($route->match([Entity::getAllCategories()]) ) $controller->listItems();
+
+    elseif ($route->match([Entity::getAllCategories(), "create"]) ) $controller->createItem();
+
+    elseif ($route->match([Entity::getAllCategories(), "delete"]) ) $controller->deleteItems();
+
+    elseif ($route->match([Entity::getAllCategories(), Entity::getAllSlugs()]) ){
+        $controller->readItem();
+    }
+
+    elseif ($route->match([Entity::getAllCategories(), Entity::getAllSlugs(), "edit"]) ) $controller->editItem();
+
+    elseif ($route->match([Entity::getAllCategories(), Entity::getAllSlugs(), "delete"]) ) $controller->deleteItem();
+
     else $controller->adminError404();
 
 } catch(Error|TypeError|Exception|PDOException $e) {

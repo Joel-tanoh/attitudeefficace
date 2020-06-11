@@ -27,20 +27,24 @@ namespace App\BackEnd\Files;
  */
 class FileUploaded extends File
 {
+    private $errors;
+    
+    private $tmpName;
+
     /**
      * Constructeur d'une image.
      * 
-     * @param $file_uploaded Tableau $_FILES qui contient les informations relatives
-     *                       à l'image.
+     * @param $fileUplaoded Tableau $_FILES qui contient les informations relatives
+     *                      à l'image.
      */
-    public function __construct(array $file_uploaded)
+    public function __construct(array $fileUplaoded)
     {
-        $this->file_uploaded_infos = pathinfo($file_uploaded['name']);
-        $this->errors = $file_uploaded['error'];
-        $this->tmp_name = $file_uploaded['tmp_name'];
-        $this->name = $this->file_uploaded_infos['filename'];
-        $this->extension = $this->file_uploaded_infos['extension'];
-        $this->size = $file_uploaded['size'];
+        $fileUploadedInfos = pathinfo($fileUplaoded['name']);
+        $this->errors = $fileUplaoded['error'];
+        $this->tmpName = $fileUplaoded['tmp_name'];
+        $this->name = $fileUploadedInfos['filename'];
+        $this->extension = $fileUploadedInfos['extension'];
+        $this->size = $fileUplaoded['size'];
     }
 
     /**
@@ -51,7 +55,7 @@ class FileUploaded extends File
      */
     public function getTempName()
     {
-        return $this->tmp_name;
+        return $this->tmpName;
     }
     
     /**

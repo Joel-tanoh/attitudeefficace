@@ -432,9 +432,9 @@ HTML;
      * @author Joel
      * @return [[Type]] [[Description]]
      */
-    public function rangIsUsed() : string
+    public function rankIsUsed() : string
     {
-        return "Une étape occupe déjà le rang que vous avez donné à celle-ci ! Nous n'avons pas ajouté ce rang, vous pourrez le modifier plus tard.";
+        return "Une étape occupe déjà le rank que vous avez donné à celle-ci ! Nous n'avons pas ajouté ce rank, vous pourrez le modifier plus tard.";
     }
 
     /**

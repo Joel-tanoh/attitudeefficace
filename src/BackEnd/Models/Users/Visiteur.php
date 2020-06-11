@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\BackEnd\Models\Persons;
+namespace App\BackEnd\Models\Users;
 
 /**
  * Gère tout ce qui est en rapport au visiteur.
@@ -26,7 +26,7 @@ namespace App\BackEnd\Models\Persons;
  * @license  url.com license
  * @link     Link
  */
-class Visiteur extends Person
+class Visiteur extends User
 {
     /**
      * Retourne la liste des visiteurs.

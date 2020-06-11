@@ -16,8 +16,8 @@
 namespace App\BackEnd\Utils;
 
 use App\BackEnd\Files\FileUploaded;
-use App\BackEnd\Models\Model;
-use App\BackEnd\Models\Persons\Administrateur;
+use App\BackEnd\Models\Entity;
+use App\BackEnd\Models\Users\User;
 use App\View\Notification;
 
 /**
@@ -32,11 +32,40 @@ use App\View\Notification;
  */
 class Validator
 {
+    /**
+     * RegEx pour les comparaison HTML
+     * 
+     * @var string
+     */
     const HTML_REGEX = "#<.*>#";
+
+    /**
+     * RegEx pour comparer aux adresses emails.
+     * 
+     * @var string
+     */
     const EMAIL_REGEX = "#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#i";
+
+    /**
+     * La longeur minimal des mots de passes.
+     * 
+     * @var string
+     */
     const PASSWORD_LENGTH = 8;
+
+    /**
+     * Tableau contenant les erreurs après validation de variables.
+     * 
+     * @var array
+     */
     private $errors = [];
-    private $to_validate = [];
+
+    /**
+     * Tableau contenant les variables à valider.
+     * 
+     * @var array
+     */
+    private $toValidate = [];
 
     /**
      * Instancie un objet pour la validation.
@@ -49,7 +78,7 @@ class Validator
      */
     public function __construct(array $data = null)
     {
-        $this->notificateur = new Notification();
+        $this->notifier = new Notification();
 
         extract($data);
 
@@ -81,12 +110,12 @@ class Validator
             $this->validateArticleContent($article_content);
         }
 
-        if (!empty($prix)) {
-            $this->validatePrix($prix);
+        if (!empty($price)) {
+            $this->validatePrix($price);
         }
 
-        if (!empty($rang)) {
-            $this->validateRang($rang);
+        if (!empty($rank)) {
+            $this->validateRang($rank);
         }
 
         if (!empty($youtube_video_link) ) {
@@ -127,9 +156,9 @@ class Validator
      */
     public function validateParentId(string $parent_id = null)
     {
-        $this->to_validate["parent_id"] = $parent_id;
+        $this->toValidate["parent_id"] = $parent_id;
         if (!is_int((int)$parent_id)) {
-            $this->errors["parent_id"] = "Le choix de catégorie que vous avez fait est invalide.";
+            $this->errors["parent_id"] = "Le parent que vous avez fait est invalide.";
         }
     }
     
@@ -142,11 +171,11 @@ class Validator
      */
     public function validateTitle(string $title = null)
     {
-        $this->to_validate["title"] = $title;
+        $this->toValidate["title"] = $title;
         if (empty($title)) {
-            $this->errors["title"] = $this->notificateur->titleIsEmpty();
+            $this->errors["title"] = $this->notifier->titleIsEmpty();
         } elseif ($this->containsHTML($title)) {
-            $this->errors["title"] = $this->notificateur->titleContainsHTML();
+            $this->errors["title"] = $this->notifier->titleContainsHTML();
         }
     }
 
@@ -160,11 +189,11 @@ class Validator
      */
     public function validateDescription(string $description = null)
     {
-        $this->to_validate["description"] = $description;
+        $this->toValidate["description"] = $description;
         if (empty($description)) {
-            $this->errors["description"] = $this->notificateur->descriptionIsEmpty();
+            $this->errors["description"] = $this->notifier->descriptionIsEmpty();
         } elseif ($this->containsHTML($description)) {
-            $this->errors["description"] = $this->notificateur->descriptionContainsHTML();
+            $this->errors["description"] = $this->notifier->descriptionContainsHTML();
         }
     }
 
@@ -177,24 +206,24 @@ class Validator
      */
     public function validateArticleContent(string $article_content = null)
     {
-        $this->to_validate["article_content"] = $article_content;
+        $this->toValidate["article_content"] = $article_content;
         if (empty($article_content)) {
-            $this->errors["article_content"] = $this->notificateur->articleContentIsEmpty();
+            $this->errors["article_content"] = $this->notifier->articleContentIsEmpty();
         }
     }
 
     /**
-     * Permet de vérifier que le prix saisi l'utilisateur est un entier.
+     * Permet de vérifier que le price saisi l'utilisateur est un entier.
      * 
-     * @param string $prix Le prix saisi par l'utilisateur.
+     * @param string $price Le price saisi par l'utilisateur.
      * 
-     * @return string Une notification si le prix n'est pas un entier.
+     * @return string Une notification si le price n'est pas un entier.
      */
-    public function validatePrix(string $prix = null)
+    public function validatePrix(string $price = null)
     {
-        $this->to_validate["prix"] = $prix;
-        if (!is_int((int)$prix)) {
-            $this->errors["prix"] = $this->notificateur->IsNotInt("prix");
+        $this->toValidate["price"] = $price;
+        if (!is_int((int)$price)) {
+            $this->errors["price"] = $this->notifier->IsNotInt("price");
         }
     }
 
@@ -205,13 +234,13 @@ class Validator
      * 
      * @return string Une notification si le rang n'est pas un entier.
      */
-    public function validateRang(string $rang = null)
+    public function validateRang(string $rank = null)
     {
-        $rang = (int)$rang;
-        $this->to_validate["rang"] = $rang;
+        $rank = (int)$rank;
+        $this->toValidate["rank"] = $rank;
 
-        if (!is_int($rang)) {
-            $this->errors["rang"] = $this->notificateur->IsNotInt("rang");
+        if (!is_int($rank)) {
+            $this->errors["rank"] = $this->notifier->IsNotInt("rank");
         }
     }
 
@@ -224,11 +253,11 @@ class Validator
      */
     public function validateLogin(string $login = null)
     {
-        $this->to_validate["login"] = $login;
+        $this->toValidate["login"] = $login;
         if (empty($login)) {
-            $this->errors["login"] = $this->notificateur->loginIsEmpty();
+            $this->errors["login"] = $this->notifier->loginIsEmpty();
         } elseif ($this->containsHTML($login)) {
-            $this->errors["login"] = $this->notificateur->loginContainsHTML();
+            $this->errors["login"] = $this->notifier->loginContainsHTML();
         }
     }
    
@@ -241,12 +270,12 @@ class Validator
      */
     public function validatePassword(string $password = null)
     {
-        $this->to_validate["password"] = $password;
+        $this->toValidate["password"] = $password;
         $password_length = strlen($password);
         if (empty($password)) {
-            $this->errors["password"] = $this->notificateur->passwordIsEmpty();
+            $this->errors["password"] = $this->notifier->passwordIsEmpty();
         } elseif ($password_length < self::PASSWORD_LENGTH) {
-            $this->errors["password"] = $this->notificateur->passwordLengthIsInvalid();
+            $this->errors["password"] = $this->notifier->passwordLengthIsInvalid();
         }
     }
 
@@ -261,12 +290,12 @@ class Validator
      */
     public function validatePasswords(string $password = null, string $confirm_password = null)
     {
-        $this->to_validate["confirm_password"] = $confirm_password;
+        $this->toValidate["confirm_password"] = $confirm_password;
         $password_hashed = password_hash($password, PASSWORD_DEFAULT);
         if (empty($confirm_password)) {
-            $this->errors["confirm_password"] = $this->notificateur->confirmPasswordIsEmpty();
+            $this->errors["confirm_password"] = $this->notifier->confirmPasswordIsEmpty();
         } elseif (!password_verify($confirm_password, $password_hashed)) {
-            $this->errors["confirm_password"] = $this->notificateur->passwordsNotIdentics();
+            $this->errors["confirm_password"] = $this->notifier->passwordsNotIdentics();
         }        
     }
    
@@ -278,10 +307,10 @@ class Validator
      */
     public function validateImage()
     {  
-        $this->to_validate["image_uploaded"] = $_FILES["image_uploaded"];
+        $this->toValidate["image_uploaded"] = $_FILES["image_uploaded"];
         $image_uploaded = new FileUploaded($_FILES["image_uploaded"]);
         if (!$image_uploaded->isAnImageHasValidSizeAndNoError()) {
-            $this->errors["image_uploaded"] = $this->notificateur->imageIsInvalid();
+            $this->errors["image_uploaded"] = $this->notifier->imageIsInvalid();
         }
     }
 
@@ -292,10 +321,10 @@ class Validator
      */
     public function validatePdfFile()
     {
-        $this->to_validate["pdf_uploaded"] = $_FILES["pdf_uploaded"];
+        $this->toValidate["pdf_uploaded"] = $_FILES["pdf_uploaded"];
         $pdf_uploaded = new FileUploaded($_FILES["pdf_uploaded"]);
         if (!$pdf_uploaded->isPdfFile()) {
-            $this->errors["pdf_uploaded"] = $this->notificateur->isNotPdfFile();
+            $this->errors["pdf_uploaded"] = $this->notifier->isNotPdfFile();
         }
     }
 
@@ -308,9 +337,9 @@ class Validator
      */
     public function validateVideoLink(string $youtube_video_link = null)
     {
-        $this->to_validate["youtube_video_link"] = $youtube_video_link;
+        $this->toValidate["youtube_video_link"] = $youtube_video_link;
         if ($this->containsHTML($youtube_video_link)) {
-            $this->errors["youtube_video_link"] = $this->notificateur->videoLinkIsInvalid();
+            $this->errors["youtube_video_link"] = $this->notifier->videoLinkIsInvalid();
         }
     }
     
@@ -318,19 +347,19 @@ class Validator
      * Effectue les validations sur un nom. Vérifie que le nom n'excède pas 250
      * caractères ou qu'il ne contient pas de code HTML.
      * 
-     * @param string $nameto_validate Le nom qu'il faut valider.
-     * @param string $post_name        La valeur de l'attribut name dans le
+     * @param string $nameToValidate Le nom qu'il faut valider.
+     * @param string $postName        La valeur de l'attribut name dans le
      *                                 le formulaire.
      * 
      * @return string|null
      */
-    public function validateName(string $nameto_validate = null, string $post_name = null)
+    public function validateName(string $nameToValidate = null, string $postName = null)
     {
-        $this->to_validate[$post_name] = $nameto_validate;
-        if (strlen($nameto_validate) > 250 ) {
-            $this->errors[$post_name] = "Veuillez vérifier que le nom n'excède pas 250 caractères.";
-        } elseif ($this->containsHTML($nameto_validate)) {
-            $this->errors[$post_name] = "Veuillez vérifier que le nom ne contient pas de code HTML.";
+        $this->toValidate[$postName] = $nameToValidate;
+        if (strlen($nameToValidate) > 250 ) {
+            $this->errors[$postName] = "Veuillez vérifier que le nom n'excède pas 250 caractères.";
+        } elseif ($this->containsHTML($nameToValidate)) {
+            $this->errors[$postName] = "Veuillez vérifier que le nom ne contient pas de code HTML.";
         }
     }
   
@@ -343,10 +372,42 @@ class Validator
      */
     public function validateEmail(string $email = null)
     {
-        $this->to_validate["email"] = $email;
+        $this->toValidate["email"] = $email;
         if (!preg_match(self::EMAIL_REGEX, $email)) {
-            $this->errors["email"] = $this->notificateur->emailIsInvalid();
+            $this->errors["email"] = $this->notifier->emailIsInvalid();
         }
+    }
+
+    /**
+     * Permet de valider une variable.
+     * 
+     * @param mixed  $var               La variable à valider.
+     * @param int    $lvl               Le niveau de validation à appliquer.
+     * @param string $errorsTabKey      La clé identifiant le tableau des erreurs concernant la
+     *                                  variable checkée. 
+     * @param string $nameInErrorString Le nom identifiant la varibale et qui sera affiché dans la
+     *                                  chaîne de caractère retournée lorsqu'il y'a erreur.
+     * 
+     * @return void
+     */
+    public function validate($var, int $lvl, string $errorsTabKey, string $nameInErrorString)
+    {
+        if ($lvl === 1) {
+            if (empty($var)) $this->errors[$errorsTabKey][] = $nameInErrorString . " ne doit pas être vide";
+        }
+
+        if ($lvl === 2) {
+
+        }
+
+        if ($lvl === 3) {
+            if ($this->containsHTML($var)) $this->errors[$errorsTabKey][] = $nameInErrorString . " ne doit pas pas contenir du HTML";
+        }
+
+        if ($lvl === 4) {
+
+        }
+        
     }
 
     /**

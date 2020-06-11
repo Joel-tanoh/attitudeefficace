@@ -48,7 +48,7 @@ class File
     /**
      * Date du fichier
      */
-    protected $date;
+    protected $dateCreation;
 
     /**
      * Retourne le nom du fichier.

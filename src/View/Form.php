@@ -15,8 +15,9 @@
 namespace App\View;
 
 use App\BackEnd\Bdd\BddManager;
-use App\BackEnd\Models\ItemParent;
-use App\BackEnd\Models\Model;
+use App\BackEnd\Models\Items\ItemParent;
+use App\BackEnd\Models\Entity;
+use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Utils\Utils;
 
 /**
@@ -42,10 +43,10 @@ class Form extends View
     public static function getForm($categorie, $item = null)
     {
         if ($categorie === "administrateurs") $formContent = self::addAdminUserForm($item);
-        elseif (Model::isParentCategorie($categorie)) $formContent = self::parentForm($item, $categorie);
+        elseif (Item::isParentCategorie($categorie)) $formContent = self::parentForm($item, $categorie);
         elseif ($categorie === "videos") $formContent = self::addVideoForm($item);
-        elseif ($categorie === "minis-services") $formContent = self::addMiniserviceForm($item, $categorie);
-        elseif (Model::isChildCategorie($categorie)) $formContent = self::childForm($item, $categorie);
+        elseif ($categorie === "mini-services") $formContent = self::addMiniserviceForm($item, $categorie);
+        elseif (Item::isChildCategorie($categorie)) $formContent = self::childForm($item, $categorie);
         else Utils::header(ADMIN_URL);
         $submitButton = self::submitButton('enregistrement', 'Enregistrer');
 
@@ -143,7 +144,7 @@ HTML;
         $descriptionTextarea = self::descriptionTextarea($item);
         $videoInput = self::videoInput($item);
         $prixInput = self::prixInput($item, $prix_label);
-        $rangInput = self::rangInput($item, "formations");
+        $rankInput = self::rankInput($item, "formations");
         $imageInput = self::imageInput();
         $notifyUserBox = self::notifyUsersBox();
 
@@ -155,7 +156,7 @@ HTML;
             </div>
             <div class="col-md-5">
                 {$prixInput}
-                {$rangInput}
+                {$rankInput}
                 {$videoInput}
                 {$imageInput}
                 {$notifyUserBox}
@@ -183,7 +184,7 @@ HTML;
         $descriptionTextarea = self::descriptionTextarea($item);
         $videoInput = self::videoInput($item);
         $prixInput = self::prixInput($item, $prix_label);
-        $rangInput = self::rangInput($item, "videos");
+        $rankInput = self::rankInput($item, "videos");
         $imageInput = self::imageInput();
         $notifyUserBox = self::notifyUsersBox();
 
@@ -197,7 +198,7 @@ HTML;
             </div>
             <div class="col-md-5">
                 {$prixInput}
-                {$rangInput}
+                {$rankInput}
                 {$imageInput}
                 {$notifyUserBox}
             </div>
@@ -244,7 +245,7 @@ HTML;
         $descriptionTextarea = self::descriptionTextarea($item);
         $videoInput = self::videoInput($item);
         $prixInput = self::prixInput($item, $prix_label);
-        $rangInput = self::rangInput($item, $categorie);
+        $rankInput = self::rankInput($item, $categorie);
         $imageInput = self::imageInput();
         $pdfFileInput = self::pdfFileInput($uploadPdf);
         $notifyUserBox = self::notifyUsersBox();
@@ -259,7 +260,7 @@ HTML;
             <div class="col-md-5">
                 {$videoInput}
                 {$prixInput}
-                {$rangInput}
+                {$rankInput}
                 {$imageInput}
                 {$pdfFileInput}
                 {$notifyUserBox}
@@ -279,7 +280,7 @@ HTML;
      */
     public static function loginInput($user = null, string $class = null)
     {
-        $login = !is_null($user) ? $user->get("login") : "";
+        $login = !is_null($user) ? $user->getLogin() : "";
         $label = self::label("login", "Login");
         extract($_POST);
         $input = self::text('login', 'login', $login, "Login", $class);
@@ -322,7 +323,7 @@ HTML;
      */
     public static function emailInput($user = null, string $class = null)
     {
-        $email = !is_null($user) ? $user->get("email") : "";
+        $email = !is_null($user) ? $user->getEmail(): "";
         $label = self::label("email", "Adresse email");
         extract($_POST);
         $input = self::email('email', 'email', $email, "johny@mail.com", $class);
@@ -343,7 +344,7 @@ HTML;
     public static function chooseAdminAccountType()
     {
         $label = self::label("", "Type de compte :");
-        $adminRadio = self::radio("account_type", "administrateur", "Administrateur");
+        $adminRadio = self::radio("role", "administrateur", "User");
         $userRadio = self::radio("account_type", "utilisateur", "Utilisateur");
         return <<<HTML
         {$label}
@@ -391,7 +392,7 @@ HTML;
      */
     public static function selectParent(string $categorie = null)
     {
-        if (null !== $categorie && Model::isChildCategorie($categorie) && $categorie !== "minis-services") {
+        if (null !== $categorie && Item::isChildCategorie($categorie) && $categorie !== "mini-services") {
             $label = self::label("selectParentList", "Choisir le parent :");
             $parentListOptions = self::parentList("themes", "Thèmes");
 
@@ -417,7 +418,7 @@ HTML;
      */
     public static function titleInput($item = null)
     {
-        $title = null !== $item ? $item->get("title") : "";
+        $title = null !== $item ? $item->getTitle() : "";
 
         extract($_POST);
 
@@ -442,7 +443,7 @@ HTML;
      */
     public static function descriptionTextarea($item)
     {
-        $description = !is_null($item) ? $item->get("description") : "";
+        $description = !is_null($item) ? $item->getDescription() : "";
 
         extract($_POST);
 
@@ -467,7 +468,7 @@ HTML;
      */
     public static function articleContentTextarea($item = null, string $categorie = null)
     {
-        $article_content = null !== $item ? $item->get("article_content") : $categorie === "articles" ? "" : null;
+        $article_content = null !== $item ? $item->getArticleContent() : $categorie === "articles" ? "" : null;
 
         extract($_POST);
 
@@ -487,7 +488,7 @@ HTML;
     }
 
     /**
-     * Retourne un champ dans le formulaire pour le prix.
+     * Retourne un champ dans le formulaire pour le price.
      * 
      * @param mixed  $item 
      * @param string $label 
@@ -496,13 +497,13 @@ HTML;
      */
     public static function prixInput($item = null, $label = null)
     {
-        $prix =  !is_null($item) ? $item->get("price") : "";
+        $price =  !is_null($item) ? $item->getPrice() : "";
 
         extract($_POST);
 
         $labelAndInput =
             self::label("Prix", $label) .
-            self::number('prix', 'Prix', $prix, "Prix", "col-12 form-control", 0);
+            self::number('price', 'Prix', $price, "Prix", "col-12 form-control", 0);
 
         return <<<HTML
         <div class="form-group">
@@ -519,30 +520,30 @@ HTML;
      * 
      * @return string Le code HTML pour le champ.
      */
-    public static function rangInput($item = null, string $categorie = null)
+    public static function rankInput($item = null, string $categorie = null)
     {
         if (null !== $item) {
-            $rang = $item->get("rang");
-            $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
+            $rank = $item->getRank();
+            $rank_actuel = ($rank == "1") ? $rank . "er" : $rank . " eme";
             $label = <<<HTML
-            Donnez un rang à cet élément :
-            <p class="notice"> Cet élément apparaîtra : {$rang_actuel}</p>
+            Donnez un rank à cet élément :
+            <p class="notice"> Cet élément apparaîtra : {$rank_actuel}</p>
 HTML;
         } else {
-            $bdd_manager = Model::bddManager();
-            $rang = $bdd_manager->getMaxValueOf("rang", Model::getTableNameFrom( $categorie ), "categorie", "categorie", $categorie ) + 1;
-            $rang_actuel = ($rang == "1") ? $rang . "er" : $rang . " eme";
+            $bddManager = Entity::bddManager();
+            $rank = $bddManager->getMaxValueOf("rank", Entity::getTableName( $categorie ), "categorie", "categorie", $categorie ) + 1;
+            $rank_actuel = ($rank == "1") ? $rank . "er" : $rank . " eme";
             $label = <<<HTML
-            Donnez un rang à cet élément :
-            <p class="notice"> Cet élément apparaîtra : {$rang_actuel} par défaut</p>
+            Donnez un rank à cet élément :
+            <p class="notice"> Cet élément apparaîtra : {$rank_actuel} par défaut</p>
 HTML;
         }
 
         extract($_POST);
 
         $labelAndInput = 
-            self::label("rang", $label) .
-            self::number('rang', 'Rang', $rang, "Rang", "col-12 form-control", 0);
+            self::label("rank", $label) .
+            self::number('rank', 'Rang', $rank, "Rang", "col-12 form-control", 0);
 
         return <<<HTML
         <div class="form-group">
@@ -560,7 +561,7 @@ HTML;
      */
     public static function videoInput($item = null)
     {
-        $youtube_video_link = !is_null($item) ? $item->get("youtube_video_link") : "";
+        $youtube_video_link = !is_null($item) ? $item->getYoutubeVideoLink() : "";
         $label = <<<HTML
         Coller l'id de la vidéo de Youtube :
         <p class="notice">Cette vidéo peut être une vidéo de description</p>
@@ -746,14 +747,14 @@ HTML;
     private static function parentList($categorie = null)
     {
         $options = null;
-        $bdd_manager = Model::bddManager();
-        $items = $bdd_manager->get("code", ItemParent::TABLE_NAME);
+        $bddManager = Entity::bddManager();
+        $items = $bddManager->get("code", ItemParent::TABLE_NAME);
         foreach ($items as $item) {
-            $item = Model::returnObject($categorie, $item["code"]);
-            $options .= '<option value="'. $item->get("id") . '">';
-            $options .= ucfirst($item->get("title"));
+            $item = Entity::returnObjectByCategorie($categorie, $item["code"]);
+            $options .= '<option value="'. $item->getID() . '">';
+            $options .= ucfirst($item->getTitle());
             $options .= ' - ';
-            $options .= '<span class="italic">'. ucfirst($item->get('categorie')) . '</span>';
+            $options .= '<span class="italic">'. ucfirst($item->getCategorie()) . '</span>';
             $options .= '</option>';
         }
         return $options;

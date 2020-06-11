@@ -16,8 +16,8 @@
 namespace App\View\ModelsView;
 
 use App\BackEnd\Bdd\BddManager;
-use App\BackEnd\Models\Model;
-use App\BackEnd\Models\ItemParent;
+use App\BackEnd\Models\Entity;
+use App\BackEnd\Models\Items\ItemParent;
 use App\BackEnd\Models\ItemChild;
 use App\View\Card;
 use App\View\Snippet;
@@ -83,63 +83,35 @@ HTML;
     }
 
     /**
-     * Affiche le type des parents enfants et le nombre qu'il contient.
-     * 
-     * @return string
-     */
-    public function parentchildrenNumber()
-    {
-        $articles = Model::getchildrenOf($this->item->get("id"), "articles");
-        $articles_number = count($articles);
-
-        $videos = Model::getchildrenOf($this->item->get("id"), "videos");
-        $videos_number = count($videos);
-
-        $livres = Model::getchildrenOf($this->item->get("id"), "livres");
-        $livres_number = count($livres);
-
-        $ebooks = Model::getchildrenOf($this->item->get("id"), "ebooks");
-        $ebooks_number = count($ebooks);
-        
-        return <<<HTML
-        Articles ({$articles_number})
-        Vidéos ({$videos_number})
-        Livres ({$livres_number})
-        Ebooks ({$ebooks_number})
-HTML;
-    }
-
-    /**
      * Affiche les parents enfants en fonction de leur catégorie.
      * 
-     * @param $children_type Le type des éléments qu'il faut qu'il faut afficher.
+     * @param $childrenType Le type des éléments qu'il faut qu'il faut afficher.
      * 
      * @return string
      */
-    private function showChildrenItemsByType(string $children_type)
+    private function showChildrenItemsByType(string $childrenType)
     {
         $children = $this->item->getChildren();
-        $children_number = count($children);
+        $childrenNumber = count($children);
 
         if (empty($children)) {
-            $children_list = '<div class="col-12 text-italic text-muted">Vide</div>';
+            $childrenList = '<div class="col-12 text-italic text-muted">Vide</div>';
         } else {
-            $children_list = null;
+            $childrenList = null;
             foreach ($children as $child) {
-                $child = Model::returnObject($children_type, $child["code"]);
-                $children_list .= Card::card(null, $child->get("title"), $child->get("admin_url"));
+                $childrenList .= Card::card(null, $child->getTitle(), $child->getUrl("administration"));
             }
         }
-        $children_type = ucfirst($children_type);
+        $childrenType = ucfirst($childrenType);
 
         return <<<HTML
         <div>
             <h5>
-                {$children_type}
-                <span class="badge bg-primary text-white">{$children_number}</span>
+                {$childrenType}
+                <span class="badge bg-primary text-white">{$childrenNumber}</span>
             </h5>
-            <div class="row">
-                {$children_list}
+            <div class="row px-2">
+                {$childrenList}
             </div>
         </div>
 HTML;

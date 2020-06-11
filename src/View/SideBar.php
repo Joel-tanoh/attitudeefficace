@@ -16,8 +16,8 @@
 namespace App\View;
 
 use App\BackEnd\Bdd\BddManager;
-use App\BackEnd\Models\Persons\Administrateur;
-use App\BackEnd\Models\Model;
+use App\BackEnd\Models\Users\User;
+use App\BackEnd\Models\Entity;
 
 /**
  * Permet de gérer les barres de menu sur le coté.
@@ -50,9 +50,9 @@ class SideBar extends View
      **/
     public static function smallScreenSideBar()
     {
-        $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
+        $adminUser = User::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
         $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
-        $sidebarUserAvatar = self::sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")));
+        $sidebarUserAvatar = self::sidebarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
         $searchBar = Snippet::searchBar();
         $links = self::links();
 
@@ -78,9 +78,9 @@ HTML;
      **/
     public static function largeScreenSideBar()
     {
-        $admin_user = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
+        $adminUser = User::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
         $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
-        $sidebarUserAvatar = self::sidebarUserAvatar($admin_user->get("avatar_src", $admin_user->get("login")));
+        $sidebarUserAvatar = self::sidebarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
         $searchBar = Snippet::searchBar();
         $links = self::links();
 
@@ -150,7 +150,7 @@ HTML;
         $links .= self::setLink(ADMIN_URL."/videos", "fas fa-video", "Vidéos");
         $links .= self::setLink(ADMIN_URL."/livres", "fas fa-book", "Livres");
         $links .= self::setLink(ADMIN_URL."/ebooks", "fas fa-book", "Ebooks");
-        $links .= self::setLink(ADMIN_URL."/minis-services", "fas fa-shopping-basket", "Minis services");
+        $links .= self::setLink(ADMIN_URL."/mini-services", "fas fa-shopping-basket", "Minis services");
 
         return $links;
     }
