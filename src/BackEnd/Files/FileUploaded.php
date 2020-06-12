@@ -77,7 +77,7 @@ class FileUploaded extends File
      */
     public function hasValidSize() : bool
     {
-        return $this->size <= MAX_IMAGE_UPLOADED_SIZE;
+        return $this->size <= Image::MAX_VALID_SIZE;
     }
 
     /**
@@ -100,7 +100,7 @@ class FileUploaded extends File
      */
     public function isAnImage() : bool
     {
-        return in_array(mb_strtolower($this->extension), VALID_IMAGE_EXTENSIONS);
+        return in_array(mb_strtolower($this->extension), Image::VALID_EXTENSIONS);
     }
     
     /**
@@ -125,6 +125,16 @@ class FileUploaded extends File
     public function isPdfFile()
     {
         return $this->extension == "pdf";
+    }
+
+    /**
+     * Permet de vérifier que le fichier uploadé est une vidéo.
+     * 
+     * @return bool
+     */
+    public function isVideo()
+    {
+
     }
 
 }

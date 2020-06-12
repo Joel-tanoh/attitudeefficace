@@ -233,7 +233,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getThumbsName()
     {
-        return $this->getCategorie() . "-" . $this->getSlug() . IMAGES_EXTENSION;
+        return $this->getCategorie() . "-" . $this->getSlug() . Image::EXTENSION;
     }
 
     /**

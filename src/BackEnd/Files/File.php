@@ -34,6 +34,13 @@ class File
     protected $name;
 
     /**
+     * Le nom du dossier.
+     * 
+     * @var string
+     */
+    protected $dirName;
+
+    /**
      * La taille du fichier uploadé
      * 
      * @var int
@@ -41,14 +48,37 @@ class File
     protected $size;
     
     /**
-     * Extension du fichier uploadé
+     * Extension du fichier uploadé.
+     * 
+     * @var string
      */
     protected $extension;
 
     /**
-     * Date du fichier
+     * Date du fichier.
+     * 
+     * @var string
      */
-    protected $dateCreation;
+    protected $date;
+
+    /**
+     * Constructeur d'un fichier.
+     * 
+     * @param $path Tableau $_FILES qui contient les informations relatives
+     *                      à l'image.
+     */
+    public function __construct(array $path = null)
+    {
+        if (null !== $path) {
+            $fileInfos = pathinfo($path);
+
+            $this->name = $fileInfos['filename'];
+            $this->dirName = $fileInfos["dirname"];
+            $this->extension = $fileInfos['extension'];
+            $this->size = $fileInfos['size'];
+        }
+        
+    }
 
     /**
      * Retourne le nom du fichier.
@@ -61,9 +91,18 @@ class File
     }
 
     /**
+     * Retourne le nom du dossier.
+     * 
+     * @return string
+     */
+    public function getDirName()
+    {
+        return $this->dirName;
+    }
+
+    /**
      * Retourne la taille du fichier.
      * 
-     * @author Joel
      * @return string
      */
     public function getSize()
@@ -80,6 +119,16 @@ class File
     public function getExtension()
     {
         return '.' . mb_strtolower($this->extension);
+    }
+
+    /**
+     * Retourne la date.
+     * 
+     * @return string
+     */
+    public function getDate()
+    {
+        return $this->date;
     }
     
 }

@@ -30,6 +30,42 @@ use Intervention\Image\ImageManager;
 class Image extends File
 {
     /**
+     * Tableau contenant les extensions de fichiers de type image
+     * autorisées.
+     * 
+     * @var array
+     */
+    const VALID_EXTENSIONS = ["png", "jpg", "jpg", "gif"];
+
+    /**
+     * Taille maximale des fichiers de types images autorisée.
+     * 
+     * @var int
+     */
+    const MAX_VALID_SIZE = 2097152;
+
+    /**
+     * Extension des images sur l'app.
+     * 
+     * @var string
+     */
+    const EXTENSION = ".png";
+
+    /**
+     * Avatar par défaut dans l'app.
+     * 
+     * @var string
+     */
+    const DEFAULT_AVATAR = AVATARS_DIR_URL . "/default-avatar" . self::EXTENSION;
+
+    /**
+     * Thumbs par défaut.
+     * 
+     * @var string
+     */
+    const DEFAULT_THUMBS = THUMBS_DIR_URL . "/default-thumbs" . self::EXTENSION;
+
+    /**
      * Permet de sauvegarder l'image dans les fichiers du serveur dans le dossier des
      * images et des miniatures.
      * 
@@ -78,7 +114,7 @@ class Image extends File
         if (null !== $imageWidth && null !== $imageHeight){
             $manager->fit($imageWidth, $imageHeight);
         }
-        $manager->save($dirPath . $imageName . IMAGES_EXTENSION);
+        $manager->save($dirPath . $imageName . self::EXTENSION);
         return true;
     }
 
@@ -93,7 +129,7 @@ class Image extends File
     public function renameImages($oldName, $newName)
     {
         $oldThumbs = THUMBS_PATH . $oldName;
-        $newThumbs = THUMBS_PATH . $newName . IMAGES_EXTENSION;
+        $newThumbs = THUMBS_PATH . $newName . self::EXTENSION;
 
         if (rename($oldThumbs, $newThumbs)) {
             return true;
@@ -103,7 +139,7 @@ class Image extends File
     }
 
     /**
-     * Supprime les images de couverture et miniatures
+     * Supprime les images de couverture et miniatures.
      * 
      * @param string $imageName Le nom de l'image.
      * 

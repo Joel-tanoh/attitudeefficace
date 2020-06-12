@@ -155,7 +155,7 @@ class User extends \App\BackEnd\Models\Entity
         $this->dayUpdatedAt = $result["day_modified_at"];
         $this->hourUpdatedAt = $result["hour_modified_at"];
         $this->url = ADMIN_URL . '/' . self::TABLE_NAME . "/" . $this->code;
-        $this->avatarName = Utils::slugify($this->login) . "-" . $this->id . IMAGES_EXTENSION;
+        $this->avatarName = Utils::slugify($this->login) . "-" . $this->id . Image::EXTENSION;
         $this->avatarPath = AVATARS_PATH . $this->avatarName;
         $this->avatarSrc = AVATARS_DIR_URL . "/" . $this->avatarName;
         $this->tableName = self::TABLE_NAME;
@@ -449,7 +449,7 @@ class User extends \App\BackEnd\Models\Entity
      */
     public function getAvatarSrc()
     {
-        return file_exists($this->avatarPath) ? $this->avatar_src : DEFAULT_AVATAR;
+        return file_exists($this->avatarPath) ? $this->avatar_src : Image::DEFAULT_AVATAR;
     }
 
 

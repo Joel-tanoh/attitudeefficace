@@ -30,6 +30,13 @@ use Exception;
 class Pdf extends File
 {
     /**
+     * Extensions des fichiers pdf.
+     * 
+     * @var string
+     */
+    const EXTENSION = ".pdf";
+
+    /**
      * Vérifie que c'est un fichier PDF.
      * 
      * @author Joel
@@ -49,7 +56,7 @@ class Pdf extends File
      */
     public function savePdfFile($pdfName)
     {
-        $destination = PDF_PATH . $pdfName . PDF_EXTENSION;
+        $destination = PDF_PATH . $pdfName . Pdf::EXTENSION;
         if (!empty($_FILES["pdf_uploaded"]["name"])) {
             if (!move_uploaded_file($_FILES["pdf_uploaded"]["tmp_name"], $destination)) {
                 throw new Exception("Echec de l'enregistrement du fichier Pdf");
