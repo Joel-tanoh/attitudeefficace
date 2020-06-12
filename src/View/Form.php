@@ -344,8 +344,9 @@ HTML;
     public static function chooseAdminAccountType()
     {
         $label = self::label("", "Type de compte :");
-        $adminRadio = self::radio("role", "administrateur", "User");
-        $userRadio = self::radio("account_type", "utilisateur", "Utilisateur");
+        $adminRadio = self::radio("role", "3", "Administrateur");
+        $userRadio = self::radio("role", "2", "Utilisateur");
+        
         return <<<HTML
         {$label}
         <div class="row mb-2">

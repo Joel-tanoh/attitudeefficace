@@ -15,9 +15,7 @@
 
 namespace App\View;
 
-use App\BackEnd\Bdd\BddManager;
-use App\BackEnd\Models\Users\User;
-use App\BackEnd\Models\Entity;
+use App\BackEnd\Models\Users\Administrateur;
 
 /**
  * Permet de gérer les barres de menu sur le coté.
@@ -50,7 +48,7 @@ class SideBar extends View
      **/
     public static function smallScreenSideBar()
     {
-        $adminUser = User::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
+        $adminUser = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
         $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
         $sidebarUserAvatar = self::sidebarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
         $searchBar = Snippet::searchBar();
@@ -78,7 +76,7 @@ HTML;
      **/
     public static function largeScreenSideBar()
     {
-        $adminUser = User::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
+        $adminUser = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
         $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
         $sidebarUserAvatar = self::sidebarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
         $searchBar = Snippet::searchBar();

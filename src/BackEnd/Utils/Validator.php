@@ -16,8 +16,6 @@
 namespace App\BackEnd\Utils;
 
 use App\BackEnd\Files\FileUploaded;
-use App\BackEnd\Models\Entity;
-use App\BackEnd\Models\Users\User;
 use App\View\Notification;
 
 /**

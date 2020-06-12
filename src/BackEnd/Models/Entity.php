@@ -20,9 +20,9 @@ use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Models\Items\ItemParent;
 use App\BackEnd\Models\Items\ItemChild;
-use App\BackEnd\Models\Users\User;
 use App\BackEnd\Models\Users\Suscriber;
 use App\BackEnd\Models\MiniserviceOrder;
+use App\BackEnd\Models\Users\Administrateur;
 
 /**
  * Classe de gestion des données.
@@ -157,7 +157,7 @@ abstract class Entity
 
         elseif (Item::isChildCategorie($categorie) || $categorie === "motivation-plus") return new ItemChild($code);
         
-        elseif ($categorie === "utilisateurs")  return new User($code);
+        elseif ($categorie === "administrateurs")  return new Administrateur($code);
 
         elseif ($categorie === "commandes") return new MiniserviceOrder($code);
         
@@ -177,7 +177,7 @@ abstract class Entity
      */
     public static function getTableName(string $categorie = null)
     {
-        if ($categorie == "utilisateurs") return User::TABLE_NAME;
+        if ($categorie == "administrateurs") return Administrateur::TABLE_NAME;
 
         elseif (Item::isParentCategorie($categorie)) return ItemParent::TABLE_NAME;
 
@@ -244,8 +244,8 @@ abstract class Entity
         $femaleCategorieWords = ["formations", "etapes", "videos"];
         $categorieBeginningByVowel = ["articles", "ebooks"];
 
-        if ($categorie == User::TABLE_NAME) {
-            return "Nouveau utilisateur";
+        if ($categorie == Administrateur::TABLE_NAME) {
+            return "Nouvel administrateur";
         } elseif (in_array($categorie, $femaleCategorieWords)) {
             return "Nouvelle " . self::getCategorieFormated($categorie);
         } elseif (in_array($categorie, $categorieBeginningByVowel)) {

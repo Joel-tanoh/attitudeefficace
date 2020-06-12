@@ -104,100 +104,18 @@ class User extends \App\BackEnd\Models\Entity
     protected $emailAddress;
 
     /**
-     * Nom de la table.
+     * Catégorie.
      * 
      * @var string
      */
-    const TABLE_NAME = "users";
+    const CATEGORIE = "users";
 
     /**
      * Url de la catégorie.
      * 
      * @var string
      */
-    const URL = ADMIN_URL."/". self::TABLE_NAME;
-    
-    /**
-     * Construit un administrateur en prenant comme paramètre son code et remplit 
-     * toutes les propriétés.
-     * 
-     * @param string $code Le code identificateur de l'administrateur dans la base de
-     *                     données.
-     */
-    public function __construct(string $code)
-    {
-        $pdo = self::connect();
-        $sql_query = new SqlQueryFormater();
-
-        $query = $sql_query
-                ->select("id, code, login, password, email_address, role, state")
-                ->select("date_format(created_at, '%d %b. %Y') AS day_created_at")
-                ->select("date_format(created_at, '%H:%i') AS hour_created_at")
-                ->select("date_format(updated_at, '%d %b. %Y') AS day_modified_at")
-                ->select("date_format(updated_at, '%H:%i') AS hour_modified_at")
-                ->from(self::TABLE_NAME)
-                ->where("code = ?")
-                ->returnQueryString();
-
-        $rep = $pdo->prepare($query);
-        $rep->execute([$code]);
-        $result = $rep->fetch();
-
-        $this->id = $result['id'];
-        $this->code = $result['code'];
-        $this->login = $result['login'];
-        $this->password = $result['password'];
-        $this->role = $result['role'];
-        $this->state = $result['state'];
-        $this->email_address = $result['email_address'];
-        $this->dayCreatedAt = $result["day_created_at"];
-        $this->hourCreatedAt = $result["hour_created_at"];
-        $this->dayUpdatedAt = $result["day_modified_at"];
-        $this->hourUpdatedAt = $result["hour_modified_at"];
-        $this->url = ADMIN_URL . '/' . self::TABLE_NAME . "/" . $this->code;
-        $this->avatarName = Utils::slugify($this->login) . "-" . $this->id . Image::EXTENSION;
-        $this->avatarPath = AVATARS_PATH . $this->avatarName;
-        $this->avatarSrc = AVATARS_DIR_URL . "/" . $this->avatarName;
-        $this->tableName = self::TABLE_NAME;
-    }
-
-    /**
-     * Permet de sauvegarder les données pour un compte administrateur ou
-     * utilisateur.
-     * 
-     * @param string $code Un code uniqe alphanumérique généré aléatoirement.
-     * @param string $data 
-     * 
-     * @return void
-     */
-    public static function create(string $code, array $data)
-    {
-        extract($data);
-
-        $login = mb_strtolower( htmlspecialchars( $login ) );
-        $password_hashed = password_hash( $password, PASSWORD_DEFAULT );
-
-        if (self::insertNotNullData( $code, $login, $password_hashed )) {
-            $newUser = new self($code);
-            
-            if (!empty($email_address)) {
-                $newUser->set("email_address", $email_address, self::TABLE_NAME, "id", $new_user->getID());
-            }
-
-            if (!empty($account_type)) {
-                $newUser->set("role", $account_type, self::TABLE_NAME, "id", $new_user->getID());
-            }
-
-            if (!empty($_FILES["avatar_uploaded"]["name"])) {
-                $new_user->setAvatar();
-            }
-
-            return new self($code);
-
-        } else {
-            throw new Exception("Echec de l'enregistrement, veuillez réessayer ou si cela persiste, veuillez contacter l'administrateur");
-        }
-    }
+    const URL = ADMIN_URL."/". self::CATEGORIE;
 
     /**
      * Permet de sauvegarder l'avatar d'un compte qui vient d'être créé dans les
@@ -232,101 +150,7 @@ class User extends \App\BackEnd\Models\Entity
      */
     public function delete()
     {
-        parent::bddManager()->delete(self::TABLE_NAME, "id", $this->id);
-        return true;
-    }
-
-    /**
-     * Vérifie si le login existe dans la base de données.
-     * 
-     * @param string $login [[Description]]
-     * 
-     * @return bool [[Description]]
-     */
-    static function loginIsset(string $login) : bool
-    {
-        $pdo = self::connect();
-
-        $sql_query = new SqlQueryFormater();
-        $query = $sql_query
-                ->select("COUNT(id) AS user")
-                ->from(self::TABLE_NAME)
-                ->where("login = ?")
-                ->returnQueryString();
-
-        $rep = $pdo->prepare($query);
-        $rep->execute([$login]);
-        $counter = $rep->fetch();
-        return $counter['user'] == 1;
-    }
-
-    /**
-     * Crée un objet User par grâce à l'adresse email.
-     * 
-     * @param string $email_address
-     * 
-     * @return self
-     */
-    static function getByEmail(string $email_address)
-    {
-        $pdo = self::connect();
-        $sql_query = new SqlQueryFormater();
-
-        $query = $sql_query
-                ->select("code, login, password")
-                ->from(self::TABLE_NAME)
-                ->where("email_address = ?")
-                ->returnQueryString();
-        
-        $rep = $pdo->prepare($query);
-        $rep->execute([mb_strtolower($email_address)]);
-        $result = $rep->fetch();
-
-        return new self($result["code"]);
-    }
-
-    /**
-     * Retourne le login et le mot de passe de l'administrateur en prenant en
-     * paramètre le login.
-     * 
-     * @param string $login [[Description]]
-     * 
-     * @author Joel
-     * @return self
-     */
-    public static function getByLogin(string $login)
-    {
-        $pdo = self::connect();
-        $sql_query = new SqlQueryFormater();
-
-        $query = $sql_query
-                ->select("code, login, password")
-                ->from(self::TABLE_NAME)
-                ->where("login = ?")
-                ->returnQueryString();
-        
-        $rep = $pdo->prepare($query);
-        $rep->execute([mb_strtolower($login)]);
-        $result = $rep->fetch();
-
-        return new self($result["code"]);
-    }
-
-    /**
-     * Insère le code, le login, le mot de passe, et le categorie dans la base de données.
-     * 
-     * @param string $code     Code.
-     * @param string $login    Login.
-     * @param string $password Mot de passe.
-     * 
-     * @return bool
-     */
-    private static function insertNotNullData($code, $login, $password)
-    {
-        $pdo = self::connect();
-        $query = "INSERT INTO " . self::TABLE_NAME . " (code, login, password) VALUES(?, ?, ?)";
-        $rep = $pdo->prepare($query);
-        $rep->execute([$code, $login, $password]);
+        parent::bddManager()->delete($this->tableName, "id", $this->id);
         return true;
     }
 
@@ -452,7 +276,6 @@ class User extends \App\BackEnd\Models\Entity
         return file_exists($this->avatarPath) ? $this->avatar_src : Image::DEFAULT_AVATAR;
     }
 
-
     /**
      * Vérifie si une personne est authentifiée.
      * 
@@ -510,4 +333,24 @@ class User extends \App\BackEnd\Models\Entity
         
     }
     
+    /**
+     * Retourne le premier contact.
+     * 
+     * @return string
+     */
+    public function getContact1()
+    {
+        return $this->contact1;
+    }
+
+    /**
+     * Retourne le deuxième contact.
+     * 
+     * @return string
+     */
+    public function getContact2()
+    {
+        return $this->contact2;
+    }
+
 }

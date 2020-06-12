@@ -14,8 +14,7 @@
 
 namespace App\View\ModelsView;
 
-use App\BackEnd\Models\Users\User;
-use App\View\Form;
+use App\BackEnd\Models\Users\Administrateur;
 
 /**
  * Gère toutes les vues concernant les comptes administrateurs.
@@ -28,11 +27,11 @@ use App\View\Form;
  */
 class UserView extends \App\View\View
 {
-    private $admin_user;
+    private $adminUser;
 
-    public function __construct($admin_user = null)
+    public function __construct($adminUser = null)
     {  
-       $this->admin_user = $admin_user;
+       $this->adminUser = $adminUser;
     }
 
     /**
@@ -42,12 +41,13 @@ class UserView extends \App\View\View
      * 
      * @return string
      */
-    public function listUsers($users)
+    public function listAdmins($users)
     {
         $accounts_list = null;
+
         if (!empty($users)) {
             foreach ($users as $user) {
-                $user = new User($user['code']);
+                $user = new Administrateur($user['code']);
                 $accounts_list .= $this->listRow($user);
             }
         }

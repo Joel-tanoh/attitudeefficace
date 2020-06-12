@@ -14,7 +14,7 @@
 
 namespace App\View;
 
-use App\BackEnd\Models\Users\User;
+use App\BackEnd\Models\Users\Administrateur;
 
 /**
  * Perlet de gérer tout ce qui concerne la barre de navigation supérieure.
@@ -99,7 +99,7 @@ HTML;
      */
     public static function addItemsLinksView()
     {
-        $adminurl = ADMIN_URL;
+        $adminUrl = ADMIN_URL;
         return <<<HTML
         <li id="addButton" class="mr-3">
             <a class="add-button-icon">
@@ -107,19 +107,19 @@ HTML;
             </a>
             <ul class="add-button-content list-unstyled">
                 <li>
-                    <a href="{$adminurl}/formations/create" class="text-primary">Formation</a>
+                    <a href="{$adminUrl}/formations/create" class="text-primary">Formation</a>
                 </li>
                 <li>
-                    <a href="{$adminurl}/articles/create" class="text-primary">Article</a>
+                    <a href="{$adminUrl}/articles/create" class="text-primary">Article</a>
                 </li>
                 <li>
-                    <a href="{$adminurl}/videos/create" class="text-primary">Vidéo</a>
+                    <a href="{$adminUrl}/videos/create" class="text-primary">Vidéo</a>
                 </li>
                 <li>
-                    <a href="{$adminurl}/livres/create" class="text-primary">Livre</a>
+                    <a href="{$adminUrl}/livres/create" class="text-primary">Livre</a>
                 </li>
                 <li>
-                    <a href="{$adminurl}/ebooks/create" class="text-primary">Ebook</a>
+                    <a href="{$adminUrl}/ebooks/create" class="text-primary">Ebook</a>
                 </li>
             </ul>
         <li>
@@ -134,10 +134,13 @@ HTML;
      */
     public static function getAdminManagementButtonsView()
     {
-        $adminurl = ADMIN_URL;
-        $adminUser = User::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
+        $adminUrl = ADMIN_URL;
+        
+        $login = $_SESSION["admin_login"] ?? $_COOKIE["admin_login"];
 
-        $privateButtons = $adminUser->getRole() === "administrateur 2"
+        $adminUser = Administrateur::getByLogin($login);
+
+        $privateButtons = $adminUser->hasAllRights()
             ? self::administrateurReservedActions() : null;
 
         $navbarUserAvatar = self::navbarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
@@ -150,11 +153,11 @@ HTML;
             </a>
             <ul id="btnUserContent" class="content border list-unstyled">
                 <li>
-                    <a href="{$adminurl}/administrateurs/me" class="text-primary">Mon profil</a>
+                    <a href="{$adminUrl}/administrateurs/me" class="text-primary">Mon profil</a>
                 </li>
                 {$privateButtons}
                 <li>
-                    <a class="bg-danger text-white" href="{$adminurl}/deconnexion">Déconnexion</a>
+                    <a class="bg-danger text-white" href="{$adminUrl}/deconnexion">Déconnexion</a>
                 </li>
             </ul>
         </li>
@@ -188,16 +191,16 @@ HTML;
      */
     private static function administrateurReservedActions()
     {
-        $adminurl = ADMIN_URL;
+        $adminUrl = ADMIN_URL;
         return <<<HTML
         <li>
-            <a href="{$adminurl}/administrateurs" class="text-primary">Liste</a>
+            <a href="{$adminUrl}/administrateurs" class="text-primary">Liste</a>
         </li>
         <li>
-            <a href="{$adminurl}/administrateurs/create" class="text-primary">Ajouter</a>
+            <a href="{$adminUrl}/administrateurs/create" class="text-primary">Ajouter</a>
         </li>
         <li>
-            <a href="{$adminurl}/administrateurs/delete" class="text-primary">Supprimer</a>
+            <a href="{$adminUrl}/administrateurs/delete" class="text-primary">Supprimer</a>
         </li>
 HTML;
     }

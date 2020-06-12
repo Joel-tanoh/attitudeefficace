@@ -139,11 +139,19 @@ class MiniserviceOrder extends Entity
     /**
      * Retourne la date de la commande.
      * 
+     * @param string $precision
+     * 
      * @return string
      */
-    public function getOrderedAt()
+    public function getOrderedAt(string $precision = null)
     {
-        return $this->orderDay . ' à ' . $this->orderHour;
+        if ($precision === "day") {
+            return $this->orderDay;
+        } elseif ($precision === "hour") {
+            return $this->orderHour;
+        } else {
+            return $this->orderDay . ' à ' . $this->orderHour;
+        }
     }
 
     /**
@@ -153,7 +161,13 @@ class MiniserviceOrder extends Entity
      */
     public function getState()
     {
-        return $this->state;
+        if ($this->state == 1) {
+            return "nouvelle commande";
+        } elseif ($this->state == 2) {
+            return "commande en attente";
+        } elseif ($this->state == 3) {
+            return "commande gérée";
+        }
     }
 
     /**
@@ -171,6 +185,16 @@ class MiniserviceOrder extends Entity
             $orders[] = $order;
         }
         return $orders;
+    }
+
+    /**
+     * Retourne la description de la commande.
+     * 
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 
 }

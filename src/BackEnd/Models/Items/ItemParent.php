@@ -166,6 +166,18 @@ class ItemParent extends Item
     }
 
     /**
+     * Retourne toutes les catégories des Items parents.
+     * 
+     * @return array
+     */
+    public static function getCategories()
+    {
+        $query = "SELECT categories FROM " . self::TABLE_NAME;
+        $rep = parent::connect()->query($query);
+        return $rep->fetchAll();
+    }
+
+    /**
      * Permet de créer une nouvelle occurrence dans la table des 
      * items parents.
      * 
@@ -254,5 +266,24 @@ class ItemParent extends Item
 
         Utils::header($itemUpdated->getUrl("administrate"));
     }
+
+    /**
+     * Retourne le nombre d'item parent.
+     * 
+     * @param string $categorie
+     * 
+     * @return int
+     */
+    public static function getNumber(string $categorie = null)
+    {
+        if (null !== $categorie) {
+            $counter = parent::bddManager()->count("id", self::TABLE_NAME, "categorie", $categorie);
+        } else {
+            $counter = parent::bddManager()->count("id", self::TABLE_NAME);
+        }
+
+        return (int)$counter;
+    }
+
 
 }

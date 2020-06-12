@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  jeu. 11 juin 2020 à 15:54
+-- Généré le :  ven. 12 juin 2020 à 17:55
 -- Version du serveur :  5.7.19
 -- Version de PHP :  7.1.9
 
@@ -21,6 +21,37 @@ SET time_zone = "+00:00";
 --
 -- Base de données :  `attitudeefficace`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `admins`
+--
+
+DROP TABLE IF EXISTS `admins`;
+CREATE TABLE IF NOT EXISTS `admins` (
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `code` varchar(255) COLLATE utf8_bin NOT NULL,
+  `login` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `email_address` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `role` int(11) NOT NULL DEFAULT '2',
+  `birth_day` date DEFAULT NULL,
+  `state` varchar(255) COLLATE utf8_bin DEFAULT 'activé',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UN_admin_code` (`code`) USING BTREE,
+  KEY `email_address` (`email_address`)
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Déchargement des données de la table `admins`
+--
+
+INSERT INTO `admins` (`id`, `code`, `login`, `password`, `email_address`, `role`, `birth_day`, `state`, `created_at`, `updated_at`) VALUES
+(1, 'u1s73YMd1rToMd', 'joel', '$2y$10$NlCt2e.XtG8DmZFYiSB0suGNVX6G0ZeNLny6mdLAriyTUnxXgMQge', 'joel.developpeur@gmail.com', 3, NULL, 'activé', '2019-10-01 08:22:06', NULL),
+(7, 'ITyPZnLwd', 'benoit', '$2y$10$XxpT8MxPW4VUFFtNuWWwS.diIqFvN1bnUUx9Sw4/J3CwNXvvrJA22', 'benoitkoua2015@gmail.com', 2, NULL, 'activé', '2020-04-14 11:04:26', '2020-04-14 11:04:26');
 
 -- --------------------------------------------------------
 
@@ -52,17 +83,15 @@ CREATE TABLE IF NOT EXISTS `items_child` (
   `views` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UN_CODE` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=88 DEFAULT CHARSET=utf8;
 
 --
 -- Déchargement des données de la table `items_child`
 --
 
 INSERT INTO `items_child` (`id`, `code`, `categorie`, `parent_id`, `title`, `description`, `slug`, `article_content`, `author`, `provider`, `pages`, `price`, `rank`, `edition_home`, `parution_year`, `created_at`, `updated_at`, `posted_at`, `youtube_video_link`, `views`) VALUES
-(63, '0JzU35gZr', 'articles', 85, 'Lorem ipsum', 'Une belle description', 'lorem-ipsum-63', '&lt;p&gt;&lt;b&gt;Texte en gras&lt;/b&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Texte souligné&lt;/u&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;br&gt;&lt;/p&gt;', NULL, NULL, NULL, 0, 2, NULL, NULL, '2020-06-05 22:02:46', '2020-06-05 22:02:46', NULL, NULL, 0),
-(58, 'rg8Jy2j', 'livres', 0, 'Lorem ipsum', 'Belle description', 'lorem-ipsum-58', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-06-04 13:06:20', '2020-06-04 13:06:21', NULL, NULL, 0),
-(59, 'j2QjWia', 'articles', 84, 'Avoir une vision', 'Une belle description', 'avoir-une-vision-59', '<p>Un beau texte pour cet article.</p>', NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-06-05 00:44:42', '2020-06-05 13:12:59', NULL, 'R9gACncMkoo', 0),
-(62, 'ypxPfUtq', 'ebooks', 83, 'Lorem toto', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet voluptatem labore cupiditate molestiae porro velit inventore totam eos? Reiciendis tempore quae odio perferendis pariatur.', 'lorem-toto-62', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-06-05 10:45:35', '2020-06-06 00:21:08', NULL, '', 0);
+(87, 't2VuO9', 'videos', -1, 'test', 'Description de ce test', 'test-87', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-06-12 13:49:58', '2020-06-12 13:50:10', NULL, '', 0),
+(83, 'zLMhEUsI', 'mini-services', 0, 'Développement personnel', 'Bon développeur', 'developpement-personnel-83', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-06-12 11:59:22', '2020-06-12 13:50:50', NULL, '', 0);
 
 -- --------------------------------------------------------
 
@@ -86,18 +115,15 @@ CREATE TABLE IF NOT EXISTS `items_parent` (
   `views` int(11) DEFAULT '0',
   `youtube_video_link` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=92 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=128 DEFAULT CHARSET=utf8;
 
 --
 -- Déchargement des données de la table `items_parent`
 --
 
 INSERT INTO `items_parent` (`id`, `code`, `categorie`, `title`, `description`, `slug`, `price`, `rank`, `created_at`, `updated_at`, `posted_at`, `views`, `youtube_video_link`) VALUES
-(84, 'LvDkJDkqb', 'themes', 'Développement personnel', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Totam fugit deserunt laboriosam ut. Excepturi dolores nam unde possimus? Minus, a voluptates? Perferendis at consectetur cupiditate!', 'developpement-personnel-84', 0, 1, '2020-05-25 19:37:01', '2020-05-25 19:37:01', NULL, 0, NULL),
-(85, 'zel7_FIv', 'themes', 'Leadership', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Totam fugit deserunt laboriosam ut. Excepturi dolores nam unde possimus? Minus, a voluptates? Perferendis at consectetur cupiditate!', 'leadership-85', 0, 2, '2020-05-25 19:38:08', '2020-05-25 19:38:08', NULL, 0, NULL),
-(86, 'vcdCSG3', 'themes', 'Séduction', 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quasi laborum tenetur fugit eveniet exercitationem! Vitae blanditiis veniam laborum corporis delectus.', 'seduction-86', 0, 3, '2020-05-25 19:59:15', '2020-05-25 19:59:15', NULL, 0, NULL),
-(87, 'ZK8DgL1t', 'themes', 'Art oratoire', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus cumque sed ex dolores quos aperiam reprehenderit labore cum, possimus aliquam?', 'art-oratoire-87', 0, 4, '2020-05-25 20:28:40', '2020-05-25 20:28:40', NULL, 0, NULL),
-(88, '_kP1ccBZT', 'etapes', 'Lorem ipsum', 'Une belle description', 'lorem-ipsum-88', 0, 1, '2020-05-26 12:12:35', '2020-06-02 18:40:50', NULL, 0, '');
+(125, 'oLbHQC5p', 'etapes', 'bien penser', 'une belle description', 'bien-penser-125', 0, 1, '2020-06-12 12:01:20', '2020-06-12 12:01:21', NULL, 0, ''),
+(127, '8La0fgr', 'themes', 'Développement personnel', 'Une belle description', 'developpement-personnel-127', 0, 1, '2020-06-12 14:16:39', '2020-06-12 14:16:53', NULL, 0, '');
 
 -- --------------------------------------------------------
 
@@ -164,7 +190,7 @@ CREATE TABLE IF NOT EXISTS `miniservices_orders` (
   `customer_id` int(15) DEFAULT NULL,
   `description` text COLLATE utf8_bin,
   `ordered_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `state` varchar(255) COLLATE utf8_bin DEFAULT 'NEW',
+  `state` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `fk_id_miniservice` (`miniservice_id`) USING BTREE,
   KEY `fk_id_customer` (`customer_id`) USING BTREE
@@ -250,37 +276,6 @@ CREATE TABLE IF NOT EXISTS `suscribers` (
 
 INSERT INTO `suscribers` (`id`, `code`, `last_name`, `first_names`, `password`, `role`, `state`, `contact_1`, `contact_2`, `email_address`) VALUES
 (1, 'XdvCjK202', 'tanoh', 'bassa patrick joel', '$2y$10$NlCt2e.XtG8DmZFYiSB0suGNVX6G0ZeNLny6mdLAriyTUnxXgMQge', 1, 1, '+22549324696', NULL, 'tanohbassapatrick@gmail.com');
-
--- --------------------------------------------------------
-
---
--- Structure de la table `users`
---
-
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(8) NOT NULL AUTO_INCREMENT,
-  `code` varchar(255) COLLATE utf8_bin NOT NULL,
-  `login` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `email_address` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `role` int(11) NOT NULL DEFAULT '2',
-  `birth_day` date DEFAULT NULL,
-  `state` varchar(255) COLLATE utf8_bin DEFAULT 'activé',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UN_admin_code` (`code`) USING BTREE,
-  KEY `email_address` (`email_address`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
---
--- Déchargement des données de la table `users`
---
-
-INSERT INTO `users` (`id`, `code`, `login`, `password`, `email_address`, `role`, `birth_day`, `state`, `created_at`, `updated_at`) VALUES
-(1, 'u1s73YMd1rToMd', 'joel', '$2y$10$NlCt2e.XtG8DmZFYiSB0suGNVX6G0ZeNLny6mdLAriyTUnxXgMQge', 'joel.developpeur@gmail.com', 3, NULL, 'activé', '2019-10-01 08:22:06', NULL),
-(7, 'ITyPZnLwd', 'benoit', '$2y$10$XxpT8MxPW4VUFFtNuWWwS.diIqFvN1bnUUx9Sw4/J3CwNXvvrJA22', 'benoitkoua2015@gmail.com', 2, NULL, 'activé', '2020-04-14 11:04:26', '2020-04-14 11:04:26');
 
 -- --------------------------------------------------------
 

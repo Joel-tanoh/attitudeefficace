@@ -9,7 +9,6 @@ use App\BackEnd\Models\Items\ItemChild;
 use App\BackEnd\Utils\Utils;
 use App\BackEnd\Files\Image;
 use App\BackEnd\Files\Pdf;
-use App\BackEnd\Models\Users\User;
 
 /**
  * Fichier de classe de gestion des Items.
@@ -561,6 +560,17 @@ class Item extends \App\BackEnd\Models\Entity
     protected function refresh()
     {
         return self::returnObjectByCategorie($this->categorie, $this->code);
+    }
+
+    /**
+     * Incrément le nombre de visite de l'instance.
+     * 
+     * @return bool
+     */
+    public function viewPlusOne() : bool
+    {
+        parent::bddManager()->incOrDecColValue("increment", "views", $this->tableName, "id", $this->getID());
+        return true;
     }
 
 }
