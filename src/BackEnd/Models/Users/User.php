@@ -181,11 +181,11 @@ class User extends \App\BackEnd\Models\Entity
             $newUser = new self($code);
             
             if (!empty($email_address)) {
-                $newUser->updateProp("email_address", $email_address, self::TABLE_NAME, "id", $new_user->getID());
+                $newUser->set("email_address", $email_address, self::TABLE_NAME, "id", $new_user->getID());
             }
 
             if (!empty($account_type)) {
-                $newUser->updateProp("role", $account_type, self::TABLE_NAME, "id", $new_user->getID());
+                $newUser->set("role", $account_type, self::TABLE_NAME, "id", $new_user->getID());
             }
 
             if (!empty($_FILES["avatar_uploaded"]["name"])) {
@@ -221,7 +221,7 @@ class User extends \App\BackEnd\Models\Entity
      */
     public function setRole($role)
     {
-        $this->updateProp("role", $role, $this->tableName, "id", $this->id);
+        $this->set("role", $role, $this->tableName, "id", $this->id);
         return true;
     }
 
@@ -378,8 +378,8 @@ class User extends \App\BackEnd\Models\Entity
     public function getRole()
     {
         if ($this->role === "1") return "utilisateur";
-        if ($this->role === "2") return "administrateur droits limités";
-        if ($this->role === "3") return "administrateur tous droits";
+        if ($this->role === "2") return "administrateur 1";
+        if ($this->role === "3") return "administrateur 2";
     }
 
     /**
@@ -419,7 +419,7 @@ class User extends \App\BackEnd\Models\Entity
      */
     public function getAge()
     {
-        return null;
+        
     }
     
     /**

@@ -71,10 +71,10 @@ HTML;
             <div class="col-12">
                 <div class="card">
                     <div class="card-body pb-0">
-                        {$this->showChildrenItemsByType('articles')}
-                        {$this->showChildrenItemsByType('videos')}
-                        {$this->showChildrenItemsByType('ebooks')}
-                        {$this->showChildrenItemsByType('livres')}
+                        {$this->showChildrenByCategorie('articles')}
+                        {$this->showChildrenByCategorie('videos')}
+                        {$this->showChildrenByCategorie('ebooks')}
+                        {$this->showChildrenByCategorie('livres')}
                     </div>
                 </div>
             </div>
@@ -89,7 +89,7 @@ HTML;
      * 
      * @return string
      */
-    private function showChildrenItemsByType(string $childrenType)
+    private function showChildrenByCategorie(string $childrenType)
     {
         $children = $this->item->getChildren();
         $childrenNumber = count($children);
@@ -99,9 +99,10 @@ HTML;
         } else {
             $childrenList = null;
             foreach ($children as $child) {
-                $childrenList .= Card::card(null, $child->getTitle(), $child->getUrl("administration"));
+                $childrenList .= Card::card(null, $child->getTitle(), $child->getUrl("administrate"));
             }
         }
+
         $childrenType = ucfirst($childrenType);
 
         return <<<HTML

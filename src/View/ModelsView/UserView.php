@@ -81,7 +81,7 @@ HTML;
         <tr>
             <td>{$user->getLogin()}</td>
             <td>{$user->getRole()}</td>
-            <td>{$user->getEmail()}</td>
+            <td>{$user->getEmailAddress()}</td>
         </tr>
 HTML;
     }

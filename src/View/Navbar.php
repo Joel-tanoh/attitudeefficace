@@ -136,7 +136,10 @@ HTML;
     {
         $adminurl = ADMIN_URL;
         $adminUser = User::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
-        $private_buttons = $adminUser->getCategorie() === "administrateur" ? self::administrateurReservedActions() : null;
+
+        $privateButtons = $adminUser->getRole() === "administrateur 2"
+            ? self::administrateurReservedActions() : null;
+
         $navbarUserAvatar = self::navbarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
 
         return <<<HTML
@@ -149,7 +152,7 @@ HTML;
                 <li>
                     <a href="{$adminurl}/administrateurs/me" class="text-primary">Mon profil</a>
                 </li>
-                {$private_buttons}
+                {$privateButtons}
                 <li>
                     <a class="bg-danger text-white" href="{$adminurl}/deconnexion">Déconnexion</a>
                 </li>

@@ -152,7 +152,7 @@ HTML;
         $cards = "";
         foreach ($itemsForCards as $item) {
             $object = Entity::returnObjectByCategorie($className, $item["code"]);
-            $cards .= Card::card($object->getThumbsSrc(), $object->getTitle(), $object->getUrl("administration"), $object->getCreatedAt());
+            $cards .= Card::card($object->getThumbsSrc(), $object->getTitle(), $object->getUrl("administrate"), $object->getCreatedAt());
         }
 
         return <<<HTML

@@ -323,7 +323,7 @@ HTML;
      */
     public static function emailInput($user = null, string $class = null)
     {
-        $email = !is_null($user) ? $user->getEmail(): "";
+        $email = !is_null($user) ? $user->getEmailAddress(): "";
         $label = self::label("email", "Adresse email");
         extract($_POST);
         $input = self::email('email', 'email', $email, "johny@mail.com", $class);
@@ -561,7 +561,7 @@ HTML;
      */
     public static function videoInput($item = null)
     {
-        $youtube_video_link = !is_null($item) ? $item->getYoutubeVideoLink() : "";
+        $youtube_video_link = null !== $item ? $item->getVideoLink("youtube") : "";
         $label = <<<HTML
         Coller l'id de la vidéo de Youtube :
         <p class="notice">Cette vidéo peut être une vidéo de description</p>

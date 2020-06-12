@@ -35,7 +35,7 @@ use App\BackEnd\Models\MiniserviceOrder;
  * @license  url.com license_name
  * @link     Link
  */
-class Entity
+abstract class Entity
 {
     /**
      * ID de l'instance dans la base de données
@@ -52,26 +52,12 @@ class Entity
     protected $code;
 
     /**
-     * Slug de l'instance  
-     * 
-     * @var string
-     */
-    protected $slug;
- 
-    /**
      * Catégorie de l'instance
      * 
      * @var string
      */
     protected $categorie;
 
-    /**
-     * Description de l'instance  
-     * 
-     * @var string
-     */
-    protected $description;
- 
     /**
      * La table où est stocké l'item.
      * 
@@ -106,7 +92,7 @@ class Entity
      */
     public function getID()
     {
-        return (int)$this->id;
+        return (int)$this->get("id");
     }
 
     /**
@@ -116,7 +102,7 @@ class Entity
      */
     public function getCode()
     {
-        return $this->code;
+        return $this->get("code");
     }
 
     /**
@@ -126,70 +112,7 @@ class Entity
      */
     public function getCategorie() 
     {
-        return $this->categorie;
-    }
-
-    /**
-     * Retourne le slug de l'item.
-     * 
-     * @return string
-     */
-    public function getSlug()
-    {
-        return $this->slug;
-    }
-
-    /**
-     * Retourne la description de l'élément courant.
-     * 
-     * @return string
-     */
-    public function getDescription() 
-    {
-        return nl2br(ucfirst(trim($this->description)));
-    }
-
-    /**
-     * Retourne la date de création.
-     * 
-     * @param string $precision La précision dans la date de création.
-     * 
-     * @return string
-     */
-    public function getCreatedAt(string $precision = null)
-    {
-        if ($precision === "day") return $this->dayCreatedAt;
-        elseif ($precision === "hour") return $this->hourCreatedAt;
-        else return $this->dayCreatedAt . " à " . $this->hourCreatedAt;
-    }
-
-    /**
-     * Retourne la date de mise à jour.
-     * 
-     * @param string $precision La partie dans la date de modification.
-     * 
-     * @return string
-     */
-    public function getUpdatedAt(string $precision = null)
-    {
-        if ($precision === "day") { return $this->dayUpdatedAt; }
-        elseif ($precision === "hour") { return $this->hourUpdatedAt; }
-        else { return $this->dayUpdatedAt . " à " . $this->hourUpdatedAt; }
-    }
-
-    /**
-     * Retourne la date de publication.
-     * 
-     * @param string $precision La partie qu'on veut récupérer dans la date de
-     *                          publication.
-     * 
-     * @return string
-     */
-    public function getPostedAt(string $precision = null)
-    {
-        if ($precision === "day") { return $this->dayPostedAt; }
-        elseif ($precision === "hour") { return $this->hourPostedAt; }
-        else { return $this->dayPostedAt . " à " . $this->hourPostedAt; }
+        return $this->get("categorie");
     }
 
     /**
@@ -203,16 +126,6 @@ class Entity
     }
 
     /**
-     * Retourne tous les slugs.
-     * 
-     * @return array
-     */
-    public static function getAllSlugs()
-    {
-        return array_merge(ItemParent::getSlugs(), ItemChild::getSlugs());
-    }
-
-    /**
      * Retourne un objet en fonction du slug, de la table et de la classe.
      * 
      * @param string $colName       Le nom de la colonne par laquelle on récupère
@@ -221,7 +134,7 @@ class Entity
      * @param string $tableName La table de laquelle récupérer les données.
      * @param string $categorie La classe ou la categorie de l'objet.
      * 
-     * @return $object
+     * @return object
      */
     public static function getObjectBy(string $colName = null, string $colValue = null, string $tableName = null, string $categorie = null)
     {
@@ -358,26 +271,39 @@ class Entity
     /**
      * Mets à jour une propriété de l'élément.
      * 
-     * @param string $colToUpdate La colonne qu'on veut mettre à jour.
-     * @param mixed  $valueToPut  La valeur à insérer dans lcette colonne.
-     * @param string $tableName   Le nom de la table.
-     * @param string $idColName   La colonne à prendre en compte pour identifier 
-     *                            l'élément à mettre à jour.
-     * @param mixed  $idValue     L'identifiant de l'élément dont on veut mettre à jour
-     *                            la propriété.
+     * @param string $colToUpdate        La colonne qu'on veut mettre à jour.
+     * @param mixed  $valueToPut         La valeur à insérer dans lcette colonne.
+     * @param string $tableName          Le nom de la table.
+     * @param string $identifierColName  La colonne à prendre en compte pour identifier 
+     *                                   l'élément à mettre à jour.
+     * @param mixed  $identifierColValue L'identifiant de l'élément dont on veut mettre à jour
+     *                                   la propriété.
      * 
      * @return bool
      */
-    protected function updateProp(string $colToUpdate, $valueToPut, string $tableName = null, string $idColName = null, $id = null) : bool
+    protected function set(string $colToUpdate, $valueToPut, string $tableName = null, string $identifierColName = null, $identifierColValue = null) : bool
     {
-        if (null === $id) $id = $this->id;
+        if (null === $identifierColValue) $identifierColValue = $this->id;
         if (null === $tableName) $tableName = $this->tableName;
-        if (null === $idColName) $idColName = "id";
+        if (null === $identifierColName) $identifierColName = "id";
 
-        self::bddManager()->update($colToUpdate, $valueToPut, $tableName, $idColName, $id);
-        self::bddManager()->update("updated_at", date("Y-m-d H:i:s"), $tableName, $idColName, $id);
+        self::bddManager()->update($colToUpdate, $valueToPut, $tableName, $identifierColName, $identifierColValue);
+        self::bddManager()->update("updated_at", date("Y-m-d H:i:s"), $tableName, $identifierColName, $identifierColValue);
 
         return true;
     }
+
+    /**
+     * Permet de récupérer une propriété de l'instance dans la base de données.
+     * 
+     * @param string $propName Le nom de la propriété.
+     * 
+     * @return mixed
+     */
+    protected function get(string $propName)
+    {
+        return self::bddManager()->get($propName, $this->tableName, "code", $this->code)[0][$propName];
+    }
+
 
 }

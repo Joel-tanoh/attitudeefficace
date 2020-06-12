@@ -88,7 +88,7 @@ HTML;
      * 
      * @return string
      */
-    public static function adminDashboardView()
+    public static function administrattionDashboard()
     {
         return <<<HTML
 
@@ -111,39 +111,40 @@ HTML;
      * Methode qui permet de lister les items.
      * 
      * @param array $items      La liste des items à lister.
-     * @param array $class_name La classe PHP ou la catégorie des items qu'on veut
+     * @param array $className La classe PHP ou la catégorie des items qu'on veut
      *                          lister qui permettrat d'instancier des objets.
      * 
      * @return string Code HTML de la page qui liste les items.
      */
-    public static function listItemsView(array $items, string $class_name)
+    public static function listItemsView(array $items, string $className)
     {
         $bddManager = Entity::bddManager();
         $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-        $number_of_items = $bddManager->count(
+
+        $itemsNumber = $bddManager->count(
             "id",
             Entity::getTableName(Router::getUrlAsArray()[0]),
             "categorie",
             Router::getUrlAsArray()[0]
         );
 
-        $listItemsContentHeader = Snippet::listItemsContentHeader($title, $number_of_items);
+        $contentHeader = Snippet::listItemsContentHeader($title, $itemsNumber);
 
         if (empty($items)) {
             $notification = new Notification();
             $content =
                 '<div class="row">'
                     . '<div class="col-12">'
-                        . $notification->info($notification->noItems($class_name))
+                        . $notification->info($notification->noItems($className))
                     .'</div>'
                 .'</div>'
             ;
         } else {
-            $content = Template::gridOfCards($items, $class_name);
+            $content = Template::gridOfCards($items, $className);
         }
 
         return <<<HTML
-        {$listItemsContentHeader}
+        {$contentHeader}
         {$content}
 HTML;
     }
@@ -158,7 +159,8 @@ HTML;
     public static function listMotivationPlusVideosView(array $videos)
     {
         $bddManager = Entity::bddManager();
-        $number_of_videos = $bddManager->count("id", ItemChild::TABLE_NAME, "categorie", "videos");
+        $videosNumber = $bddManager->count("id", ItemChild::TABLE_NAME, "categorie", "videos");
+
         if (empty($videos)) {
             $notification = new Notification();
             $content = 
@@ -172,7 +174,7 @@ HTML;
             $content = Template::gridOfCards($videos, "videos");
         }
 
-        $listItemsContentHeader = Snippet::listItemsContentHeader("Motivation +", $number_of_videos);
+        $listItemsContentHeader = Snippet::listItemsContentHeader("Motivation +", $videosNumber);
 
         return <<<HTML
         {$listItemsContentHeader}
@@ -192,14 +194,14 @@ HTML;
     {
         $bddManager = Entity::bddManager();
         $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-        $number_of_items = $bddManager->count(
+        $itemsNumber = $bddManager->count(
             "id"
             , Entity::getTableName(Router::getUrlAsArray()[0])
             , "categorie"
             , "mini-services"
         );
 
-        $listItemsContentHeader = Snippet::listItemsContentHeader($title, $number_of_items);
+        $listItemsContentHeader = Snippet::listItemsContentHeader($title, $itemsNumber);
         $miniServiceCommandsResume = Snippet::miniServicesCommandsResume();
 
         if (empty($items)) {
@@ -312,11 +314,11 @@ HTML;
     public static function readItemView($item)
     {
         if ($item->isParent()) {
-            $parent_view = new ParentView($item);
-            return $parent_view->readParent();
-        } elseif ($item->isChild()) { 
-            $child_view = new ChildView($item);
-            return $child_view->readChild();
+            $parentView = new ParentView($item);
+            return $parentView->readParent();
+        } elseif ($item->isChild() || $item->getCategorie() === "motivation-plus") {
+            $childView = new ChildView($item);
+            return $childView->readChild();
         }
     }
 
@@ -338,7 +340,7 @@ HTML;
         $notification = new Notification();
         $error = !empty($errors) ? $notification->errors($errors) : null;
 
-        $title = $item->getTilte() . " &#8250 éditer";
+        $title = $item->getTitle() . " &#8250 éditer";
         $listItemsContentHeader = Snippet::listItemsContentHeader($title);
 
         return <<<HTML

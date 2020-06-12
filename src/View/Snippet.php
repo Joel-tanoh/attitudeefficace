@@ -90,19 +90,19 @@ HTML;
      * Retourne un listItemsContentHeader.
      * 
      * @param string $title
-     * @param mixed  $number_of_items
+     * @param mixed  $itemsNumber
      * 
      * @return string
      */
-    public static function listItemsContentHeader(string $title = null, $number_of_items = null)
+    public static function listItemsContentHeader(string $title = null, $itemsNumber = null)
     {
         $title = ucfirst($title);
         $contextMenu = self::contextMenu();
 
-        if ($number_of_items) {
-            $number_of_items = '<div class="badge bg-primary text-white px-2 py-1 rounded">' . $number_of_items . '</div>';
+        if ($itemsNumber) {
+            $itemsNumber = '<div class="badge bg-primary text-white px-2 py-1 rounded">' . $itemsNumber . '</div>';
         } else {
-            $number_of_items = null;
+            $itemsNumber = null;
         }
         
         return <<<HTML
@@ -110,7 +110,7 @@ HTML;
             <div class="col-6">
                 <div class="d-flex align-items-center">
                     <h3 class="mr-2">{$title}</h3>
-                    {$number_of_items}
+                    {$itemsNumber}
                 </div>
             </div>
             <div class="col-6">
@@ -157,10 +157,9 @@ HTML;
      */
     public static function manageButtons($item)
     {
-        $buttons = self::button($item->getUrl("edit"), null, "btn-primary mr-1", "d-none d-md-inline", "far fa-edit fa-lg");
-        $buttons .= self::button($item->getUrl("post"), "Poster", "btn-success mr-1", "d-none d-md-inline", "fas fa-reply fa-lg");
-        $buttons .= self::button($item->getUrl("share"), "Partager", "btn-success mr-1", "d-none d-md-inline", "fas fa-share fa-lg");
-        $buttons .= self::button($item->getUrl("delete"), null, "btn-danger mr-1", "d-none d-md-inline", "far fa-trash-alt fa-lg");
+        $buttons = self::button($item->getUrl("edit"), null, "btn-primary", null, "far fa-edit");
+        $buttons .= self::button($item->getUrl("post"), null, "btn-success", null, "fas fa-reply");
+        $buttons .= self::button($item->getUrl("delete"), null, "btn-danger", null, "fas fa-trash-alt");
         
         return <<<HTML
         <div class="float-sm-right">
@@ -168,39 +167,6 @@ HTML;
         </div>
 HTML;
     }
-
-//     /**
-//      * Retourne une liste "voir aussi" pour afficher les autres items de la même
-//      * catégorie que l'item courant en excluant l'item courant.
-//      * 
-//      * @param $exclu Le titre de la méthode qu'on ne veut pas
-//      *                      afficher. 
-//      * 
-//      * @return $array
-//      */
-//     public static function voirAussi($exclu)
-//     {
-//         $bddManager = Entity::bddManager();
-//         $table = Entity::getTableName($exclu->getCategorie());
-//         $items = $bddManager->getTableOccurencesExecepted($table, $exclu->getID(), $exclu->getCategorie());
-//         $list = '';
-//         foreach ($items as $item) {
-//             $item = Entity::returnObjectByCategorie($exclu->getCategorie(), $item["code"]);
-//             $list .= self::voirAussiRow($item);
-//         }
-//         if (empty($list)) $list = '<div>Vide</div>';
-
-//         return <<<HTML
-//         <div class="col-md-3">
-//             <div class="card">
-//                 <h6 class="card-header bg-white">Voir aussi</h6>
-//                 <div class="card-body">
-//                     {$list}
-//                 </div>
-//             </div>
-//         </div>
-// HTML;
-//     }
 
     /**
      * Affiche le résumé des commandes de minis services. Les nouvelles commandes,
@@ -264,8 +230,8 @@ HTML;
      */
     public static function contextMenu()
     {
-        $createButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", null, "btn-success",  "fas fa-plus");
-        $deleteItemsButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", null, "btn-danger", "fas fa-trash-alt");
+        $createButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", null, "btn-success", null, "fas fa-plus");
+        $deleteItemsButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", null, "btn-danger", null, "fas fa-trash-alt");
 
         return <<<HTML
         {$createButton}
@@ -485,32 +451,6 @@ HTML;
         </div>
 HTML;
     }
-
-//     /**
-//      * Retourne une vue pour afficher les autres items de même type
-//      * que celui passé en paramètre.
-//      *  
-//      * @param $item La catégorie qu'on veut afficher.
-//      * 
-//      * @return string
-//      */
-//     public static function voirAussiRow($item)
-//     {
-//         $title = ucfirst($item->getTitle());
-//         $thumbsSrc = $item->getThumbsSrc();
-
-//         return <<<HTML
-//         <div class="d-flex p-2">
-//             <div class="mr-2" style="width:5rem">
-//                 <img src="{$thumbsSrc}" alt="{$item->getThumbsSrc()}" class="img-fluid">
-//             </div>
-//             <div>
-//                 <h5><a href="{$item->getUrl('public')}">{$title}</a></h5>
-//                 <span class="text-muted float-right text-small">{$item->getThumbsSrc()("day_created_at")}</span>
-//             </div>
-//         </div>
-// HTML;
-//     }
 
     /**
      * Retourne une ligne dans le tableau de suppression des éléments.

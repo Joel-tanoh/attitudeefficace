@@ -58,7 +58,9 @@ class Router
     }
 
     /**
-     * Vérifie la concordance de l'url et la variable passée en paramètre.
+     * Vérifie la concordance de l'url et la variable passée en paramètre. Deux formats
+     * d'url paramètres sont passables. Le premier format est une chaîne de caractères
+     * et le second format est un tableau de variable si l'url doit varier.
      * 
      * @param mixed $route
      * 
@@ -101,7 +103,19 @@ class Router
      */
     public static function getUrl()
     {
-        return isset($_GET["url"]) ? $_GET["url"] : "";
+        $url = isset($_GET["url"]) ? $_GET["url"] : "";
+
+        if ($url !== "") {
+            $urlLength = strlen($url);
+            $urlOtherChars = substr($url, 0, $urlLength - 1);
+            $urlLastChar = substr($url, $urlLength - 1, 1);
+    
+            if ($urlLastChar === "/") {
+                $url = $urlOtherChars;
+            }    
+        }
+
+        return $url;
     }
 
     /**
@@ -112,8 +126,9 @@ class Router
     public static function getUrlAsArray()
     {
         $urlAsArray = explode("/", self::getUrl());
-        $last_urlAsArray_key = array_key_last($urlAsArray);
-        if (empty($urlAsArray[$last_urlAsArray_key])) {
+        $lastUrlAsArrayKey = array_key_last($urlAsArray);
+
+        if (empty($urlAsArray[$lastUrlAsArrayKey])) {
             array_pop($urlAsArray);
         }
 

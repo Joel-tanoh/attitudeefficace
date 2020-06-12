@@ -24,6 +24,7 @@ use App\Router;
 use App\Controller;
 use App\BackEnd\Utils\Utils;
 use App\BackEnd\Models\Entity;
+use App\BackEnd\Models\Items\Item;
 use App\View\Notification;
 
 try {
@@ -36,29 +37,27 @@ try {
 
     if ($route->match("")) $controller->dashboard();
 
-    elseif ($route->match("administrateurs")) $controller->listAdminUsersAccounts();
+    elseif ($route->match( [Entity::getAllCategories()] )) $controller->listItems();
 
-    elseif ($route->match("motivation-plus")) $controller->listMotivationPlusVideo();
+    elseif ($route->match( "administrateurs" )) $controller->listAdminUsersAccounts();
 
-    elseif ($route->match("motivation-plus/create")) $controller->createMotivationPlusVideo();
+    elseif ($route->match( "motivation-plus")) $controller->listMotivationPlusVideo();
 
-    elseif ($route->match("motivation-plus/delete")) $controller->deleteItems();
+    elseif ($route->match( "mini-services/commands" )) $controller->listMiniservicesCommands();
 
-    elseif ($route->match("mini-services/commands")) $controller->listMiniservicesCommands();
+    elseif ($route->match( [Entity::getAllCategories(), "create"] )) $controller->createItem();
 
-    elseif ($route->match([Entity::getAllCategories()]) ) $controller->listItems();
+    elseif ($route->match( "motivation-plus/create" )) $controller->createItem();
 
-    elseif ($route->match([Entity::getAllCategories(), "create"]) ) $controller->createItem();
+    elseif ($route->match( [Entity::getAllCategories(), Item::getAllSlugs()] )) $controller->readItem();
 
-    elseif ($route->match([Entity::getAllCategories(), "delete"]) ) $controller->deleteItems();
+    elseif ($route->match( [Entity::getAllCategories(), Item::getAllSlugs(), "edit"] ) ) $controller->editItem();
 
-    elseif ($route->match([Entity::getAllCategories(), Entity::getAllSlugs()]) ){
-        $controller->readItem();
-    }
+    elseif ($route->match( [Entity::getAllCategories(), "delete"] )) $controller->deleteItems();
 
-    elseif ($route->match([Entity::getAllCategories(), Entity::getAllSlugs(), "edit"]) ) $controller->editItem();
+    elseif ($route->match( [Entity::getAllCategories(), Item::getAllSlugs(), "delete"] )) $controller->deleteItem();
 
-    elseif ($route->match([Entity::getAllCategories(), Entity::getAllSlugs(), "delete"]) ) $controller->deleteItem();
+    elseif ($route->match( "motivation-plus/delete" )) $controller->deleteItems();
 
     else $controller->adminError404();
 

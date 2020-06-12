@@ -49,8 +49,8 @@ class Controller{
      */
     function publicAccueilPage()
     {
-        $meta_title = "Bienvenu sur " . APP_NAME;
-        $page = new PageBuilder($meta_title, View::publicAccueilView());
+        $metaTitle = "Bienvenu sur " . APP_NAME;
+        $page = new PageBuilder($metaTitle, View::publicAccueilView());
         VisitManager::appVisitCounter();
         echo $page->publicPage();
     }
@@ -62,8 +62,8 @@ class Controller{
      */
     function dashboard()
     {
-        $meta_title = "Tableau de bord";
-        $page = new PageBuilder($meta_title, View::adminDashboardView());
+        $metaTitle = "Tableau de bord";
+        $page = new PageBuilder($metaTitle, View::administrattionDashboard());
         echo $page->adminPage();
     }
       
@@ -84,15 +84,15 @@ class Controller{
         );
 
         if ($this->categorie === "mini-services") {
-            $meta_title = "Mes mini services";
+            $metaTitle = "Mes mini services";
             $view = View::listMiniservicesView($items);
 
         } else {
-            $meta_title = "Mes " . Entity::getCategorieFormated($this->categorie, "pluriel");
+            $metaTitle = "Mes " . Entity::getCategorieFormated($this->categorie, "pluriel");
             $view = View::listItemsView($items, $this->categorie);
         }
 
-        $page = new PageBuilder($meta_title, $view);
+        $page = new PageBuilder($metaTitle, $view);
         echo $page->adminPage();
     }
 
@@ -104,9 +104,9 @@ class Controller{
     function listAdminUsersAccounts()
     {
         $bddManager = Entity::bddManager();
-        $meta_title = "Utilisateurs";
+        $metaTitle = "Utilisateurs";
         $accounts = $bddManager->get("code", Entity::getTableName( $this->categorie ), "categorie", "utilisateur");
-        $page = new PageBuilder($meta_title, View::listAccountsView($accounts));
+        $page = new PageBuilder($metaTitle, View::listAccountsView($accounts));
         echo $page->adminPage();
     }
 
@@ -118,9 +118,9 @@ class Controller{
     function listMotivationPlusVideo()
     {
         $bddManager = Entity::bddManager();
-        $meta_title = "Motivation plus";
+        $metaTitle = "Motivation plus";
         $videos = $bddManager->get("code", ItemChild::TABLE_NAME, "parent_id", "-1");
-        $page = new PageBuilder($meta_title, View::listMotivationPlusVideosView($videos));
+        $page = new PageBuilder($metaTitle, View::listMotivationPlusVideosView($videos));
         echo $page->adminPage();
     }
 
@@ -131,9 +131,9 @@ class Controller{
      */
     function listMiniservicesCommands()
     {
-        $meta_title = "Mini services &#8250 Commandes";
+        $metaTitle = "Mini services &#8250 Commandes";
         $commands = MiniserviceOrder::getAll();
-        $page = new PageBuilder($meta_title, View::listMiniservicesCommandsView($commands));
+        $page = new PageBuilder($metaTitle, View::listMiniservicesCommandsView($commands));
         echo $page->adminPage();
     }
 
@@ -147,9 +147,9 @@ class Controller{
         $errors = null;
         
         if ($this->categorie === "motivation-plus") {
-            $meta_title = "Motivation plus &#8250 nouvelle vidéo";
+            $metaTitle = "Motivation plus &#8250 nouvelle vidéo";
         } else {
-            $meta_title = Entity::getCreateItemPageTitle($this->categorie);
+            $metaTitle = Entity::getCreateItemPageTitle($this->categorie);
         }
 
         if (isset($_POST['enregistrement'])) {
@@ -158,40 +158,17 @@ class Controller{
             $errors = $validator->getErrors();
 
             if (empty($errors)) {
-                if ($this->categorie === "motivation-plus") {
-                    Item::createItem("videos", $_POST);
-                } else {
-                    Item::createItem($this->categorie, $_POST);
-                }
+                Item::createItem($this->categorie);
             }
         }
 
         if ($this->categorie === "motivation-plus") {
-            $page = new PageBuilder($meta_title, View::createMotivationPlusVideoView($errors));
+            $view = View::createMotivationPlusVideoView($errors);
         } else {
-            $page = new PageBuilder($meta_title, View::createItemView($this->categorie, $errors));
+            $view = View::createItemView($this->categorie, $errors);
         }
 
-        echo $page->adminPage();
-    }
-
-    /**
-     * Controlleur appelé lorsque url = motivation-plus/create.
-     * 
-     * @return void
-     */
-    function createMotivationPlusVideo()
-    {
-        $errors = null;
-        $meta_title = "Motivation plus &#8250 nouvelle vidéo";
-        if (isset($_POST["enregistrement"])) {
-            $validator = new Validator($_POST);
-            $errors = $validator->getErrors();
-            if (empty($errors)) {
-                Item::createItem("videos", $_POST);
-            }
-        }
-        $page = new PageBuilder($meta_title, View::createMotivationPlusVideoView($errors));
+        $page = new PageBuilder($metaTitle, $view);
         echo $page->adminPage();
     }
 
@@ -203,8 +180,11 @@ class Controller{
     function readItem()
     {
         $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
-        $meta_title = ucfirst($item->getCategorie()) . ' &#8250; ' . ucfirst($item->getTitle());
-        $page = new PageBuilder($meta_title, View::readItemView($item));
+
+        $metaTitle = ucfirst($item->getCategorie()) . ' &#8250; ' . ucfirst($item->getTitle());
+
+        $page = new PageBuilder($metaTitle, View::readItemView($item));
+
         echo $page->adminPage();
     }
 
@@ -217,17 +197,18 @@ class Controller{
     {
         $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
         $errors = null;
-        $meta_title = ucfirst($item->getCategorie()) . " &#8250 " . ucfirst($item->getTitle()) . " &#8250 Editer";
+        $metaTitle = ucfirst($item->getCategorie()) . " &#8250 " . ucfirst($item->getTitle()) . " &#8250 Editer";
 
         if (isset($_POST["enregistrement"])) {
             $validator = new Validator($_POST);
             $errors = $validator->getErrors();
+
             if (empty($errors)) {
-                $item->editItem($this->categorie, $_POST);
+                $item->update($this->categorie, $_POST);
             }
         }
 
-        $page = new PageBuilder($meta_title, View::editItemView($item, $this->categorie, $errors));
+        $page = new PageBuilder($metaTitle, View::editItemView($item, $this->categorie, $errors));
         echo $page->adminPage();
     }
 
@@ -240,11 +221,12 @@ class Controller{
     {
         $error = null;
         $bddManager = Entity::bddManager();
+        
         if ($this->categorie === "motivation-plus") {
-            $meta_title = "Motivation plus &#8250 supprimer";
+            $metaTitle = "Motivation plus &#8250 supprimer";
             $toDelete = $bddManager->get("code", ItemChild::TABLE_NAME, "parent_id", "-1");
         } else {
-            $meta_title = "Supprimer des " . Entity::getCategorieFormated($this->categorie, "pluriel");
+            $metaTitle = "Supprimer des " . Entity::getCategorieFormated($this->categorie, "pluriel");
             $toDelete = $bddManager->get("code", Entity::getTableName($this->categorie), "categorie", $this->categorie);
         }
 
@@ -258,7 +240,7 @@ class Controller{
             }
         }
 
-        $page = new PageBuilder($meta_title, View::deleteItemsView($toDelete, $this->categorie, $error));
+        $page = new PageBuilder($metaTitle, View::deleteItemsView($toDelete, $this->categorie, $error));
         echo $page->adminPage();
     }
 
@@ -283,8 +265,8 @@ class Controller{
      */
     function adminError404()
     {
-        $meta_title = "Page non trouvée";
-        $page = new PageBuilder($meta_title, View::adminError404View());
+        $metaTitle = "Page non trouvée";
+        $page = new PageBuilder($metaTitle, View::adminError404View());
         echo $page->adminPage();
     }
 
@@ -296,8 +278,8 @@ class Controller{
      */
     function publicError404()
     {
-        $meta_title = "Page non trouvée";
-        $page = new PageBuilder($meta_title, View::publicError404View());
+        $metaTitle = "Page non trouvée";
+        $page = new PageBuilder($metaTitle, View::publicError404View());
         echo $page->publicPage();
     }
 

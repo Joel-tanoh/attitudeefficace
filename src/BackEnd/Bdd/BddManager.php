@@ -139,7 +139,7 @@ class BddManager
      * @param string $whereColName  Une clause sur les éléments à compter.
      * @param mixed  $whereColValue La valeur de la colonne.
      * 
-     * @return string|int
+     * @return string
      */
     public function count(string $colToCount, string $tableName = null, string $whereColName = null, $whereColValue = null)
     {
@@ -197,7 +197,7 @@ class BddManager
 
     /**
      * Permet de vérifier qu'une donnée existe dans le base de données. On peut lui
-     * passer une clause wher
+     * passer une clause where pour spécifier une occurrence.
      * 
      * @param string $colCheck      La colonne à vérifier.
      * @param string $tableName     Le nom de la table.

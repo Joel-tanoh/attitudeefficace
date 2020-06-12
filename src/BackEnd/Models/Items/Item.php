@@ -2,6 +2,7 @@
 
 namespace App\BackEnd\Models\Items;
 
+use App\BackEnd\Bdd\SqlQueryFormater;
 use Exception;
 use App\BackEnd\Models\Items\ItemParent;
 use App\BackEnd\Models\Items\ItemChild;
@@ -16,7 +17,7 @@ use App\BackEnd\Models\Users\User;
  * @author Joel <joel.developpeur@gmail.com>
  */
 class Item extends \App\BackEnd\Models\Entity
-{ 
+{
     /**
      * Nom/titre de l'instance
      * 
@@ -25,51 +26,39 @@ class Item extends \App\BackEnd\Models\Entity
     protected $title;
 
     /**
+     * Slug de l'instance  
+     * 
+     * @var string
+     */
+    protected $slug;
+ 
+    /**
+     * Description de l'instance  
+     * 
+     * @var string
+     */
+    protected $description;
+ 
+    /**
+     * Rang de l'item.
+     * 
+     * @var int
+     */
+    protected $rank;
+
+    /**
+     * La date de création.
+     * 
+     * @var string
+     */
+    protected $createdAt;
+    
+    /**
      * Prix de l'instance.  
      * 
      * @var int
      */
     protected $price;
-
-    /**
-     * Rang de l'item.
-     */
-    protected $rank;
-    
-    /**
-     * Nom de l'image de couverture de l'instance  
-     * 
-     * @var string
-     */
-    protected $thumbsName;
-
-    /**
-     * Chemin total de l'image miniature.
-     * 
-     * @var string
-     */
-    protected $thumbsPath;
-
-    /**
-     * Source de l'image miniature
-     * 
-     * @var string
-     */
-    protected $thumbsSrc;
-
-    /**
-     * Chemin total de l'image de couverture.
-     * 
-     * @var string
-     */
-    protected $originalImagePath;
-
-    /**
-     * Source de l'image de couverture.
-     * 
-     * @var string
-     */
-    protected $originalImageSrc;
 
     /**
      * Lien de la vidéo de description de l'instance  
@@ -85,7 +74,132 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getTitle()
     {
-        return $this->title;
+        return $this->get("title");
+    }
+
+    /**
+     * Retourne le slug de l'item.
+     * 
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->get("slug");
+    }
+
+    /**
+     * Retourne la description de l'élément courant.
+     * 
+     * @return string
+     */
+    public function getDescription() 
+    {
+        return nl2br(ucfirst(trim($this->get("description"))));
+    }
+
+    /**
+     * Retourne le rang.
+     * 
+     * @return string
+     */
+    public function getRank()
+    {
+        return $this->get("rank");
+    }
+
+    /**
+     * Retourne le prix de l'instance.
+     * 
+     * @return string
+     */
+    public function getPrice()  
+    {
+        return $this->get("price");
+    }
+
+    /**
+     * Retourne la date de création.
+     * 
+     * @param string $precision La précision dans la date de création.
+     * 
+     * @return string
+     */
+    public function getCreatedAt(string $precision = null)
+    {
+        $sqlQuery = new SqlQueryFormater();
+        $query = $sqlQuery
+            ->select("date_format(created_at, '%d %b. %Y') AS day_created_at")
+            ->select("date_format(created_at, '%H:%i') AS hour_created_at")
+            ->from($this->tableName)
+            ->where("code = ?")
+            ->returnQueryString();
+
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$this->getCode()]);
+        $result = $rep->fetch();
+
+        if ($precision === "day") return $result["day_created_at"];
+
+        elseif ($precision === "hour") return $result["hour_created_at"];
+
+        else return $result["day_created_at"] . " à " . $result["hour_created_at"];
+    }
+
+    /**
+     * Retourne la date de mise à jour.
+     * 
+     * @param string $precision La partie dans la date que l'on veut de modification.
+     * 
+     * @return string
+     */
+    public function getUpdatedAt(string $precision = null)
+    {
+        $sqlQuery = new SqlQueryFormater();
+        $query = $sqlQuery
+            ->select("date_format(updated_at, '%d %b. %Y') AS day_modified_at")
+            ->select("date_format(updated_at, '%H:%i') AS hour_modified_at")
+            ->from($this->tableName)
+            ->where("code = ?")
+            ->returnQueryString();
+
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$this->getCode()]);
+        $result = $rep->fetch();
+
+        if ($precision === "day") { return $result["day_modified_at"]; }
+
+        elseif ($precision === "hour") { return $result["hour_modified_at"]; }
+
+        else { return $result["day_modified_at"] . " à " . $result["hour_modified_at"]; }
+    }
+
+    /**
+     * Retourne la date de publication.
+     * 
+     * @param string $precision La partie qu'on veut récupérer dans la date de
+     *                          publication.
+     * 
+     * @return string
+     */
+    public function getPostedAt(string $precision = null)
+    {
+        $sqlQuery = new SqlQueryFormater();
+        $query = $sqlQuery
+            ->select("date_format(posted_at, '%d %b. %Y') AS day_posted_at")
+            ->select("date_format(posted_at, '%H:%i') AS hour_posted_at")
+            ->from($this->tableName)
+            ->where("code = ?")
+            ->returnQueryString();
+
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$this->getCode()]);
+        $result = $rep->fetch();
+
+        if ($precision === "day"){ return $result["day_posted_at"]; }
+
+        elseif ($precision === "hour") { return $result["hour_posted_at"]; }
+
+        else { return $result["day_posted_at"] . " à " . $result["hour_posted_at"]; }
     }
 
     /**
@@ -98,7 +212,7 @@ class Item extends \App\BackEnd\Models\Entity
     public function getVideoLink(string $hostedPlateform = null)
     {
         if ($hostedPlateform === "youtube")
-            return $this->youtubeVideoLink;
+            return $this->get("youtube_video_link");
     }
 
     /**
@@ -109,7 +223,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getViews()
     {
-        return $this->views;
+        return $this->get("views");
     }
 
     /**
@@ -119,7 +233,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getThumbsName()
     {
-        return $this->thumbsName;
+        return $this->getCategorie() . "-" . $this->getSlug() . IMAGES_EXTENSION;
     }
 
     /**
@@ -129,7 +243,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getThumbsPath()
     {
-        return $this->thumbsPath;
+        return THUMBS_PATH . $this->getThumbsName();
     }
 
     /**
@@ -139,7 +253,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getOriginalThumbsPath()
     {
-        return $this->originalImagePath;
+        return ORIGINALS_THUMBS_PATH . $this->getThumbsName();
     }
 
     /**
@@ -149,7 +263,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getThumbsSrc()
     {
-        return file_exists($this->thumbsPath) ? $this->thumbsSrc : null;
+        return file_exists($this->getThumbsPath()) ? THUMBS_DIR_URL."/".$this->getThumbsName() : null;
     }
 
     /**
@@ -159,27 +273,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getOriginalThumbsSrc()
     {
-        return file_exists($this->originalImagePath) ? $this->originalImageSrc : null;
-    }
-
-    /**
-     * Retourne le rang.
-     * 
-     * @return string
-     */
-    public function getRank()
-    {
-        return $this->rank;
-    }
-
-    /**
-     * Retourne le prix de l'instance.
-     * 
-     * @return string
-     */
-    public function getPrice()  
-    {
-        return $this->price;
+        return file_exists($this->getoriginalThumbsPath()) ? ORIGINALS_THUMBS_DIR."/". $this->getThumbsName() : null;
     }
 
     /**
@@ -215,13 +309,34 @@ class Item extends \App\BackEnd\Models\Entity
      * 
      * @return string
      */
-    public function getUrl(string $action = null) {
-        if     ($action === "administration") {return $this->administrationUrl;}
-        elseif ($action === "edit"          ) {return $this->editUrl;}
-        elseif ($action === "post"          ) {return $this->postUrl;}
-        elseif ($action === "share"         ) {return $this->shareUrl;}
-        elseif ($action === "delete"        ) {return $this->deleteUrl;}
-        else return $this->url;
+    public function getUrl(string $action = null)
+    {
+        $url = $this->categorie . "/" . $this->slug;
+        $administrateUrl = ADMIN_URL . "/" . $url;
+
+        if (null === $action) {
+            return $url;
+        }
+
+        elseif ($action === "administrate") {
+            return $administrateUrl;
+        }
+
+        elseif ($action === "public") {
+            return PUBLIC_URL . "/" . $url;
+        }
+
+        elseif ($action === "edit") {
+            return $administrateUrl . "/edit";
+        }
+
+        elseif ($action === "post") {
+            return $administrateUrl . '/post';
+        }
+
+        elseif ($action === "delete") {
+            return $administrateUrl . "/delete";
+        }
     }
 
     /**
@@ -242,70 +357,6 @@ class Item extends \App\BackEnd\Models\Entity
     public function isChild()
     {
         return in_array($this->categorie, ItemChild::CATEGORIES);
-    }
-        
-    /**
-     * Modifie un item.
-     * 
-     * @param string $categorie La catégorie ou la classe de l'item.
-     * @param array  $post      Les données issues du formulaire.
-     * 
-     * @return void
-     */
-    public function update($categorie = null, array $post = null)
-    {
-        extract($post);
-
-        $image = new Image();
-
-        if ($title == $this->getTitle() && !empty($_FILES["image_uploaded"]["name"])) {
-            $image->saveImages($this->getCategorie() . "-" . $this->getSlug());
-        }
-
-        if ($title !== $this->getTitle()) {
-            $slug = Utils::slugify($title) . '-' . $this->getID();
-            $oldThumbsName = $this->getThumbsName();
-            $newThumbsName = $this->getCategorie() . "-" . $slug;
-
-            if (empty($_FILES["image_uploaded"]["name"])) {
-                $image->renameImages($oldThumbsName, $newThumbsName);
-            } else {
-                $image->saveImages($newThumbsName);
-                $image->deleteImages($oldThumbsName);
-            }
-        }
-
-        if (isset($title)) {
-            $this->updateProp("title", $title, $this->tableName, "id", $this->id);
-        }
-
-        if (isset($description)) {
-            $this->updateProp("description", $description, $this->tableName, "id", $this->id);
-        }
-
-        if (isset($article_content)) {
-            $this->updateProp("article_content", $article_content, $this->tableName, "id", $this->id);
-        }
-
-        if (isset($price)) {
-            $this->updateProp("price", (int)$price, $this->tableName, "id", $this->id);
-        }
-
-        if (isset($rank)) {
-            $this->setRank((int)$rank);
-        }
-
-        if (isset($youtube_video_link)){
-            $this->updateProp("youtube_video_link", $youtube_video_link, $this->tableName, "id", $this->id);
-        }
-
-        if (isset($slug)) {
-            $this->updateProp("slug", $slug, $this->tableName, "id", $this->id);
-        }
-
-        $itemUpdated = parent::returnObjectByCategorie($categorie, $this->code);
-
-        Utils::header($itemUpdated->getUrl("administration"));
     }
 
     /**
@@ -328,8 +379,8 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function deleteImage()
     {
-        $image = new Image();
-        $image->deleteImages($this->imageName);
+        $imageManager = new Image();
+        $imageManager->deleteImages($this->getThumbsName());
     }
 
     /**
@@ -341,14 +392,17 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function setRank(int $rank)
     {
-        if ($rank!== 0 && parent::bddManager()->checkIsset($this->tableName, "rank", $rank)) {
-            $items = parent::bddManager()->getItemsOfValueMoreOrEqualTo($this->tableName, "rank", $rank, $this->categorie );
+        if ($rank!== 0 && parent::bddManager()->checkIsset("rank", $this->tableName, "rank", $rank)) {
+
+            $items = parent::bddManager()->getItemsOfValueMoreOrEqualTo("code", $this->tableName, "rank", $rank, "categorie", $this->categorie );
+            
             foreach ($items as $item) {
                 $obj = parent::returnObjectByCategorie($this->categorie, $item["code"]);
                 parent::bddManager()->incOrDecColValue("increment", "rank", $this->tableName, "id", $obj->getID());
             }
         }
-        $this->updateProp("rank", (int)$rank, $this->tableName, "id", $this->id);
+
+        $this->set("rank", (int)$rank, $this->tableName, "id", $this->id);
     }
 
     /**
@@ -372,19 +426,20 @@ class Item extends \App\BackEnd\Models\Entity
      * nouvel dans la table passée en paramètre.
      * 
      * @param string $categorie La catégorie de l'item qu'on veut créer.
-     * @param string $data      Le tableau contenant les données du formulaire.
      * 
      * @return void
      */
-    public static function createItem(string $categorie, array $data)
+    public static function createItem(string $categorie)
     {
-        $code = Utils::generateCode();
-
-        $newItem = self::insertPostData($code, $data, $categorie);
+        if (self::isParentCategorie($categorie)) {
+            $newItem = ItemParent::create($categorie);
+        } else {
+            $newItem = ItemChild::create($categorie);
+        }
 
         if (!empty($_FILES["image_uploaded"]["name"])) {
-            $image = new Image();
-            $image->saveImages($newItem->getCategorie() . "-" . $newItem->getSlug());
+            $imageManager = new Image();
+            $imageManager->saveImages($newItem->getCategorie() . "-" . $newItem->getSlug());
         }
 
         if (!empty($_FILES["pdf_uploaded"]["name"])) {
@@ -393,98 +448,9 @@ class Item extends \App\BackEnd\Models\Entity
             $pdf->savePdfFile($pdf_file_name);
         }
 
-        if (self::isParentCategorie($categorie)) $newItem = new ItemParent($newItem->getCode());
-        else $newItem = new ItemChild($newItem->getCode());
+        $newItem = $newItem->refresh();
 
-        Utils::header($newItem->getUrl("administration"));
-    }
-
-    /**
-     * Permet de sauvegarder les données de création d'un item en base de données.
-     * 
-     * parent::returnObjectByCategorie@param string $code      Le code de l'item qu'on veut enregistrer.
-     * @param array  $data      Les données issues du formulaire.
-     * @param string $categorie La catégorie de l'item qu'on veut enregistrer.
-     * 
-     * @return self
-     */
-    private static function insertPostData(string $code, array $data, $categorie = null)
-    {
-        extract($data);
-        $tableName = parent::getTableName($categorie);
-
-        if (self::insertNotNullData($tableName, $code, $title, $description, $categorie)) {
-            
-            $newItem = parent::returnObjectByCategorie($categorie, $code);
-            
-            $slug = Utils::slugify($newItem->getTitle()) . '-' . $newItem->getID();
-            $newItem->updateProp("slug", $slug, $tableName);
-
-            if (!empty($rank)) {
-                $newItem->setRank((int)$rank);
-            }
-           
-            if (isset($parent_id)) {
-                $newItem->updateProp("parentId", (int)$parent_id, $tableName);
-            }
-
-            if (!empty($price)) {
-                $newItem->updateProp("price", (int)$price, $tableName);
-            }
-
-            if (!empty($article_content)) {
-                $newItem->updateProp("article_content", htmlspecialchars($article_content), $tableName);
-            }
-
-            if (!empty($autheur_livre)) {
-                $newItem->updateProp("autheur", $autheur, $tableName);
-            }
-
-            if (!empty($fournisseur)) {
-                $newItem->updateProp("fournisseur", $fournisseur, $tableName);
-            }
-
-            if (!empty($nombre_pages)) {
-                $newItem->updateProp("nombre_pages", $nombre_pages, $tableName);
-            }
-
-            if (!empty($edition_home)) {
-                $newItem->updateProp("edition_home", $edition_home, $tableName);
-            }
-
-            if (!empty($parution_year)) {
-                $newItem->updateProp("parution_year", $parution_year, $tableName);
-            }
-
-            if (!empty($youtube_video_link)) {
-                $newItem->updateProp("youtube_video_link", $youtube_video_link, $tableName);
-            }
-
-            return parent::returnObjectByCategorie($categorie, $code);
-
-        } else {
-            throw new Exception("Echec de l'enregistrement des données");
-        }
-    }
-    
-    /**
-     * Permet d'insérer les données principale d'un item parent ou enfant qui ne 
-     * doivent pas être nulle dès la création.
-     * 
-     * @param string $tableName   La catégorie de l'item
-     * @param string $code        Le code de l'item
-     * @param string $title       Le titre de l'item
-     * @param string $description La description de l'item
-     * @param string $categorie   La catégorie de l'item
-     * 
-     * @return bool True si les données ont été bien insérées.
-     */
-    private static function insertNotNullData(string $tableName = null, string $code = null, string $title = null, string $description = null, string $categorie = null)
-    {
-        $query = "INSERT INTO $tableName(code, title, description, categorie) VALUES(?, ?, ?, ?)";
-        $rep = self::connect()->prepare($query);
-        $rep->execute([$code, $title, $description, $categorie]);
-        return true;
+        Utils::header($newItem->getUrl("administrate"));
     }
 
     /**
@@ -553,6 +519,48 @@ class Item extends \App\BackEnd\Models\Entity
     public static function isChildCategorie(string $categorie)
     {
         return in_array($categorie, ItemChild::CATEGORIES);
+    }
+
+    /**
+     * Retourne tous les slugs.
+     * 
+     * @return array
+     */
+    public static function getAllSlugs()
+    {
+        return array_merge(ItemParent::getSlugs(), ItemChild::getSlugs());
+    }
+
+    /**
+     * Permet d'insérer les données principale d'un item parent ou enfant qui ne 
+     * doivent pas être nulle dès la création.
+     * 
+     * @param string $tableName   La catégorie de l'item
+     * @param string $code        Le code de l'item
+     * @param string $title       Le titre de l'item
+     * @param string $description La description de l'item
+     * @param string $categorie   La catégorie de l'item
+     * 
+     * @return bool True si les données ont été bien insérées.
+     */
+    protected static function insertNotNullData(string $tableName = null, string $code, string $title, string $description, string $categorie)
+    {
+        $query = "INSERT INTO $tableName(code, title, description, categorie) VALUES(?, ?, ?, ?)";
+
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$code, $title, $description, $categorie]);
+
+        return true;
+    }
+
+    /**
+     * Permet de rafraichir un item.
+     * 
+     * @return self
+     */
+    protected function refresh()
+    {
+        return self::returnObjectByCategorie($this->categorie, $this->code);
     }
 
 }
