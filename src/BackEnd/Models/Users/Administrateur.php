@@ -26,7 +26,7 @@ class Administrateur extends User
      * 
      * @var string
      */
-    const URL = ADMIN_URL."/". self::TABLE_NAME;
+    const URL = ADMIN_URL."/". "administrateurs";
     
     /**
      * Construit un administrateur en prenant comme paramètre son code et remplit 
@@ -254,6 +254,26 @@ class Administrateur extends User
     public function hasAllRights()
     {
         return $this->role == 3;
+    }
+
+    /**
+     * Retourne tous les administrateurs qui ont le role passé en
+     * paramètre.
+     * 
+     * @param int $role 
+     * 
+     * @return array
+     */
+    public static function getAll(int $role)
+    {
+        $result = parent::bddManager()->get("code", self::TABLE_NAME, "role", $role);
+        $admins = [];
+
+        foreach ($result as $admin) {
+            $admins[] = new self($admin["code"]);
+        }
+
+        return $admins;
     }
 
 }

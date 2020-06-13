@@ -34,8 +34,18 @@ use App\View\Snippet;
  */
 class ParentView extends \App\View\View
 {
+    /**
+     * Item de type parent.
+     * 
+     * @var \App\BackEnd\Models\Items\ItemParent
+     */
     private $item;
 
+    /**
+     * Constructeur
+     * 
+     * @param \App\BackEnd\Models\Items\ItemParent
+     */
     public function __construct($item = null)
     {
         $this->item = $item;
@@ -47,14 +57,14 @@ class ParentView extends \App\View\View
      * 
      * @return string
      */
-    public function readParent()
+    public function read()
     {
         $readItemContentHeader = Snippet::readItemContentHeader($this->item);
-        $data = Snippet::showData($this->item);
+        $showData = Snippet::showData($this->item);
 
         return <<<HTML
         {$readItemContentHeader}
-        {$data}
+        {$showData}
         {$this->showChildren()}
 HTML;
     }
@@ -95,9 +105,10 @@ HTML;
         $childrenNumber = count($children);
 
         if (empty($children)) {
-            $childrenList = '<div class="col-12 text-italic text-muted">Vide</div>';
+            $childrenList = '<div class="col-12 text-italic text-muted mb-2">Vide</div>';
         } else {
             $childrenList = null;
+
             foreach ($children as $child) {
                 $childrenList .= Card::card(null, $child->getTitle(), $child->getUrl("administrate"));
             }
@@ -114,6 +125,43 @@ HTML;
             <div class="row px-2">
                 {$childrenList}
             </div>
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche les tous ceux qui ont souscrits à l'item courante.
+     * 
+     * @return string
+     */
+    public function showSuscribers()
+    {
+        $suscribers = null;
+
+        foreach ($this->item->getSuscribers() as $suscriber) {
+            $suscribers .= $suscriber->getName();
+        }
+
+        return <<<HTML
+        <div class="card">
+            <div class="card-header">Liste des inscrits</div>
+            <div class="card-body">
+                {$suscribers}
+            </div>
+        </div>
+HTML;
+    }
+
+    /**
+     * Montre le nombre de personne ayant souscrit l'item parent courant.
+     * 
+     * @return string
+     */
+    public function showSuscribersNumber()
+    {
+        return <<<HTML
+        <div>
+            Nombre d'inscrit : {$this->item->getSuscribersNumber()}
         </div>
 HTML;
     }

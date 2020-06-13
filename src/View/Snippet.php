@@ -11,6 +11,7 @@ namespace App\View;
 use App\Router;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\MiniserviceOrder;
+use App\View\ModelsView\ParentView;
 
 /**
  * Gère les fragments de code.
@@ -199,14 +200,14 @@ HTML;
     /**
      * Affiche les données.
      * 
-     * @param $item L'item dont on affiche les données.
+     * @param \App\BackEnd\Models\Items\Item $item L'item dont on affiche les données.
      * 
      * @return string
      */
     public static function showData($item)
     {
         $videoBox = self::showVideo($item->getVideoLink("youtube"));
-        $bddData = self::bddData($item);
+        $showBddData = self::showBddData($item);
         $thumbs = self::showThumbs($item);
 
         return <<<HTML
@@ -215,7 +216,7 @@ HTML;
                 {$thumbs}
             </div>
             <div class="col-12 col-md-6">
-                {$bddData}
+                {$showBddData}
                 {$videoBox}
             </div>
         </div>
@@ -243,18 +244,22 @@ HTML;
      * Retourne une vue qui affiche l'ensemble des données principales
      * pour l'item passé en paramètre.
      * 
-     * @param $item 
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item 
      * 
      * @return string
      */
-    public static function bddData($item)
+    public static function showBddData($item)
     {
+        $parentView = new ParentView($item);
+        $suscriberNumber = $item->isParent() ? $parentView->showSuscribersNumber() : null;
+
         return <<<HTML
         <div class="card mb-3">
             <div class="card-header bg-white">Données</div>
             <div class="card-body">
                 <div>Catégorie : {$item->getCategorie()}</div>
                 <div>Description : {$item->getDescription()}</div>
+                {$suscriberNumber}
                 <div>Prix : {$item->getPrice()}</div>
                 <div>Date de création : {$item->getCreatedAt()}</div>
                 <div>Date de mise à jour : {$item->getUpdatedAt()}</div>
@@ -393,7 +398,7 @@ HTML;
     /**
      * Retourne l'image de l'item passé en paramètre.
      * 
-     * @param $item 
+     * @param \App\BackEnd\Models\Items\ItemChild|\App\BackEnd\Models\Items\ItemParent $item 
      * 
      * @return string
      */
@@ -414,8 +419,10 @@ HTML;
     public static function thumbs($item)
     {
         return <<<HTML
-        <img src="{$item->getThumbsSrc()}" alt="{$item->getTitle()}" class="img-fluid"/>
-        <p class="text-muted p-3 bg-white">Image de couverture</p>
+        <div class="border rounded">
+            <p class="text-muted p-2 bg-white mb-0">Image de couverture</p>
+            <img src="{$item->getThumbsSrc()}" alt="{$item->getTitle()}" class="img-fluid"/>
+        </div>
 HTML;
     }
 

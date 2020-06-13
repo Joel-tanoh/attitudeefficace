@@ -122,7 +122,7 @@ HTML;
             {$this->metaData()}
             {$this->adminCss()}
         </head>
-        <body id="adminPart" class="bg-cloud">
+        <body id="adminPart" class="bg-blueish">
             {$template}
             {$this->adminJs()}
         </body>

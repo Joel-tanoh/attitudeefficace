@@ -391,7 +391,7 @@ HTML;
      * @author Joel
      * @return string
      */
-    public function noAccounts() : string
+    public function noAdministrateurs() : string
     {
         return "Les comptes utilisateurs et administrateurs s'afficheront ici.";
     }

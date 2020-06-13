@@ -278,7 +278,31 @@ class ItemChild extends Item
     }
 
     /**
-     * Retourne le nombre d'item parent.
+     * Retourne tous les éléments.
+     * 
+     * @param string $categorie
+     * 
+     * @return array
+     */
+    public static function getAll(string $categorie = null)
+    {
+        if (null === $categorie) {
+            $result = parent::bddManager()->get("code", self::TABLE_NAME);
+        } else {
+            $result = parent::bddManager()->get("code", self::TABLE_NAME, "categorie", $categorie);
+        }
+
+        $items = [];
+
+        foreach ($result as $item) {
+            $items[] = new self($item["code"]);
+        }
+
+        return $items;
+    }
+
+    /**
+     * Retourne le nombre d'item.
      * 
      * @param string $categorie
      * 
@@ -286,15 +310,8 @@ class ItemChild extends Item
      */
     public static function getNumber(string $categorie = null)
     {
-        if (null !== $categorie) {
-            $counter = parent::bddManager()->count("id", self::TABLE_NAME, "categorie", $categorie);
-        } else {
-            $counter = parent::bddManager()->count("id", self::TABLE_NAME);
-        }
-
-        return (int)$counter;
+        return (int)self::getAll($categorie);
     }
-
 
 }
 

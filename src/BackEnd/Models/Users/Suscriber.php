@@ -112,4 +112,25 @@ class Suscriber extends User
     {
         return parent::bddManager()->get("email_address", self::TABLE_NAME);
     }
+
+    /**
+     * Retourne la date à laquelle il a souscrit.
+     * 
+     * @param \App\BackEnd\Models\Items\ItemParent $item L'item dont
+     *                                                   on veut connaitre la date de
+     *                                                   souscription.
+     * 
+     * @return string
+     */
+    public function getSubscriptionDate(\App\BackEnd\Models\Items\ItemParent $item)
+    {
+        $query = "SELECT date_format(subscritption_date, '%d %b. %Y à %H:%i') as subscription_date"
+                . " FROM " . Subscription::TABLE_NAME
+                . " WHERE suscriber_id = ? AND item_id = ?";
+        
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$this->getID(), $item->getID()]);
+        return $rep->fetch()["subscription_date"];
+    }
+
 }

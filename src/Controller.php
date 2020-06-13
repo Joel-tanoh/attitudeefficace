@@ -12,6 +12,7 @@ use App\BackEnd\Models\MiniserviceOrder;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Models\Items\ItemChild;
+use App\BackEnd\Models\Users\Administrateur;
 use App\BackEnd\Utils\Validator;
 use App\BackEnd\Utils\Utils;
 use App\BackEnd\Utils\VisitManager;
@@ -74,22 +75,20 @@ class Controller{
      */
     function listItems()
     {
-        $bddManager = Entity::bddManager();
-        
-        $items = $bddManager->get(
-            "code"
-            , Entity::getTableName($this->categorie)
-            , "categorie"
-            , $this->categorie
-        );
+        $items = Item::getAll($this->categorie);
 
         if ($this->categorie === "mini-services") {
             $metaTitle = "Mes mini services";
-            $view = View::listMiniservicesView($items);
+            $view = View::listMiniservices($items);
+
+        } elseif ($this->categorie === "motivation-plus") {
+            $metaTitle = "Motivation plus";
+            $items = Item::getMotivationPlusVideos();
+            $view = View::listItems($items, $this->categorie);
 
         } else {
             $metaTitle = "Mes " . Entity::getCategorieFormated($this->categorie, "pluriel");
-            $view = View::listItemsView($items, $this->categorie);
+            $view = View::listItems($items, $this->categorie);
         }
 
         $page = new PageBuilder($metaTitle, $view);
@@ -101,26 +100,11 @@ class Controller{
      * 
      * @return void
      */
-    function listAdminUsersAccounts()
+    function listAdmins()
     {
-        $bddManager = Entity::bddManager();
-        $metaTitle = "Utilisateurs";
-        $accounts = $bddManager->get("code", Entity::getTableName( $this->categorie ), "categorie", "utilisateur");
-        $page = new PageBuilder($metaTitle, View::listAccountsView($accounts));
-        echo $page->adminPage();
-    }
-
-    /**
-     * Controller appelé lorsque url = motivation-plus
-     * 
-     * @return void
-     */
-    function listMotivationPlusVideo()
-    {
-        $bddManager = Entity::bddManager();
-        $metaTitle = "Motivation plus";
-        $videos = $bddManager->get("code", ItemChild::TABLE_NAME, "parent_id", "-1");
-        $page = new PageBuilder($metaTitle, View::listMotivationPlusVideosView($videos));
+        $metaTitle = "Administrateurs";
+        $admins = Administrateur::getAll(2);
+        $page = new PageBuilder($metaTitle, View::listAdmins($admins));
         echo $page->adminPage();
     }
 
@@ -133,7 +117,7 @@ class Controller{
     {
         $metaTitle = "Mini services &#8250 Commandes";
         $commands = MiniserviceOrder::getAll();
-        $page = new PageBuilder($metaTitle, View::listMiniservicesCommandsView($commands));
+        $page = new PageBuilder($metaTitle, View::listMiniservicesOrders($commands));
         echo $page->adminPage();
     }
 
@@ -161,12 +145,8 @@ class Controller{
                 Item::createItem($this->categorie);
             }
         }
-
-        if ($this->categorie === "motivation-plus") {
-            $view = View::createMotivationPlusVideoView($errors);
-        } else {
-            $view = View::createItemView($this->categorie, $errors);
-        }
+        
+        $view = View::createItem($this->categorie, $errors);
 
         $page = new PageBuilder($metaTitle, $view);
         echo $page->adminPage();
@@ -183,7 +163,7 @@ class Controller{
 
         $metaTitle = ucfirst($item->getCategorie()) . ' &#8250; ' . ucfirst($item->getTitle());
 
-        $page = new PageBuilder($metaTitle, View::readItemView($item));
+        $page = new PageBuilder($metaTitle, View::readItem($item));
 
         echo $page->adminPage();
     }
@@ -208,7 +188,7 @@ class Controller{
             }
         }
 
-        $page = new PageBuilder($metaTitle, View::editItemView($item, $this->categorie, $errors));
+        $page = new PageBuilder($metaTitle, View::updateItem($item, $this->categorie, $errors));
         echo $page->adminPage();
     }
 
@@ -240,7 +220,7 @@ class Controller{
             }
         }
 
-        $page = new PageBuilder($metaTitle, View::deleteItemsView($toDelete, $this->categorie, $error));
+        $page = new PageBuilder($metaTitle, View::deleteItems($toDelete, $this->categorie, $error));
         echo $page->adminPage();
     }
 

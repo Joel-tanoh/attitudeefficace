@@ -165,6 +165,16 @@ class User extends \App\BackEnd\Models\Entity
     }
 
     /**
+     * Retourne le nom entier de l'utilsateur.
+     * 
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->getLastName() . " " . $this->getFirstNames();
+    }
+
+    /**
      * Retourne le nom d'un utilisateur.
      * 
      * @return string

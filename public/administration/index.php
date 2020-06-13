@@ -40,9 +40,9 @@ try {
 
     elseif ($route->match( [Entity::getAllCategories()] )) $controller->listItems();
 
-    elseif ($route->match( "administrateurs" )) $controller->listAdminUsersAccounts();
+    elseif ($route->match( "administrateurs" )) $controller->listAdmins();
 
-    elseif ($route->match( "motivation-plus")) $controller->listMotivationPlusVideo();
+    elseif ($route->match( "motivation-plus")) $controller->listItems();
 
     elseif ($route->match( "mini-services/commands" )) $controller->listMiniservicesCommands();
 

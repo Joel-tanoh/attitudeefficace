@@ -32,22 +32,27 @@ class Utils
     /**
      * Génère et retourne un code aléatoire.
      * 
+     * @param int $length La longeur du code.
+     * 
      * @author Joel
      * @return string
      */
-    public static function generateCode()
+    public static function generateCode(int $length = 10)
     {
         $code = '';
         $string_array = explode(
             ',',
             '0,1,2,3,4,5,6,7,8,9,_,A,a,B,b,C,c,D,d,E,e,F,f,G,g,H,h,I,i,J,j,K,k,L,l,M,n,O,o,P,p,Q,q,R,r,S,s,T,t,U,u,V,v,W,w,X,x,Y,y,Z,z'
         );
-        $code_length = random_int(5, 8);
+
+        $code_length = random_int(5, $length);
         $string_array_length = count($string_array);
+
         for ($i = 0; $i <= $code_length; $i++) {
             $j = random_int(0, $string_array_length - 1);
             $code .= $string_array[$j];
         }
+
         return $code;
     }
 
@@ -89,6 +94,44 @@ class Utils
         } else {
             return false;
         }
+    }
+
+    /**
+     * Permet de convertir ue date en français.
+     * 
+     * @param string $date      Au format YYYY-mm-dd HH:ii:ss.
+     * @param string $precision
+     * 
+     * @return string
+     */
+    public static function convertDate($date, string $precision = null) 
+    {
+        list($date, $time) = explode(" ", $date);
+        list($year, $month, $day) = explode("-", $date);
+        list($hour, $min, $sec) = explode(":", $time);
+
+        $month = Utils::convertMonth($month);
+
+        if ($precision === "day") {
+            return $day . " " . $month . " " . $year;
+        } elseif ($precision === "hour") {
+            return $hour . ':' . $min;
+        } else {
+            return $day ." ". $month ." ". $year ." à ". $hour .':'. $min;
+        }
+    }
+
+    /**
+     * Convertit un chiffre en mois.
+     * 
+     * @param int $monthNumber
+     * 
+     * @return string
+     */
+    public static function convertMonth(int $monthNumber)
+    {
+        $frenchMonths = array('janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre');
+        return $frenchMonths[$monthNumber - 1];
     }
 
 }

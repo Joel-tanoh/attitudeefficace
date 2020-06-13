@@ -127,8 +127,7 @@ class Item extends \App\BackEnd\Models\Entity
     {
         $sqlQuery = new SqlQueryFormater();
         $query = $sqlQuery
-            ->select("date_format(created_at, '%d %b. %Y') AS day_created_at")
-            ->select("date_format(created_at, '%H:%i') AS hour_created_at")
+            ->select("created_at")
             ->from($this->tableName)
             ->where("code = ?")
             ->returnQueryString();
@@ -137,11 +136,7 @@ class Item extends \App\BackEnd\Models\Entity
         $rep->execute([$this->getCode()]);
         $result = $rep->fetch();
 
-        if ($precision === "day") return $result["day_created_at"];
-
-        elseif ($precision === "hour") return $result["hour_created_at"];
-
-        else return $result["day_created_at"] . " à " . $result["hour_created_at"];
+        return Utils::convertDate($result["created_at"], $precision);
     }
 
     /**
@@ -155,8 +150,7 @@ class Item extends \App\BackEnd\Models\Entity
     {
         $sqlQuery = new SqlQueryFormater();
         $query = $sqlQuery
-            ->select("date_format(updated_at, '%d %b. %Y') AS day_modified_at")
-            ->select("date_format(updated_at, '%H:%i') AS hour_modified_at")
+            ->select("updated_at")
             ->from($this->tableName)
             ->where("code = ?")
             ->returnQueryString();
@@ -165,11 +159,7 @@ class Item extends \App\BackEnd\Models\Entity
         $rep->execute([$this->getCode()]);
         $result = $rep->fetch();
 
-        if ($precision === "day") { return $result["day_modified_at"]; }
-
-        elseif ($precision === "hour") { return $result["hour_modified_at"]; }
-
-        else { return $result["day_modified_at"] . " à " . $result["hour_modified_at"]; }
+        return Utils::convertDate($result["updated_at"], $precision);
     }
 
     /**
@@ -184,8 +174,7 @@ class Item extends \App\BackEnd\Models\Entity
     {
         $sqlQuery = new SqlQueryFormater();
         $query = $sqlQuery
-            ->select("date_format(posted_at, '%d %b. %Y') AS day_posted_at")
-            ->select("date_format(posted_at, '%H:%i') AS hour_posted_at")
+            ->select("posted_at")
             ->from($this->tableName)
             ->where("code = ?")
             ->returnQueryString();
@@ -194,11 +183,7 @@ class Item extends \App\BackEnd\Models\Entity
         $rep->execute([$this->getCode()]);
         $result = $rep->fetch();
 
-        if ($precision === "day"){ return $result["day_posted_at"]; }
-
-        elseif ($precision === "hour") { return $result["hour_posted_at"]; }
-
-        else { return $result["day_posted_at"] . " à " . $result["hour_posted_at"]; }
+        return Utils::convertDate($result["posted_at"], $precision);
     }
 
     /**
@@ -571,6 +556,73 @@ class Item extends \App\BackEnd\Models\Entity
     {
         parent::bddManager()->incOrDecColValue("increment", "views", $this->tableName, "id", $this->getID());
         return true;
+    }
+
+    /**
+     * Retourne le nombre des items selon la categorie.
+     * 
+     * @param string $categorie
+     * 
+     * @return int
+     */
+    public static function getNumber(string $categorie = null)
+    {
+        if (null === $categorie) {
+            return ItemParent::getNumber($categorie) + ItemChild::getNumber($categorie);
+        } elseif (self::isParentCategorie($categorie)) {
+            return ItemParent::getNumber($categorie);
+        } else {
+            return ItemChild::getNumber($categorie);
+        }
+    }
+
+    /**
+     * Retourne les vidéos de Motivation plus
+     * 
+     * @return array
+     */
+    public static function getMotivationPlusVideos()
+    {
+        $query = "SELECT code"
+                . " FROM " . ItemChild::TABLE_NAME
+                . " WHERE categorie = 'videos' AND parent_id = -1";
+        
+        $rep = self::connect()->query($query);
+        $result = $rep->fetchAll();
+
+        $videos = [];
+
+        foreach ($result as $video) {
+            $videos[] = new ItemChild($video["code"]);
+        }
+
+        return $videos;
+    }
+
+    /**
+     * Retourne le nombre de vidéos de motivation plus.
+     * 
+     * @return int
+     */
+    public static function getMotivationPlusVideosNumber()
+    {
+        return (int)count(self::getMotivationPlusVideos());
+    }
+
+    /**
+     * Retourne tous les items en fonction de leur catégorie.
+     * 
+     * @param string $categorie
+     * 
+     * @return array
+     */
+    public static function getAll(string $categorie = null)
+    {
+        if (self::isParentCategorie($categorie)) {
+            return ItemParent::getAll($categorie);
+        } else {
+            return ItemChild::getAll($categorie);
+        }
     }
 
 }

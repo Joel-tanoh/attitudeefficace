@@ -35,7 +35,7 @@ use App\BackEnd\Models\Users\Administrateur;
  * @license  url.com license_name
  * @link     Link
  */
-abstract class Entity
+class Entity
 {
     /**
      * ID de l'instance dans la base de données

@@ -10,10 +10,11 @@ namespace App\View;
 
 use App\Router;
 use App\BackEnd\Models\Entity;
+use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Models\Items\ItemChild;
 use App\View\Notification;
 use App\View\Form;
-use App\View\ModelsView\UserView;
+use App\View\ModelsView\AdministrateurView;
 use App\View\ModelsView\ParentView;
 use App\View\ModelsView\ChildView;
 
@@ -110,23 +111,21 @@ HTML;
     /**
      * Methode qui permet de lister les items.
      * 
-     * @param array $items      La liste des items à lister.
-     * @param array $className La classe PHP ou la catégorie des items qu'on veut
-     *                          lister qui permettrat d'instancier des objets.
+     * @param array $items     La liste des items à lister.
+     * @param array $categorie La classe PHP ou la catégorie des items qu'on veut
+     *                         lister qui permettrat d'instancier des objets.
      * 
      * @return string Code HTML de la page qui liste les items.
      */
-    public static function listItemsView(array $items, string $className)
+    public static function listItems(array $items, string $categorie)
     {
-        $bddManager = Entity::bddManager();
-        $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-
-        $itemsNumber = $bddManager->count(
-            "id",
-            Entity::getTableName(Router::getUrlAsArray()[0]),
-            "categorie",
-            Router::getUrlAsArray()[0]
-        );
+        if ($categorie === "motivation-plus") {
+            $itemsNumber = Item::getMotivationPlusVideosNumber();
+            $title = "Motivation +";
+        } else {
+            $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
+            $itemsNumber = Item::getNumber($categorie);
+        }
 
         $contentHeader = Snippet::listItemsContentHeader($title, $itemsNumber);
 
@@ -135,49 +134,16 @@ HTML;
             $content =
                 '<div class="row">'
                     . '<div class="col-12">'
-                        . $notification->info($notification->noItems($className))
+                        . $notification->info($notification->noItems($categorie))
                     .'</div>'
                 .'</div>'
             ;
         } else {
-            $content = Template::gridOfCards($items, $className);
+            $content = Template::gridOfCards($items, $categorie);
         }
 
         return <<<HTML
         {$contentHeader}
-        {$content}
-HTML;
-    }
-
-    /**
-     * Affiche la vue qui permet de lister les vidéos de motivation plus.
-     * 
-     * @param array $videos
-     * 
-     * @return string
-     */
-    public static function listMotivationPlusVideosView(array $videos)
-    {
-        $bddManager = Entity::bddManager();
-        $videosNumber = $bddManager->count("id", ItemChild::TABLE_NAME, "categorie", "videos");
-
-        if (empty($videos)) {
-            $notification = new Notification();
-            $content = 
-            '<div class="row">'
-                . '<div class="col-12">'
-                    . $notification->info($notification->noItems("motivation-plus"))
-                .'</div>'
-            .'</div>'
-        ;
-        } else {
-            $content = Template::gridOfCards($videos, "videos");
-        }
-
-        $listItemsContentHeader = Snippet::listItemsContentHeader("Motivation +", $videosNumber);
-
-        return <<<HTML
-        {$listItemsContentHeader}
         {$content}
 HTML;
     }
@@ -190,7 +156,7 @@ HTML;
      * 
      * @return string Code HTML de la page qui liste les mini services.
      */
-    public static function listMiniservicesView(array $items)
+    public static function listMiniservices(array $items)
     {
         $bddManager = Entity::bddManager();
         $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
@@ -229,7 +195,7 @@ HTML;
      * 
      * @return string
      */
-    public static function listMiniservicesCommandsView($commands = null)
+    public static function listMiniservicesOrders($commands = null)
     {
         return <<<HTML
         <section>
@@ -241,22 +207,22 @@ HTML;
     /**
      * Vue de listing des comptes administrateurs et utilisateurs.
      * 
-     * @param $accounts Un tableau qui contient les variables qui viennent de la base
-     *                  de données.
+     * @param $admins Un tableau qui contient les variables qui viennent de la base
+     *                de données.
      * 
      * @return string
      */
-    public static function listAccountsView($accounts)
+    public static function listAdmins($admins)
     {
-        if (empty($accounts)) {
+        if (empty($admins)) {
             $notification = new Notification();
-            $to_return = $notification->info( $notification->noAccounts() );
+            $toReturn = $notification->info( $notification->noAdministrateurs() );
         } else {
-            $adminTemplate = new UserView();
-            $to_return = $adminTemplate->listUsers($accounts);
+            $adminView = new AdministrateurView();
+            $toReturn = $adminView->listAdmins($admins);
         }
 
-        return $to_return;
+        return $toReturn;
     }
 
     /**
@@ -268,34 +234,20 @@ HTML;
      * 
      * @return string
      */
-    public static function createItemView(string $categorie = null, $errors = null)
+    public static function createItem(string $categorie = null, $errors = null)
     {
         $notification = new Notification();
-        $formContent = Form::getForm($categorie);
-        $error = !empty($errors) ? $notification->errors($errors) : null;
-        $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
-        $listItemsContentHeader = Snippet::listItemsContentHeader($title);
 
-        return <<<HTML
-        {$listItemsContentHeader}
-        {$error}
-        {$formContent}
-HTML;
-    }
-
-    /**
-     * Retourne la vue pour ajouter une vidéo de motivation plus.
-     * 
-     * @param string $errors S'il y'a des erreurs à afficher.
-     * 
-     * @return string
-     */
-    public static function createMotivationPlusVideoView($errors = null)
-    {
-        $notification = new Notification();
-        $formContent = Form::getForm("videos");
+        if ($categorie === "motivation-plus") {
+            $formContent = Form::getForm("videos");
+            $title = "Motivation + &#8250 nouvelle vidéo";
+        } else {
+            $formContent = Form::getForm($categorie);
+            $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
+        }
+        
         $error = !empty($errors) ? $notification->errors($errors) : null;
-        $contentHeader = Snippet::listItemsContentHeader("Motivation + &#8250 nouvelle vidéo");
+        $contentHeader = Snippet::listItemsContentHeader($title);
 
         return <<<HTML
         {$contentHeader}
@@ -311,14 +263,14 @@ HTML;
      * 
      * @return string
      */
-    public static function readItemView($item)
+    public static function readItem($item)
     {
         if ($item->isParent()) {
             $parentView = new ParentView($item);
-            return $parentView->readParent();
+            return $parentView->read();
         } elseif ($item->isChild() || $item->getCategorie() === "motivation-plus") {
             $childView = new ChildView($item);
-            return $childView->readChild();
+            return $childView->read();
         }
     }
 
@@ -333,7 +285,7 @@ HTML;
      * 
      * @return string
      */
-    public static function editItemView($item, $categorie, $errors = null)
+    public static function updateItem($item, $categorie, $errors = null)
     {
         $form = Form::getForm($categorie, $item);
 
@@ -359,7 +311,7 @@ HTML;
      * 
      * @return string Code de la page.
      */
-    public static function deleteItemsView($items, $categorie, $error = null)
+    public static function deleteItems($items, $categorie, $error = null)
     {
         $notifier = new Notification();
         $notification = null;

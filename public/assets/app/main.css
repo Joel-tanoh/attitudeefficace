@@ -78,6 +78,9 @@ a:hover {
 .bg-blue {
 	background-color: rgb(41, 128, 185);
 }
+.bg-blueish {
+	background-color: rgb(240, 240, 255);
+}
 .app-btn.bg-blue:hover {
 	background-color: rgb(20, 93, 141);
 }

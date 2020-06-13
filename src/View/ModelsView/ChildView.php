@@ -29,8 +29,18 @@ use App\View\Snippet;
  */
 class ChildView extends \App\View\View
 {
+    /**
+     * Item de type enfant.
+     * 
+     * @var \App\BackEnd\Models\Items\ItemChild
+     */
     private $item;
 
+    /**
+     * Constructeur.
+     * 
+     * @param \App\BackEnd\Models\Items\ItemChild
+     */
     public function __construct($item = null)
     {
         $this->item = $item;
@@ -41,7 +51,7 @@ class ChildView extends \App\View\View
      * 
      * @return string
      */
-    public function readChild()
+    public function read()
     {
         $readItemContentHeader = Snippet::readItemContentHeader($this->item);
         $data = Snippet::showData($this->item);

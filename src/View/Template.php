@@ -141,18 +141,17 @@ HTML;
      * Template de liste de cartes.
      * 
      * @param array  $itemsForCards Un tableau contenant des cartes.
-     * @param string $className     La classe ou la catégorie des éléments passées permettant
+     * @param string $categorie     La classe ou la catégorie des éléments passées permettant
      *                              d'instancier des objets.
      * @param string $cssClass      Classe css.
      * 
      * @return string
      */
-    public static function gridOfCards(array $itemsForCards = null, string $className = null, string $cssClass = null)
+    public static function gridOfCards(array $itemsForCards = null, string $categorie = null, string $cssClass = null)
     {
         $cards = "";
         foreach ($itemsForCards as $item) {
-            $object = Entity::returnObjectByCategorie($className, $item["code"]);
-            $cards .= Card::card($object->getThumbsSrc(), $object->getTitle(), $object->getUrl("administrate"), $object->getCreatedAt());
+            $cards .= Card::card($item->getThumbsSrc(), $item->getTitle(), $item->getUrl("administrate"), $item->getCreatedAt());
         }
 
         return <<<HTML
