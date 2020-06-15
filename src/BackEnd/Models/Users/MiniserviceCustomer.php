@@ -101,4 +101,8 @@ class MiniserviceCustomer extends Entity
         return $customers;
     }
 
+    
+    ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
+
+
 }

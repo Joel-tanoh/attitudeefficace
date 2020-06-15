@@ -3,10 +3,9 @@
 namespace App\BackEnd\Models\Items;
 
 use App\BackEnd\Bdd\SqlQueryFormater;
-use Exception;
 use App\BackEnd\Models\Items\ItemParent;
 use App\BackEnd\Models\Items\ItemChild;
-use App\BackEnd\Utils\Utils;
+use App\BackEnd\Utilities\Utility;
 use App\BackEnd\Files\Image;
 use App\BackEnd\Files\Pdf;
 
@@ -51,6 +50,20 @@ class Item extends \App\BackEnd\Models\Entity
      * @var string
      */
     protected $createdAt;
+
+    /**
+     * La date de modification.
+     * 
+     * @var string
+     */
+    protected $updatedAt;
+
+    /**
+     * La date de publication.
+     * 
+     * @var string
+     */
+    protected $postedAt;
     
     /**
      * Prix de l'instance.  
@@ -67,13 +80,20 @@ class Item extends \App\BackEnd\Models\Entity
     protected $youtubeVideoLink;
 
     /**
+     * Le nombre de vue de l'item.
+     * 
+     * @var int
+     */
+    protected $views;
+
+    /**
      * Retourne le titre de l'item.
      * 
      * @return string
      */
     public function getTitle()
     {
-        return $this->get("title");
+        return ucfirst($this->title);
     }
 
     /**
@@ -83,7 +103,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getSlug()
     {
-        return $this->get("slug");
+        return $this->slug;
     }
 
     /**
@@ -93,7 +113,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getDescription() 
     {
-        return nl2br(ucfirst(trim($this->get("description"))));
+        return nl2br(ucfirst(trim($this->description)));
     }
 
     /**
@@ -103,7 +123,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getRank()
     {
-        return $this->get("rank");
+        return $this->rank;
     }
 
     /**
@@ -113,7 +133,9 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getPrice()  
     {
-        return $this->get("price");
+        $money = "F CFA";
+
+        return $this->price . " " . $money;
     }
 
     /**
@@ -125,18 +147,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getCreatedAt(string $precision = null)
     {
-        $sqlQuery = new SqlQueryFormater();
-        $query = $sqlQuery
-            ->select("created_at")
-            ->from($this->tableName)
-            ->where("code = ?")
-            ->returnQueryString();
-
-        $rep = parent::connect()->prepare($query);
-        $rep->execute([$this->getCode()]);
-        $result = $rep->fetch();
-
-        return Utils::convertDate($result["created_at"], $precision);
+        return Utility::convertDate($this->createdAt, $precision);
     }
 
     /**
@@ -148,18 +159,23 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getUpdatedAt(string $precision = null)
     {
-        $sqlQuery = new SqlQueryFormater();
-        $query = $sqlQuery
-            ->select("updated_at")
-            ->from($this->tableName)
-            ->where("code = ?")
-            ->returnQueryString();
+        return Utility::convertDate($this->updatedAt, $precision);
+    }
 
-        $rep = parent::connect()->prepare($query);
-        $rep->execute([$this->getCode()]);
-        $result = $rep->fetch();
+    /**
+     * Permet de poster l'item courant.
+     * 
+     * @return bool
+     */
+    public function post()
+    {
+        $query = "UPDATE " . $this->tableName
+                . " SET posted_at = " . date("Y-m-d H:i:s")
+                . " WHERE id = " . $this->id;
 
-        return Utils::convertDate($result["updated_at"], $precision);
+        parent::connect()->query($query);
+
+        return true;
     }
 
     /**
@@ -172,18 +188,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getPostedAt(string $precision = null)
     {
-        $sqlQuery = new SqlQueryFormater();
-        $query = $sqlQuery
-            ->select("posted_at")
-            ->from($this->tableName)
-            ->where("code = ?")
-            ->returnQueryString();
-
-        $rep = parent::connect()->prepare($query);
-        $rep->execute([$this->getCode()]);
-        $result = $rep->fetch();
-
-        return Utils::convertDate($result["posted_at"], $precision);
+        return Utility::convertDate($this->postedAt, $precision);
     }
 
     /**
@@ -196,7 +201,7 @@ class Item extends \App\BackEnd\Models\Entity
     public function getVideoLink(string $hostedPlateform = null)
     {
         if ($hostedPlateform === "youtube")
-            return $this->get("youtube_video_link");
+            return $this->youtubeVideoLink;
     }
 
     /**
@@ -207,7 +212,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getViews()
     {
-        return $this->get("views");
+        return $this->views;
     }
 
     /**
@@ -217,7 +222,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getThumbsName()
     {
-        return $this->getCategorie() . "-" . $this->getSlug() . Image::EXTENSION;
+        return $this->categorie . "-" . $this->slug . Image::EXTENSION;
     }
 
     /**
@@ -257,7 +262,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getOriginalThumbsSrc()
     {
-        return file_exists($this->getoriginalThumbsPath()) ? ORIGINALS_THUMBS_DIR."/". $this->getThumbsName() : null;
+        return file_exists($this->getOriginalThumbsPath()) ? ORIGINALS_THUMBS_DIR."/". $this->getThumbsName() : null;
     }
 
     /**
@@ -281,7 +286,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function isPosted()
     {
-        return $this->postedAt ? "posté(e)" : "Non posté(e)";
+        return $this->postedAt ? "Posté(e)" : "Non posté(e)";
     }
 
     /**
@@ -302,12 +307,12 @@ class Item extends \App\BackEnd\Models\Entity
             return $url;
         }
 
-        elseif ($action === "administrate") {
-            return $administrateUrl;
-        }
-
         elseif ($action === "public") {
             return PUBLIC_URL . "/" . $url;
+        }
+
+        elseif ($action === "administrate") {
+            return $administrateUrl;
         }
 
         elseif ($action === "edit") {
@@ -324,7 +329,7 @@ class Item extends \App\BackEnd\Models\Entity
     }
 
     /**
-     * Vérifie si un item est parent.
+     * Vérifie si l'item courant est parent.
      * 
      * @return bool
      */
@@ -334,7 +339,7 @@ class Item extends \App\BackEnd\Models\Entity
     }
 
     /**
-     * Vérifie si un item est enfant.
+     * Vérifie si l'item courant est enfant.
      * 
      * @return bool
      */
@@ -344,7 +349,7 @@ class Item extends \App\BackEnd\Models\Entity
     }
 
     /**
-     * Supprime un item.
+     * Supprime l'item courant.
      * 
      * @return bool
      */
@@ -381,7 +386,7 @@ class Item extends \App\BackEnd\Models\Entity
             $items = parent::bddManager()->getItemsOfValueMoreOrEqualTo("code", $this->tableName, "rank", $rank, "categorie", $this->categorie );
             
             foreach ($items as $item) {
-                $obj = parent::returnObjectByCategorie($this->categorie, $item["code"]);
+                $obj = parent::createObjectByCategorieAndCode($this->categorie, $item["code"]);
                 parent::bddManager()->incOrDecColValue("increment", "rank", $this->tableName, "id", $obj->getID());
             }
         }
@@ -398,8 +403,8 @@ class Item extends \App\BackEnd\Models\Entity
     {
         $items = parent::bddManager()->getItemsOfValueMoreOrEqualTo("code", $this->tableName, "rank", $this->rank, "categorie", $this->categorie);
         foreach ($items as $item) {
-            $item = parent::returnObjectByCategorie($this->categorie, $item["code"]);
-            parent::bddManager()->incOrDecColValue("decrement", "rank", $this->tableName, "id", $item->getID());
+            $item = parent::createObjectByCategorieAndCode($this->categorie, $item["code"]);
+            parent::bddManager()->incOrDecColValue("decrement", "rank", $this->tableName, "id", $item->id);
         }
 
         return true;
@@ -423,18 +428,24 @@ class Item extends \App\BackEnd\Models\Entity
 
         if (!empty($_FILES["image_uploaded"]["name"])) {
             $imageManager = new Image();
-            $imageManager->saveImages($newItem->getCategorie() . "-" . $newItem->getSlug());
+            $imageName = $newItem->categorie . "-" . $newItem->slug;
+
+            if ($newItem->getCategorie() === "mini-services") {
+                $imageManager->saveImages($imageName, 340, 340);
+            } else {
+                $imageManager->saveImages($imageName);
+            }
         }
 
         if (!empty($_FILES["pdf_uploaded"]["name"])) {
             $pdf = new Pdf();
-            $pdf_file_name = $newItem->getTitle() . "-" . $newItem->getID();
-            $pdf->savePdfFile($pdf_file_name);
+            $pdfFileName = $newItem->title . "-" . $newItem->id;
+            $pdf->savePdfFile($pdfFileName);
         }
 
         $newItem = $newItem->refresh();
 
-        Utils::header($newItem->getUrl("administrate"));
+        Utility::header($newItem->getUrl("administrate"));
     }
 
     /**
@@ -448,7 +459,7 @@ class Item extends \App\BackEnd\Models\Entity
     {
         $counter = 0;
         foreach ($_POST["codes"] as $code) {
-            $item = parent::returnObjectByCategorie($categorie, $code);
+            $item = parent::createObjectByCategorieAndCode($categorie, $code);
             $item->delete();
             $counter++;
         }
@@ -544,36 +555,18 @@ class Item extends \App\BackEnd\Models\Entity
      */
     protected function refresh()
     {
-        return self::returnObjectByCategorie($this->categorie, $this->code);
+        return self::createObjectByCategorieAndCode($this->categorie, $this->code);
     }
 
     /**
-     * Incrément le nombre de visite de l'instance.
+     * Incrémente le nombre de visite de l'instance.
      * 
      * @return bool
      */
-    public function viewPlusOne() : bool
+    public function incrementView() : bool
     {
         parent::bddManager()->incOrDecColValue("increment", "views", $this->tableName, "id", $this->getID());
         return true;
-    }
-
-    /**
-     * Retourne le nombre des items selon la categorie.
-     * 
-     * @param string $categorie
-     * 
-     * @return int
-     */
-    public static function getNumber(string $categorie = null)
-    {
-        if (null === $categorie) {
-            return ItemParent::getNumber($categorie) + ItemChild::getNumber($categorie);
-        } elseif (self::isParentCategorie($categorie)) {
-            return ItemParent::getNumber($categorie);
-        } else {
-            return ItemChild::getNumber($categorie);
-        }
     }
 
     /**
@@ -618,11 +611,82 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public static function getAll(string $categorie = null)
     {
-        if (self::isParentCategorie($categorie)) {
-            return ItemParent::getAll($categorie);
+        if (null === $categorie) {
+            return array_merge(ItemParent::getAllItems($categorie), ItemChild::getAllItems($categorie));
+
+        } elseif (self::isParentCategorie($categorie)) {
+            return ItemParent::getAllItems($categorie);
+
         } else {
-            return ItemChild::getAll($categorie);
+            return ItemChild::getAllItems($categorie);
         }
+    }
+
+    /**
+     * Retourne le nombre des items selon la categorie.
+     * 
+     * @param string $categorie
+     * 
+     * @return int
+     */
+    public static function countAllItems(string $categorie = null)
+    {
+        if (null === $categorie) {
+            return ItemParent::count($categorie) + ItemChild::count($categorie);
+
+        } elseif (self::isParentCategorie($categorie)) {
+            return ItemParent::count($categorie);
+
+        } else {
+            return ItemChild::count($categorie);
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////// LES VUES ///////////////////////////////////////////////////////
+
+    /**
+     * Affiche le titre de l'item courant.
+     * 
+     * @return string
+     */
+    public function showTitle()
+    {
+        return <<<HTML
+        <div class="d-flex align-items-center">
+            <span class="h6 p-1 bg-primary text-white rounded mr-2">{$this->getCategorie()} &#8250</span>
+            <h2>{$this->getTitle()}</h2>
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche la description de l'item
+     * 
+     * @return string
+     */
+    public function showDescription()
+    {
+        return <<<HTML
+        <div class="my-2">
+            <p class="m-0">Description :</p>
+            <p>{$this->getDescription()}</p>
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche le nombre de vue de l'item courant
+     * 
+     * @return string
+     */
+    public function showViews()
+    {
+        return <<<HTML
+        <div>
+            Vue {$this->getViews()} fois
+        </div>
+HTML;
     }
 
 }

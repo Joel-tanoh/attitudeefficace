@@ -18,7 +18,7 @@ use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Items\ItemParent;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\Item;
-use App\BackEnd\Utils\Utils;
+use App\BackEnd\Utilities\Utility;
 
 /**
  * Classe qui gère les formulaires.
@@ -47,7 +47,7 @@ class Form extends View
         elseif ($categorie === "videos") $formContent = self::addVideoForm($item);
         elseif ($categorie === "mini-services") $formContent = self::addMiniserviceForm($item, $categorie);
         elseif (Item::isChildCategorie($categorie)) $formContent = self::childForm($item, $categorie);
-        else Utils::header(ADMIN_URL);
+        else Utility::header(ADMIN_URL);
         $submitButton = self::submitButton('enregistrement', 'Enregistrer');
 
         return self::returnForm($formContent);
@@ -751,7 +751,7 @@ HTML;
         $bddManager = Entity::bddManager();
         $items = $bddManager->get("code", ItemParent::TABLE_NAME);
         foreach ($items as $item) {
-            $item = Entity::returnObjectByCategorie($categorie, $item["code"]);
+            $item = Entity::createObjectByCategorieAndCode($categorie, $item["code"]);
             $options .= '<option value="'. $item->getID() . '">';
             $options .= ucfirst($item->getTitle());
             $options .= ' - ';

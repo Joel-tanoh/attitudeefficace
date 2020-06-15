@@ -110,9 +110,9 @@ class Entity
      * 
      * @return string
      */
-    public function getCategorie() 
+    public function getCategorie()
     {
-        return $this->get("categorie");
+        return ucfirst(self::getCategorieFormated($this->get("categorie")));
     }
 
     /**
@@ -128,8 +128,8 @@ class Entity
     /**
      * Retourne un objet en fonction du slug, de la table et de la classe.
      * 
-     * @param string $colName       Le nom de la colonne par laquelle on récupère
-     *                          l'objet.
+     * @param string $colName   Le nom de la colonne par laquelle on récupère
+     *                          les données pour l'instanciation.
      * @param string $colValue  La valeur que doit avoir cette colonne.
      * @param string $tableName La table de laquelle récupérer les données.
      * @param string $categorie La classe ou la categorie de l'objet.
@@ -139,7 +139,8 @@ class Entity
     public static function getObjectBy(string $colName = null, string $colValue = null, string $tableName = null, string $categorie = null)
     {
         $code = self::bddManager()->get("code", $tableName, $colName, $colValue)[0];
-        return self::returnObjectByCategorie($categorie, $code["code"]);
+
+        return self::createObjectByCategorieAndCode($categorie, $code["code"]);
     }
 
     /**
@@ -151,7 +152,7 @@ class Entity
      * 
      * @return $object
      */
-    public static function returnObjectByCategorie(string $categorie, string $code)
+    public static function createObjectByCategorieAndCode(string $categorie, string $code)
     {
         if (Item::isParentCategorie($categorie)) return new ItemParent($code);
 
@@ -214,7 +215,7 @@ class Entity
     {
         if ($categorie == "themes") { $categorie = "thème"; }
         if ($categorie == "videos") { $categorie = "vidéo"; }
-        if ($categorie == "etapes") { $categorie = "étape"; }
+        if ($categorie == "etapes") { $categorie = "etape"; }
         if ($categorie == "mini-services") { $categorie = "mini service"; }
         if ($categorie == "motivation-plus") { $categorie = "motivation plus"; }
             
@@ -303,6 +304,21 @@ class Entity
     protected function get(string $propName)
     {
         return self::bddManager()->get($propName, $this->tableName, "code", $this->code)[0][$propName];
+    }
+
+
+    ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
+
+    /**
+     * Vue permettant de lister toutes les entitiés.
+     * 
+     * @return string
+     */
+    public static function listEntities()
+    {
+        return <<<HTML
+
+HTML;
     }
 
 

@@ -12,6 +12,8 @@ use App\Router;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\MiniserviceOrder;
 use App\View\ModelsView\ParentView;
+use App\View\ModelsView\ChildView;
+use App\View\ModelsView\ItemView;
 
 /**
  * Gère les fragments de code.
@@ -34,16 +36,15 @@ class Snippet extends View
         $submitButton = Form::submitButton("suppression", "Supprimer");
 
         foreach($items as $item) {
-            $item = Entity::returnObjectByCategorie($categorie, $item["code"]);
+            $item = Entity::createObjectByCategorieAndCode($categorie, $item["code"]);
             $tableRows .= self::deleteItemsTableRow($item);
         }
 
         return <<<HTML
         <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
-            <table class="mb-3">
+            <table class="table mb-3">
                 <thead>
-                    <th><input type="checkbox" id="checkAllItemsForDelete"></th>
-                    <th>Titre</th>
+                    <th><input type="checkbox" id="checkAllItemsForDelete"></th><th>Titre</th>
                 </thead>
                 {$tableRows}
             </table>
@@ -84,7 +85,12 @@ HTML;
             $result = self::noVideoBox();
         }
 
-        return $result;
+        return <<<HTML
+        <div class="card mb-3 mb-md-0">
+            <div class="card-header bg-white">Vidéo descriptive</div>
+            <div class="card-body p-0">{$result}</div>
+        </div>
+HTML;
     }
 
     /**
@@ -126,18 +132,19 @@ HTML;
     /**
      * Retourne l'entête sur la page de lecture d'un item.
      * 
-     * @param $item
+     * @param \App\BackEnd\Models\Items\Item\ItemParent|\App\BackEnd\Models\Items\Item\ItemChild  $item
      * 
      * @return string
      */
     public static function readItemContentHeader($item)
     {
         $manageButtons = Snippet::manageButtons($item);
+
         return <<<HTML
         <div class="row mb-3">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2>{$item->getTitle()}</h2>
+                    {$item->showTitle()}
                     {$manageButtons}
                 </div>
             </div>
@@ -206,19 +213,37 @@ HTML;
      */
     public static function showData($item)
     {
+        $showThumbs = self::showThumbs($item);
         $videoBox = self::showVideo($item->getVideoLink("youtube"));
         $showBddData = self::showBddData($item);
-        $thumbs = self::showThumbs($item);
 
         return <<<HTML
         <div class="row mb-3">
-            <div class="col-12 col-md-6 mb-3">
-                {$thumbs}
+            <div class="col-12 col-md-6">
+                {$showThumbs}
+                {$videoBox}
             </div>
             <div class="col-12 col-md-6">
                 {$showBddData}
-                {$videoBox}
             </div>
+        </div>
+HTML;
+    }
+
+    /**
+     * Retourne l'image de l'item passé en paramètre.
+     * 
+     * @param \App\BackEnd\Models\Items\ItemChild|\App\BackEnd\Models\Items\ItemParent $item 
+     * 
+     * @return string
+     */
+    public static function showThumbs($item)
+    {
+        $content = null !== $item->getThumbsSrc() ? self::thumbs($item) : self::noThumbsBox();
+
+        return <<<HTML
+        <div class="mb-3">
+            {$content}
         </div>
 HTML;
     }
@@ -250,19 +275,21 @@ HTML;
      */
     public static function showBddData($item)
     {
-        $parentView = new ParentView($item);
-        $suscriberNumber = $item->isParent() ? $parentView->showSuscribersNumber() : null;
+        $suscriberNumber = $item->isParent() ? $item->showSuscribersNumber() : null;
+        $parent = $item->isChild() ? $item->showParent() : null;
 
         return <<<HTML
         <div class="card mb-3">
             <div class="card-header bg-white">Données</div>
             <div class="card-body">
                 <div>Catégorie : {$item->getCategorie()}</div>
-                <div>Description : {$item->getDescription()}</div>
+                {$parent}
+                {$item->showDescription()}
                 {$suscriberNumber}
                 <div>Prix : {$item->getPrice()}</div>
                 <div>Date de création : {$item->getCreatedAt()}</div>
                 <div>Date de mise à jour : {$item->getUpdatedAt()}</div>
+                {$item->showViews()}
             </div>
         </div>
 HTML;
@@ -278,7 +305,7 @@ HTML;
         $searchBar = Form::input("search", "recherche", "rechercheInput", null, "Rechercher", "app-search-bar-input p-1");
 
         return <<<HTML
-        <div class="app-search-bar bg-white mx-3 my-2 pl-2">
+        <div class="app-search-bar bg-white mx-3 mt-3 mb-4 pl-2">
             <form action="" method="post" class="d-flex justify-content-between">
                 {$searchBar}
                 <button type="submit" class="app-search-bar-button">
@@ -286,21 +313,6 @@ HTML;
                 </button>
             </form>
         </div>
-HTML;
-    }
-
-    /**
-     * Retourne le vue pour lire la vidéo issue de Youtube.
-     * 
-     * @param string $youtube_video_link
-     * 
-     * @return string
-     */
-    public static function youtubeIframe(string $youtube_video_link)
-    {
-        return <<<HTML
-        <iframe src="https://www.youtube.com/embed/{$youtube_video_link}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen class="w-100 video" style="height:20rem"></iframe>
 HTML;
     }
 
@@ -341,36 +353,6 @@ HTML;
     }
 
     /**
-     * Retourne un bouton qui dirige vers la page pour se connecter grâce
-     * à Facebook.
-     * 
-     * @return string Code du bouton.
-     */
-    public static function connexionFormFacebookButton()
-    {
-        return <<<HTML
-        <a href="" class="d-block text-center bg-facebook text-white rounded p-2">
-            Se connecter avec Facebook
-        </a>
-HTML;
-    }
-
-    /**
-     * Retourne un bouton qui dirige vers la page pour se connecter grâce
-     * à Google.
-     * 
-     * @return string Code du bouton.
-     */
-    public static function connexionFormGoogleButton()
-    {
-        return <<<HTML
-        <a href="" class="d-block text-center bg-danger text-white rounded p-2">
-            Se connecter avec Google
-        </a>
-HTML;
-    }
-
-    /**
      * Retourne un lien du contextMenu.
      * 
      * @param string $href 
@@ -396,33 +378,66 @@ HTML;
     }
 
     /**
-     * Retourne l'image de l'item passé en paramètre.
+     * Retourne le vue pour lire la vidéo issue de Youtube.
      * 
-     * @param \App\BackEnd\Models\Items\ItemChild|\App\BackEnd\Models\Items\ItemParent $item 
+     * @param string $youtube_video_link
      * 
      * @return string
      */
-    public static function showThumbs($item)
+    private static function youtubeIframe(string $youtube_video_link)
     {
-        $content = null !== $item->getThumbsSrc() ? self::thumbs($item) : self::noThumbsBox();
+        return <<<HTML
+        <iframe src="https://www.youtube.com/embed/{$youtube_video_link}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen class="w-100 video" style="height:20rem"></iframe>
+HTML;
+    }
 
-        return $content;
+    /**
+     * Retourne un bouton qui dirige vers la page pour se connecter grâce
+     * à Facebook.
+     * 
+     * @return string Code du bouton.
+     */
+    private static function connexionFormFacebookButton()
+    {
+        return <<<HTML
+        <a href="" class="d-block text-center bg-facebook text-white rounded p-2">
+            Se connecter avec Facebook
+        </a>
+HTML;
+    }
+
+    /**
+     * Retourne un bouton qui dirige vers la page pour se connecter grâce
+     * à Google.
+     * 
+     * @return string Code du bouton.
+     */
+    private static function connexionFormGoogleButton()
+    {
+        return <<<HTML
+        <a href="" class="d-block text-center bg-danger text-white rounded p-2">
+            Se connecter avec Google
+        </a>
+HTML;
     }
 
     /**
      * Retourne l'image de couverture de l'item passé en paramètre.
      * 
-     * @param mixed $item
+     * @param \App\BackEnd\Models\Items\Item $item
      * 
      * @return string
      */
-    public static function thumbs($item)
+    private static function thumbs(\App\BackEnd\Models\Items\Item $item)
     {
         return <<<HTML
-        <div class="border rounded">
-            <p class="text-muted p-2 bg-white mb-0">Image de couverture</p>
-            <img src="{$item->getThumbsSrc()}" alt="{$item->getTitle()}" class="img-fluid"/>
-        </div>
+        <div class="card">
+            <div class="card-header bg-white">Image de couverture</div>
+            <div class="card-body p-0">
+                <img src="{$item->getOriginalThumbsSrc()}" alt="{$item->getTitle()}" class="img-fluid"/>
+            </div>
+        </div>          
 HTML;
     }
 
@@ -431,7 +446,7 @@ HTML;
      * 
      * @return string
      */
-    public static function noThumbsBox()
+    private static function noThumbsBox()
     {
         return <<<HTML
         <div class="card">
@@ -448,7 +463,7 @@ HTML;
      * 
      * @return string
      */
-    public static function noVideoBox()
+    private static function noVideoBox()
     {
         return <<<HTML
         <div class="card">
@@ -466,7 +481,7 @@ HTML;
      * 
      * @return string
      */
-    public static function deleteItemsTableRow($item)
+    private static function deleteItemsTableRow($item)
     {
         return <<<HTML
         <tr>

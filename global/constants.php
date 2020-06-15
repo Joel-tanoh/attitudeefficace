@@ -32,7 +32,7 @@ define("ASSETS_DIR",            PUBLIC_URL . "/assets");
 define("FILES_DIR_URL",         PUBLIC_URL . "/files");
 define("PDF_DIR",               FILES_DIR_URL . "/pdf");
 define("IMAGES_DIR_URL",        FILES_DIR_URL . "/images");
-define("ORIGINALS_THUMBS_DIR",  IMAGES_DIR_URL . "/orgininals");
+define("ORIGINALS_THUMBS_DIR",  IMAGES_DIR_URL . "/originals");
 define("THUMBS_DIR_URL",        IMAGES_DIR_URL . "/thumbs");
 define("AVATARS_DIR_URL",       IMAGES_DIR_URL . "/avatars");
 define("LOGOS_DIR_URL",         IMAGES_DIR_URL . "/logos");

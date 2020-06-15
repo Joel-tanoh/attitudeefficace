@@ -17,7 +17,7 @@ namespace App\BackEnd\Models\Users;
 use App\BackEnd\Bdd\SqlQueryFormater;
 use App\BackEnd\Files\Image;
 use App\BackEnd\Models\Entity;
-use App\BackEnd\Utils\Utils;
+use App\BackEnd\Utilities\Utility;
 use Exception;
 
 /**
@@ -362,5 +362,9 @@ class User extends \App\BackEnd\Models\Entity
     {
         return $this->contact2;
     }
+
+    
+    ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
+
 
 }

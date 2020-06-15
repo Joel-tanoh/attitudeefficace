@@ -5,6 +5,7 @@ namespace App\BackEnd\Models;
 use App\BackEnd\Bdd\SqlQueryFormater;
 use App\BackEnd\Models\Items\ItemParent;
 use App\BackEnd\Models\Users\Suscriber;
+use App\BackEnd\Utilities\Utility;
 
 /**
  * Fichier de classe, qui gère les souscriptions.
@@ -19,13 +20,6 @@ class Subscription extends Entity
      * @var string
      */
     private $subscriberID;
-
-    /**
-     * ID de l'élément souscrit.
-     * 
-     * @var string
-     */
-    private $itemID;
     
     /**
      * La personne ayant souscrit.
@@ -35,6 +29,13 @@ class Subscription extends Entity
     private $suscriber;
 
     /**
+     * ID de l'élément souscrit.
+     * 
+     * @var string
+     */
+    private $itemID;
+
+    /**
      * L'item souscrit.
      * 
      * @var \App\BackEnd\Models\ItemParent
@@ -42,18 +43,11 @@ class Subscription extends Entity
     private $suscribedItem;
 
     /**
-     * Jour de la souscription.
+     * Date de la souscription.
      * 
      * @var string
      */
-    private $subscriptionDay;
-
-    /**
-     * Heure de la souscription.
-     * 
-     * @var string
-     */
-    private $subscriptionHour;
+    private $susbcriptionDate;
 
     /**
      * Le nom de la table.
@@ -72,9 +66,7 @@ class Subscription extends Entity
     public function __construct(string $code)
     {
         $sqlQuery = new SqlQueryFormater();
-        $query = $sqlQuery->select("id, code, subscriber_id, item_id")
-                          ->select("date_format(subscription_date, '%d %b. %Y') as subscription_day")
-                          ->select("date_format(subscription_date, '%H:%i') as subscription_hour")
+        $query = $sqlQuery->select("id, code, subscriber_id, item_id, subscription_date")
                           ->from(self::TABLE_NAME)
                           ->where("code = ?")
                           ->returnQueryString();
@@ -87,20 +79,7 @@ class Subscription extends Entity
         $this->code = $result["code"];
         $this->subscriberID = $result["subscriber_id"];
         $this->itemID = $result["item_id"];
-        $this->subscriptionDay = $result["subscription_day"];
-        $this->subscriptionHour = $result["subscription_hour"];
-
-        // La personne qui a souscrit
-        $result = parent::bddManager()->get("code", Suscriber::TABLE_NAME, "id", $this->suscriberID);
-        if ($result["code"]) {
-            $this->suscriber = new Suscriber($result["code"]);
-        }
-
-        // L'item souscrit
-        $result = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $this->itemID);
-        if ($result["code"]) {
-            $this->suscribedItem = new ItemParent($result["code"]);
-        }
+        $this->subscriptionDate = $result["subscription_date"];
     }
 
     /**
@@ -110,7 +89,8 @@ class Subscription extends Entity
      */
     public function getSuscriber()
     {
-        return $this->suscriber;
+        $result = parent::bddManager()->get("code", Suscriber::TABLE_NAME, "id", $this->suscriberID);
+        return new Suscriber($result[0]["code"]);
     }
 
     /**
@@ -120,7 +100,8 @@ class Subscription extends Entity
      */
     public function getSuscribedItem()
     {
-        return $this->suscribedItem;
+        $result = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $this->itemID);
+        return new ItemParent($result[0]["code"]);
     }
 
     /**
@@ -132,13 +113,7 @@ class Subscription extends Entity
      */
     public function getSubscriptionDate(string $precision = null)
     {
-        if ($precision === "day") {
-            return $this->subscriptionDay;
-        } elseif ($precision === "hour") {
-            return $this->subscrptionHour;
-        } else {
-            return $this->subscriptionDay . ' à ' . $this->subscrptionHour;
-        }
+        return Utility::convertDate($this->susbcriptionDate, $precision);
     }
 
     /**
@@ -148,12 +123,17 @@ class Subscription extends Entity
      */
     public static function getAll()
     {
-        $rsl = parent::bddManager()->get("code", self::TABLE_NAME);
+        $result = parent::bddManager()->get("code", self::TABLE_NAME);
         $subscriptions = [];
-        foreach ($rsl as $sub) {
-            $subscriptions[] = new self($rsl["code"]);
+
+        foreach ($result as $subscription) {
+            $subscriptions[] = new self($subscription["code"]);
         }
         
         return $subscriptions;
     }
+
+    ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
+
+    
 }

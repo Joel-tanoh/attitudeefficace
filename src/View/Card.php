@@ -81,13 +81,33 @@ HTML;
             : null
         ;
         return <<<HTML
-        <div class="col-6 mb-3">
+        <div class="col-4 col-md-12 mb-3">
             <div class="small-box text-small text-white bg-{$bgColor} rounded p-2">
                 <div class="inner">
                     <h3>{$number}</h3>
                     <p>{$text}</p>
                     {$href}
                 </div>
+            </div>
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche une carte de miniservice.
+     * 
+     * @param \App\BackEnd\Models\Items\ItemChild $item
+     * 
+     * @return string
+     */
+    public static function miniserviceCard(\App\BackEnd\Models\Items\ItemChild $item)
+    {
+        return <<<HTML
+        <div class="col-12 col-sm-6 col-md-3">
+            <img class="img-fluid" src="{$item->getThumbsSrc()}" alt="{$item->getSlug()}">
+            <div class="bg-white p-3">
+                <p>{$item->getDescription()}</p>
+                <a class="btn btn-success" href="{$item->getUrl()}">Voir plus</a>
             </div>
         </div>
 HTML;

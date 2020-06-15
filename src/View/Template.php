@@ -16,6 +16,7 @@
 namespace App\View;
 
 use App\BackEnd\Models\Entity;
+use App\View\ModelsView\ChildView;
 
 /**
  * Une template est un type de disposition du contenu d'une page.
@@ -147,11 +148,17 @@ HTML;
      * 
      * @return string
      */
-    public static function gridOfCards(array $itemsForCards = null, string $categorie = null, string $cssClass = null)
+    public static function gridOfCards(array $itemsForCards = null, string $cssClass = null)
     {
-        $cards = "";
+        $cards = null;
+
         foreach ($itemsForCards as $item) {
-            $cards .= Card::card($item->getThumbsSrc(), $item->getTitle(), $item->getUrl("administrate"), $item->getCreatedAt());
+
+            if ($item->getCategorie() === "mini-services") {
+                $cards .= Card::miniserviceCard($item);
+            } else {
+                $cards .= Card::card($item->getThumbsSrc(), $item->getTitle(), $item->getUrl("administrate"), $item->getCreatedAt());
+            }
         }
 
         return <<<HTML

@@ -20,7 +20,7 @@ require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use App\BackEnd\Models\Users\Administrateur;
 use App\View\Notification;
-use App\BackEnd\Utils\Utils;
+use App\BackEnd\Utilities\Utility;
 use App\View\View;
 use App\View\PageBuilder;
 
@@ -57,7 +57,7 @@ try {
                             $admin->setCookie("admin_login", $admin->getLogin());
                         }
 
-                        Utils::header(ADMIN_URL);
+                        Utility::header(ADMIN_URL);
                     } else {
                         $error = $notification->errorLogin();
                     }
@@ -74,7 +74,7 @@ try {
         echo $page->connexionPage();
 
     } else {
-        Utils::header(ADMIN_URL);
+        Utility::header(ADMIN_URL);
     }
 
 } catch(Error|TypeError|Exception|PDOException $e) {

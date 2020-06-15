@@ -1,16 +1,16 @@
 <?php
 
-namespace App\BackEnd\Utils;
+namespace App\BackEnd\Utilities;
 
 use App\BackEnd\Bdd\BddManager;
-use App\BackEnd\Utils\Utils;
+use App\BackEnd\Utilities\Utility;
 
 /**
  * Fichier de classe gestionnaire des visites sur l'app.
  * 
  * @author Joel <joel.developpeur@gmail.com>
  */
-class VisitManager extends Utils
+class VisitManager extends Utility
 {
     /**
      * Année de la visite.
@@ -108,7 +108,7 @@ class VisitManager extends Utils
      * 
      * @return int
      */
-    public function getNumber()
+    public function count()
     {
         return (int)$this->number;
     }

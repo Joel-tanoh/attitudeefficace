@@ -12,6 +12,7 @@ use App\Router;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Models\Items\ItemChild;
+use App\BackEnd\Models\Users\Administrateur;
 use App\View\Notification;
 use App\View\Form;
 use App\View\ModelsView\AdministrateurView;
@@ -120,11 +121,11 @@ HTML;
     public static function listItems(array $items, string $categorie)
     {
         if ($categorie === "motivation-plus") {
-            $itemsNumber = Item::getMotivationPlusVideosNumber();
             $title = "Motivation +";
+            $itemsNumber = Item::getMotivationPlusVideosNumber();
         } else {
             $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-            $itemsNumber = Item::getNumber($categorie);
+            $itemsNumber = Item::countAllItems($categorie);
         }
 
         $contentHeader = Snippet::listItemsContentHeader($title, $itemsNumber);
@@ -139,54 +140,12 @@ HTML;
                 .'</div>'
             ;
         } else {
-            $content = Template::gridOfCards($items, $categorie);
+            $content = Template::gridOfCards($items);
         }
 
         return <<<HTML
         {$contentHeader}
         {$content}
-HTML;
-    }
-
-    /**
-     * La vue qui liste les minis services et affiche le résumé des commandes de minis
-     * service.
-     * 
-     * @param array $items      La liste des items à lister.
-     * 
-     * @return string Code HTML de la page qui liste les mini services.
-     */
-    public static function listMiniservices(array $items)
-    {
-        $bddManager = Entity::bddManager();
-        $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-        $itemsNumber = $bddManager->count(
-            "id"
-            , Entity::getTableName(Router::getUrlAsArray()[0])
-            , "categorie"
-            , "mini-services"
-        );
-
-        $listItemsContentHeader = Snippet::listItemsContentHeader($title, $itemsNumber);
-        $miniServiceCommandsResume = Snippet::miniServicesCommandsResume();
-
-        if (empty($items)) {
-            $notification = new Notification();
-            $content = '<div>'. $notification->info($notification->noItems("mini-services")) .'</div>';
-        } else {
-            $content = Template::gridOfCards($items, "mini-services", "px-2");
-        }
-
-        return <<<HTML
-        {$listItemsContentHeader}
-        <section class="row mb-3">
-            <section class="col-12 col-md-9 mb-3">
-                {$content}
-            </section>
-            <section class="col-12 col-md-3">
-                {$miniServiceCommandsResume}
-            </section>
-        </section>
 HTML;
     }
 
@@ -218,8 +177,7 @@ HTML;
             $notification = new Notification();
             $toReturn = $notification->info( $notification->noAdministrateurs() );
         } else {
-            $adminView = new AdministrateurView();
-            $toReturn = $adminView->listAdmins($admins);
+            $toReturn = Administrateur::list($admins);
         }
 
         return $toReturn;
@@ -259,18 +217,17 @@ HTML;
     /**
      * Retourne la vue pour lire un item.
      * 
-     * @param $item Objet
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item Objet
      * 
      * @return string
      */
     public static function readItem($item)
     {
         if ($item->isParent()) {
-            $parentView = new ParentView($item);
-            return $parentView->read();
+            return $item->readView();
+
         } elseif ($item->isChild() || $item->getCategorie() === "motivation-plus") {
-            $childView = new ChildView($item);
-            return $childView->read();
+            return $item->readView();
         }
     }
 
@@ -292,7 +249,8 @@ HTML;
         $notification = new Notification();
         $error = !empty($errors) ? $notification->errors($errors) : null;
 
-        $title = $item->getTitle() . " &#8250 éditer";
+        $title = $item->getTitle()
+                . ' <span class="h6 bg-primary text-white rounded p-1"> Editer</span>';
         $listItemsContentHeader = Snippet::listItemsContentHeader($title);
 
         return <<<HTML

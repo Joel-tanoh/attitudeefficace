@@ -12,9 +12,8 @@
  * @link     Link
  */
 
-namespace App\BackEnd\Utils;
+namespace App\BackEnd\Utilities;
 
-use App\BackEnd\Models\Entity;
 use Cocur\Slugify\Slugify;
 
 /**
@@ -27,7 +26,7 @@ use Cocur\Slugify\Slugify;
  * @version  "Release: package_version"
  * @link     Link
  */
-class Utils
+class Utility
 {
     /**
      * Génère et retourne un code aléatoire.
@@ -110,7 +109,7 @@ class Utils
         list($year, $month, $day) = explode("-", $date);
         list($hour, $min, $sec) = explode(":", $time);
 
-        $month = Utils::convertMonth($month);
+        $month = Utility::convertMonth($month);
 
         if ($precision === "day") {
             return $day . " " . $month . " " . $year;

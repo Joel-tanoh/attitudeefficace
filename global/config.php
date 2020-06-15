@@ -14,9 +14,9 @@
  */
 
 /*** Constantes des bases de données ***/
-define("APP_NAME",      "Attitude efficace");
-define("DB_NAME",       "Attitudeefficace");
-define("DB_ADDRESS",    "localhost");
-define("DB_LOGIN",      "root");
-define("DB_PASSWORD",   "Joel1997@admin");
-define("ROOT_PATH",             dirname(__DIR__) . DIRECTORY_SEPARATOR);
+define("APP_NAME",    "Attitude efficace");
+define("DB_NAME",     "attitude_efficace");
+define("DB_ADDRESS",  "localhost");
+define("DB_LOGIN",    "root");
+define("DB_PASSWORD", "Joel1997@admin");
+define("ROOT_PATH",   dirname(__DIR__) . DIRECTORY_SEPARATOR);

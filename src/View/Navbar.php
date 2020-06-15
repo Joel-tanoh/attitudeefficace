@@ -152,9 +152,6 @@ HTML;
                 <span class="fas fa-caret-down"></span>
             </a>
             <ul id="btnUserContent" class="content border list-unstyled">
-                <li>
-                    <a href="{$adminUrl}/administrateurs/me" class="text-primary">Mon profil</a>
-                </li>
                 {$privateButtons}
                 <li>
                     <a class="bg-danger text-white" href="{$adminUrl}/deconnexion">Déconnexion</a>

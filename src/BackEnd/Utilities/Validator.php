@@ -13,7 +13,7 @@
  * @link     Link
  */
 
-namespace App\BackEnd\Utils;
+namespace App\BackEnd\Utilities;
 
 use App\BackEnd\Files\FileUploaded;
 use App\View\Notification;

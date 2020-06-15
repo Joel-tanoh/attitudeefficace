@@ -6,6 +6,7 @@ use App\BackEnd\Bdd\SqlQueryFormater;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\ItemChild;
 use App\BackEnd\Models\Users\MiniserviceCustomer;
+use App\BackEnd\Utilities\Utility;
 
 /**
  * Classe de gestion des commandes de mini services.
@@ -50,18 +51,11 @@ class MiniserviceOrder extends Entity
     private $state;
 
     /**
-     * Jour de la commande.
+     * Date de la commande.
      * 
      * @var string
      */
-    private $orderDay;
-
-    /**
-     * Heure de la commande.
-     * 
-     * @var string
-     */
-    private $orderHour;
+    private $orderedAt;
 
     /**
      * Nom de la table des commandes dans la base de données.
@@ -82,9 +76,7 @@ class MiniserviceOrder extends Entity
         $this->pdo = self::connect();
         $sql_query = new SqlQueryFormater();
 
-        $query = $sql_query->select("id, code, miniservice_id, customer_id, description, state")
-            ->select("date_format(ordered_at, '%d %b. %Y') AS order_day")
-            ->select("date_format(ordered_at, '%H:%i') AS order_hour")
+        $query = $sql_query->select("id, code, miniservice_id, customer_id, description, state, ordered_at")
             ->from(self::TABLE_NAME)
             ->where("code = ?")
             ->returnQueryString();
@@ -99,8 +91,7 @@ class MiniserviceOrder extends Entity
         $this->customerID = $result['customer_id'];
         $this->description = $result['description'];
         $this->state = $result['state'];
-        $this->orderDay = $result["order_day"];
-        $this->orderHour = $result['order_hour'];
+        $this->orderedAt = $result['ordered_at'];
 
         // On récupère le mini service commandé
         $miniservice = parent::bddManager()->get("code", ItemChild::TABLE_NAME, "id", $this->miniserviceID);
@@ -137,6 +128,16 @@ class MiniserviceOrder extends Entity
     }
 
     /**
+     * Retourne la description de la commande.
+     * 
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
      * Retourne la date de la commande.
      * 
      * @param string $precision
@@ -145,13 +146,7 @@ class MiniserviceOrder extends Entity
      */
     public function getOrderedAt(string $precision = null)
     {
-        if ($precision === "day") {
-            return $this->orderDay;
-        } elseif ($precision === "hour") {
-            return $this->orderHour;
-        } else {
-            return $this->orderDay . ' à ' . $this->orderHour;
-        }
+        return Utility::convertDate($this->orderedAt, $precision);
     }
 
     /**
@@ -162,11 +157,11 @@ class MiniserviceOrder extends Entity
     public function getState()
     {
         if ($this->state == 1) {
-            return "nouvelle commande";
+            return "Nouvelle commande";
         } elseif ($this->state == 2) {
-            return "commande en attente";
+            return "Commande en attente";
         } elseif ($this->state == 3) {
-            return "commande gérée";
+            return "Commande gérée";
         }
     }
 
@@ -187,14 +182,19 @@ class MiniserviceOrder extends Entity
         return $orders;
     }
 
+
+    ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
+
     /**
-     * Retourne la description de la commande.
+     * Vue permettant de lister toutes les commandes.
      * 
      * @return string
      */
-    public function getDescription()
+    public static function listAll()
     {
-        return $this->description;
+        return <<<HTML
+
+HTML;
     }
 
 }

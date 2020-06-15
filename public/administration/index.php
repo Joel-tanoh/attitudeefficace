@@ -23,14 +23,14 @@ require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use App\Router;
 use App\Controller;
-use App\BackEnd\Utils\Utils;
+use App\BackEnd\Utilities\Utility;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\Item;
 use App\View\Notification;
 
 try {
     
-    if (!someoneIsConnected()) { Utils::header(ADMIN_URL . "/connexion"); }
+    if (!someoneIsConnected()) { Utility::header(ADMIN_URL . "/connexion"); }
 
     $route = new Router(Router::getUrl());
 

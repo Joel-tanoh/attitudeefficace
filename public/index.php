@@ -22,6 +22,7 @@ try {
     $controller = new Controller($route->getUrl());
 
     if ($route->match("")) $controller->publicAccueilPage();
+    
     else $controller->publicError404();
     
 } catch(Error|TypeError|Exception|PDOException $e) {

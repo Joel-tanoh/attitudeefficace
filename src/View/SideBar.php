@@ -48,9 +48,7 @@ class SideBar extends View
      **/
     public static function smallScreenSideBar()
     {
-        $adminUser = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
         $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
-        $sidebarUserAvatar = self::sidebarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
         $searchBar = Snippet::searchBar();
         $links = self::links();
 
@@ -62,7 +60,6 @@ class SideBar extends View
         </label>
         <div class="sidebar d-lg-none">
             {$sidebarBrand}
-            {$sidebarUserAvatar}
             {$searchBar}
             {$links}
         </div>
@@ -76,9 +73,7 @@ HTML;
      **/
     public static function largeScreenSideBar()
     {
-        $adminUser = Administrateur::getByLogin($_SESSION["admin_login"] ?? $_COOKIE["admin_login"]);
         $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
-        $sidebarUserAvatar = self::sidebarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
         $searchBar = Snippet::searchBar();
         $links = self::links();
 
@@ -90,7 +85,6 @@ HTML;
         </label>
         <div class="sidebar d-none d-lg-block">
             {$sidebarBrand}
-            {$sidebarUserAvatar}
             {$searchBar}
             {$links}
         </div>
@@ -100,16 +94,16 @@ HTML;
     /**
      * Affiche le logo dans la sidebar.
      *
-     * @param string $brand_src        Le lien vers l'image.
-     * @param string $click_direction  L'url exécuté lors du click sur le logo.
+     * @param string $brandSrc Le lien vers l'image.
+     * @param string $href     L'url exécuté lors du click sur le logo.
      * 
      * @return string
      */
-    public static function sidebarBrand(string $brand_src, string $click_direction = null) : string
+    public static function sidebarBrand(string $brandSrc, string $href = null) : string
     {
         return <<<HTML
-        <a class="brand text-center" href="{$click_direction}">
-            <img src="{$brand_src}" alt="Attitude efficace" class="brand sidebar-brand my-2">
+        <a class="brand" href="{$href}">
+            <img src="{$brandSrc}" alt="Attitude efficace" class="brand sidebar-brand m-3">
         </a>
 HTML;
     }
@@ -148,7 +142,7 @@ HTML;
         $links .= self::setLink(ADMIN_URL."/videos", "fas fa-video", "Vidéos");
         $links .= self::setLink(ADMIN_URL."/livres", "fas fa-book", "Livres");
         $links .= self::setLink(ADMIN_URL."/ebooks", "fas fa-book", "Ebooks");
-        $links .= self::setLink(ADMIN_URL."/mini-services", "fas fa-shopping-basket", "Minis services");
+        $links .= self::setLink(ADMIN_URL."/mini-services", "fas fa-shopping-basket", "Mini services");
 
         return $links;
     }

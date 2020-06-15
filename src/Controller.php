@@ -13,9 +13,10 @@ use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Models\Items\ItemChild;
 use App\BackEnd\Models\Users\Administrateur;
-use App\BackEnd\Utils\Validator;
-use App\BackEnd\Utils\Utils;
-use App\BackEnd\Utils\VisitManager;
+use App\BackEnd\Utilities\Validator;
+use App\BackEnd\Utilities\Utility;
+use App\BackEnd\Utilities\VisitManager;
+use App\View\ModelsView\ChildView;
 use App\View\PageBuilder;
 use App\View\View;
 use App\View\Notification;
@@ -37,7 +38,7 @@ class Controller{
      * 
      * @return void
      */
-    function __construct($url)
+    public function __construct($url)
     {
         $this->url = $url;
         $this->categorie = !empty($this->url[0]) ? $this->url[0] : null;
@@ -48,7 +49,7 @@ class Controller{
      * 
      * @return void
      */
-    function publicAccueilPage()
+    public function publicAccueilPage()
     {
         $metaTitle = "Bienvenu sur " . APP_NAME;
         $page = new PageBuilder($metaTitle, View::publicAccueilView());
@@ -61,7 +62,7 @@ class Controller{
      * 
      * @return void
      */
-    function dashboard()
+    public function dashboard()
     {
         $metaTitle = "Tableau de bord";
         $page = new PageBuilder($metaTitle, View::administrattionDashboard());
@@ -73,13 +74,13 @@ class Controller{
      * 
      * @return void
      */
-    function listItems()
+    public function listItems()
     {
         $items = Item::getAll($this->categorie);
 
         if ($this->categorie === "mini-services") {
             $metaTitle = "Mes mini services";
-            $view = View::listMiniservices($items);
+            $view = ItemChild::listMiniservices($items);
 
         } elseif ($this->categorie === "motivation-plus") {
             $metaTitle = "Motivation plus";
@@ -100,7 +101,7 @@ class Controller{
      * 
      * @return void
      */
-    function listAdmins()
+    public function listAdmins()
     {
         $metaTitle = "Administrateurs";
         $admins = Administrateur::getAll(2);
@@ -113,7 +114,7 @@ class Controller{
      * 
      * @return void
      */
-    function listMiniservicesCommands()
+    public function listMiniservicesCommands()
     {
         $metaTitle = "Mini services &#8250 Commandes";
         $commands = MiniserviceOrder::getAll();
@@ -126,7 +127,7 @@ class Controller{
      * 
      * @return void
      */
-    function createItem()
+    public function createItem()
     {
         $errors = null;
         
@@ -157,7 +158,7 @@ class Controller{
      * 
      * @return void
      */
-    function readItem()
+    public function readItem()
     {
         $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
 
@@ -173,7 +174,7 @@ class Controller{
      * 
      * @return void
      */
-    function editItem()
+    public function editItem()
     {
         $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
         $errors = null;
@@ -197,7 +198,7 @@ class Controller{
      * 
      * @return void
      */
-    function deleteItems()
+    public function deleteItems()
     {
         $error = null;
         $bddManager = Entity::bddManager();
@@ -216,7 +217,7 @@ class Controller{
                 $error = $notification->nothingSelected();
             } else {
                 Item::deleteItems($this->categorie);
-                Utils::header(ADMIN_URL . "/" . $this->categorie);
+                Utility::header(ADMIN_URL . "/" . $this->categorie);
             }
         }
 
@@ -229,11 +230,11 @@ class Controller{
      * 
      * @return void
      */
-    function deleteItem()
+    public function deleteItem()
     {
         $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
         if ($item->delete()) {
-            Utils::header(ADMIN_URL . "/" . $this->categorie);
+            Utility::header(ADMIN_URL . "/" . $this->categorie);
         }
     }
 
@@ -243,7 +244,7 @@ class Controller{
      * 
      * @return void
      */
-    function adminError404()
+    public function adminError404()
     {
         $metaTitle = "Page non trouvée";
         $page = new PageBuilder($metaTitle, View::adminError404View());
@@ -256,7 +257,7 @@ class Controller{
      * 
      * @return void
      */
-    function publicError404()
+    public function publicError404()
     {
         $metaTitle = "Page non trouvée";
         $page = new PageBuilder($metaTitle, View::publicError404View());

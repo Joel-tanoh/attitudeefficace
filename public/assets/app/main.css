@@ -303,3 +303,7 @@ button {
 .app-search-bar-button {
 	background-color: transparent;
 }
+
+.circle {
+	border-radius: 50%;
+}

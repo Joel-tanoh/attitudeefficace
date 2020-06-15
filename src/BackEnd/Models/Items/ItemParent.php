@@ -18,7 +18,9 @@ use App\BackEnd\Bdd\SqlQueryFormater;
 use App\BackEnd\Files\Image;
 use App\BackEnd\Models\Subscription;
 use App\BackEnd\Models\Users\Suscriber;
-use App\BackEnd\Utils\Utils;
+use App\BackEnd\Utilities\Utility;
+use App\View\Card;
+use App\View\Snippet;
 
 /**
  * Gère une catégorie
@@ -71,7 +73,7 @@ class ItemParent extends Item
         $pdo = parent::connect();
         $sqlQuery1 = new SqlQueryFormater();
         $query = $sqlQuery1
-            ->select("id, code, categorie, title, description, slug, price, rank, created_at, youtube_video_link, views")
+            ->select("id, code, categorie, title, description, slug, price, rank, created_at, updated_at, posted_at, youtube_video_link, views")
             ->from(self::TABLE_NAME)
             ->where("code = ?")
             ->returnQueryString();
@@ -80,33 +82,20 @@ class ItemParent extends Item
         $rep->execute([$code]);
         $result = $rep->fetch();
 
-        $this->id               = $result['id'];
+        $this->id               = (int)$result['id'];
         $this->code             = $result['code'];
         $this->categorie        = $result['categorie'];
         $this->title            = $result['title'];
-        $this->slug             = $result['slug'];
         $this->description      = $result['description'];
-        $this->youtubeVideoLink = $result['youtube_video_link'];
-        $this->price            = $result['price'];
+        $this->slug             = $result['slug'];
+        $this->price            = (int)$result['price'];
         $this->rank             = $result['rank'];
         $this->createdAt        = $result['created_at'];
-        $this->views            = $result["views"];
+        $this->updatedAt        = $result['updated_at'];
+        $this->postedAt         = $result['posted_at'];
+        $this->youtubeVideoLink = $result['youtube_video_link'];
+        $this->views            = (int)$result["views"];
         $this->tableName        = self::TABLE_NAME;
- 
-        // Children
-        $result = parent::bddManager()->get("code", ItemChild::TABLE_NAME, "parent_id", $this->id);
-        foreach ($result as $child) {
-            $child = new ItemChild($child["code"]);
-            $this->children[] = $child;
-        }
-
-        // Les souscrivants
-        $result = parent::bddManager()->get("suscriber_id", Subscription::TABLE_NAME, "item_id", $this->id);
-        foreach ($result as $subscriber) {
-            $suscriberCode = parent::bddManager()->get("code", Suscriber::TABLE_NAME, "id", $result["suscriber_id"]);
-            $suscriber = new Suscriber($suscriberCode["code"]);
-            $this->suscribers[] = $suscriber;
-        }
     }
 
     /**
@@ -128,6 +117,20 @@ class ItemParent extends Item
      */
     public function getSuscribers()
     {
+        $dbSuscribersIDs = parent::bddManager()->get("suscriber_id", Subscription::TABLE_NAME, "item_id", $this->id);
+
+        $suscribers = [];
+
+        if (!empty($dbSuscribersIDs)) {
+
+            foreach ($dbSuscribersIDs as $subscriber) {
+                $suscriber = parent::bddManager()->get("code", Suscriber::TABLE_NAME, "id", $subscriber["suscriber_id"]);
+                $suscribers[] = new Suscriber($suscriber[0]["code"]);
+            }
+        }
+
+        $this->suscribers = $suscribers;
+
         return $this->suscribers;
     }
 
@@ -151,11 +154,28 @@ class ItemParent extends Item
      */
     public function getChildren(string $categorie = null)
     {
-        if ($categorie !== null) {
-            return array_map( function ($child, $categorie) {
-                return $child->getCategorie() === $categorie;
-            }, $this->children );
+        if (null === $categorie) {
+            $dbChildren = parent::bddManager()->get("code", ItemChild::TABLE_NAME, "parent_id", $this->id);
+        } else {
+            $query = "SELECT code "
+                    . " FROM " . ItemChild::TABLE_NAME
+                    . " WHERE parent_id = ? AND categorie = ?";
+
+            $rep = parent::connect()->prepare($query);
+            $rep->execute([$this->id, $categorie]);
+            $dbChildren = $rep->fetchAll();
         }
+
+        $children = [];
+
+        if (!empty($dbChildren)) {
+            foreach ($dbChildren as $child) {
+                $children[] = new ItemChild($child["code"]);
+            }
+        }
+
+        $this->children = $children;
+
         return $this->children;
     }
 
@@ -183,8 +203,9 @@ class ItemParent extends Item
      */
     public static function getCategories()
     {
-        $query = "SELECT categories FROM " . self::TABLE_NAME;
+        $query = "SELECT DISTINCT categories FROM " . self::TABLE_NAME;
         $rep = parent::connect()->query($query);
+
         return $rep->fetchAll();
     }
 
@@ -198,7 +219,7 @@ class ItemParent extends Item
      */
     public static function create(string $categorie)
     {
-        $code = Utils::generateCode();
+        $code = Utility::generateCode();
 
         $title              = htmlspecialchars($_POST["title"]);
         $description        = htmlspecialchars($_POST["description"]);
@@ -210,7 +231,7 @@ class ItemParent extends Item
 
             $newThis = new self($code);
 
-            $slug = Utils::slugify($newThis->getTitle()) . '-' . $newThis->getID();
+            $slug = Utility::slugify($newThis->title) . '-' . $newThis->id;
             $newThis->set("slug", $slug, self::TABLE_NAME);
 
             $newThis->setRank((int)$rank);
@@ -230,7 +251,7 @@ class ItemParent extends Item
      * 
      * @param
      * 
-     * @return self
+     * @return void
      */
     public function update()
     {
@@ -243,15 +264,15 @@ class ItemParent extends Item
         $youtubeVideoLink   = $_POST["youtube_video_link"]  ?? null;
         
         if ($title === $this->getTitle() && !empty($_FILES["image_uploaded"]["name"])) {
-            $imageManager->saveImages($this->getCategorie() . "-" . $this->getSlug());
-            $slug = $this->getSlug();
+            $imageManager->saveImages($this->categorie . "-" . $this->slug);
+            $slug = $this->slug;
         }
 
-        if ($title !== $this->getTitle()) {
+        if ($title !== $this->title) {
 
-            $slug = Utils::slugify($title) . '-' . $this->getID();
+            $slug = Utility::slugify($title) . '-' . $this->id;
             $oldThumbsName = $this->getThumbsName();
-            $newThumbsName = $this->getCategorie() . "-" . $slug;
+            $newThumbsName = $this->categorie . "-" . $slug;
 
             if (empty($_FILES["image_uploaded"]["name"])) {
                 $imageManager->renameImages($oldThumbsName, $newThumbsName);
@@ -275,7 +296,7 @@ class ItemParent extends Item
 
         $itemUpdated = $this->refresh();
 
-        Utils::header($itemUpdated->getUrl("administrate"));
+        Utility::header($itemUpdated->getUrl("administrate"));
     }
 
     /**
@@ -285,7 +306,7 @@ class ItemParent extends Item
      * 
      * @return array
      */
-    public static function getAll(string $categorie = null)
+    public static function getAllItems(string $categorie = null)
     {
         if (null === $categorie) {
             $result = parent::bddManager()->get("code", self::TABLE_NAME);
@@ -309,9 +330,152 @@ class ItemParent extends Item
      * 
      * @return int
      */
-    public static function getNumber(string $categorie = null)
+    public static function count(string $categorie = null)
     {
-        return (int)self::getAll($categorie);
+        return count(self::getAllItems($categorie));
     }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////// LES VUES ///////////////////////////////////////////////////////
+
+    
+    /**
+     * Vue de création d'un item parent.
+     * 
+     * @return string
+     */
+    public static function createView(string $categorie = null, $errors = null)
+    {
+        return <<<HTML
+
+HTML;
+    }
+
+    /**
+     * Retourne la page qui permet d'afficher un parent parent et toutes ses
+     * informations.
+     * 
+     * @return string
+     */
+    public function readView()
+    {
+        $contentHeader = Snippet::readItemContentHeader($this);
+        $showData = Snippet::showData($this);
+
+        return <<<HTML
+        {$contentHeader}
+        {$showData}
+        {$this->showChildren()}
+HTML;
+    }
+
+    /**
+     * Vue de mise à jour d'un item parent.
+     * 
+     * @return string
+     */
+    public function updateView($errors = null)
+    {
+        
+    }
+    
+    /**
+     * Affiche les cartes des articles, des vidéos, des ebooks et des livres.
+     * 
+     * @return string
+     */
+    private function showChildren()
+    {
+        return <<<HTML
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body py-3">
+                        {$this->showChildrenByCategorie('articles')}
+                        {$this->showChildrenByCategorie('videos')}
+                        {$this->showChildrenByCategorie('ebooks')}
+                        {$this->showChildrenByCategorie('livres')}
+                    </div>
+                </div>
+            </div>
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche les parents enfants en fonction de leur catégorie.
+     * 
+     * @param $childrenCategorie La catégorie des items enfants qu'il faut qu'il faut afficher.
+     * 
+     * @return string
+     */
+    private function showChildrenByCategorie(string $childrenCategorie)
+    {
+        $children = $this->getChildren($childrenCategorie);
+        $childrenNumber = count($children);
+
+        if (empty($children)) {
+            $childrenList = '<div class="col-12 text-italic text-muted mb-2">Vide</div>';
+        } else {
+            $childrenList = null;
+
+            foreach ($children as $child) {
+                $childrenList .= Card::card(null, $child->getTitle(), $child->getUrl("administrate"));
+            }
+        }
+
+        $childrenCategorie = ucfirst($childrenCategorie);
+
+        return <<<HTML
+        <div>
+            <h5>
+                {$childrenCategorie}
+                <span class="badge bg-primary text-white">{$childrenNumber}</span>
+            </h5>
+            <div class="row px-2">
+                {$childrenList}
+            </div>
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche les tous ceux qui ont souscrits à l'item courante.
+     * 
+     * @return string
+     */
+    public function showSuscribers()
+    {
+        $suscribers = null;
+
+        foreach ($this->item->getSuscribers() as $suscriber) {
+            $suscribers .= $suscriber->getName();
+        }
+
+        return <<<HTML
+        <div class="card">
+            <div class="card-header">Liste des inscrits</div>
+            <div class="card-body">
+                {$suscribers}
+            </div>
+        </div>
+HTML;
+    }
+
+    /**
+     * Montre le nombre de personne ayant souscrit l'item parent courant.
+     * 
+     * @return string
+     */
+    public function showSuscribersNumber()
+    {
+        return <<<HTML
+        <div>
+            Nombre d'inscrit : {$this->getSuscribersNumber()}
+        </div>
+HTML;
+    }
+
 
 }

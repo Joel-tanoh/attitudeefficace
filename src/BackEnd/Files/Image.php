@@ -70,12 +70,14 @@ class Image extends File
      * images et des miniatures.
      * 
      * @param string $imageName Le nom de l'image.
+     * @param string $width
+     * @param string $height
      * 
      * @return bool
      */
-    public function saveImages(string $imageName)
+    public function saveImages(string $imageName, int $width = 1280, int $height = 720)
     {
-        $this->save($imageName, THUMBS_PATH, 1280, 720);
+        $this->save($imageName, THUMBS_PATH, $width, $height);
         $this->save($imageName, ORIGINALS_THUMBS_PATH);
         return true;
     }

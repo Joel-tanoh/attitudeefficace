@@ -4,7 +4,7 @@ namespace App\BackEnd\Models\Users;
 
 use App\BackEnd\Bdd\SqlQueryFormater;
 use App\BackEnd\Files\Image;
-use App\BackEnd\Utils\Utils;
+use App\BackEnd\Utilities\Utility;
 use Exception;
 
 /**
@@ -66,7 +66,7 @@ class Administrateur extends User
         $this->dayUpdatedAt = $result["day_modified_at"];
         $this->hourUpdatedAt = $result["hour_modified_at"];
         $this->url = ADMIN_URL . '/' . self::TABLE_NAME . "/" . $this->code;
-        $this->avatarName = Utils::slugify($this->login) . "-" . $this->id . Image::EXTENSION;
+        $this->avatarName = Utility::slugify($this->login) . "-" . $this->id . Image::EXTENSION;
         $this->avatarPath = AVATARS_PATH . $this->avatarName;
         $this->avatarSrc = AVATARS_DIR_URL . "/" . $this->avatarName;
         $this->tableName = self::TABLE_NAME;
@@ -80,7 +80,7 @@ class Administrateur extends User
      */
     public static function create()
     {
-        $code           = Utils::generateCode();
+        $code           = Utility::generateCode();
         $login          = mb_strtolower(htmlspecialchars( $_POST["login"] ));
         $passwordHashed = password_hash($_POST["login"], PASSWORD_DEFAULT);
         $emailAddress   = htmlspecialchars($_POST["email_address"]);
@@ -275,5 +275,58 @@ class Administrateur extends User
 
         return $admins;
     }
+
+
+    ///////////////////////// LES VUES ///////////////////////////
+    
+    /**
+     * Liste tous les comptes administrateurs créées sur le site.
+     * 
+     * @param array $admins 
+     * 
+     * @return string
+     */
+    public static function list($admins)
+    {
+        $list = null;
+
+        foreach ($admins as $admin) {
+            $list .= self::listRow($admin);
+        }
+
+        return <<<HTML
+        <div>
+            <table class="table border">
+                <thead class="thead-light">
+                    <th>Login</th>
+                    <th>Role</th>
+                    <th>Adresse email</th>
+                </thead>
+                <tbody>
+                    {$list}
+                </tbody>
+            </table>
+        </div>
+HTML;
+    }
+
+    /**
+     * Unle ligne du tableau qui liste les comptes administrateurs.
+     * 
+     * @param self $admin
+     * 
+     * @return string
+     */
+    private static function listRow($admin)
+    {
+        return <<<HTML
+        <tr>
+            <td>{$admin->getLogin()}</td>
+            <td>{$admin->getRole()}</td>
+            <td>{$admin->getEmailAddress()}</td>
+        </tr>
+HTML;
+    }
+
 
 }
