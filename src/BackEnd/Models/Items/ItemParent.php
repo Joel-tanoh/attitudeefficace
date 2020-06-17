@@ -264,15 +264,15 @@ class ItemParent extends Item
         $youtubeVideoLink   = $_POST["youtube_video_link"]  ?? null;
         
         if ($title === $this->getTitle() && !empty($_FILES["image_uploaded"]["name"])) {
-            $imageManager->saveImages($this->categorie . "-" . $this->slug);
-            $slug = $this->slug;
+            $imageManager->saveImages($this->getCategorie() . "-" . $this->getSlug());
+            $slug = $this->getSlug();
         }
 
-        if ($title !== $this->title) {
+        if ($title !== $this->getTitle()) {
 
-            $slug = Utility::slugify($title) . '-' . $this->id;
+            $slug = Utility::slugify($title) . '-' . $this->getID();
             $oldThumbsName = $this->getThumbsName();
-            $newThumbsName = $this->categorie . "-" . $slug;
+            $newThumbsName = $this->getCategorie() . "-" . $slug;
 
             if (empty($_FILES["image_uploaded"]["name"])) {
                 $imageManager->renameImages($oldThumbsName, $newThumbsName);
@@ -282,17 +282,17 @@ class ItemParent extends Item
             }
         }
 
-        $this->set("title", $title, $this->tableName, "id", $this->id);
+        $this->set("title", $title, $this->tableName, "id", $this->getID());
         
-        $this->set("description", $description, $this->tableName, "id", $this->id);
+        $this->set("description", $description, $this->tableName, "id", $this->getID());
 
-        $this->set("slug", $slug, $this->tableName, "id", $this->id);
+        $this->set("slug", $slug, $this->tableName, "id", $this->getID());
         
-        $this->set("price", (int)$price, $this->tableName, "id", $this->id);
+        $this->set("price", (int)$price, $this->tableName, "id", $this->getID());
 
         $this->setRank((int)$rank);
 
-        $this->set("youtube_video_link", $youtubeVideoLink, $this->tableName, "id", $this->id);
+        $this->set("youtube_video_link", $youtubeVideoLink, $this->tableName, "id", $this->getID());
 
         $itemUpdated = $this->refresh();
 

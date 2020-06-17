@@ -93,7 +93,11 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getTitle()
     {
-        return ucfirst($this->title);
+        if ($this->title) {
+            return ucfirst($this->title);
+        } else {
+            return "Motivation plus";
+        }
     }
 
     /**
@@ -428,7 +432,7 @@ class Item extends \App\BackEnd\Models\Entity
 
         if (!empty($_FILES["image_uploaded"]["name"])) {
             $imageManager = new Image();
-            $imageName = $newItem->categorie . "-" . $newItem->slug;
+            $imageName = $newItem->getCategorie() . "-" . $newItem->getSlug();
 
             if ($newItem->getCategorie() === "mini-services") {
                 $imageManager->saveImages($imageName, 340, 340);
@@ -439,7 +443,7 @@ class Item extends \App\BackEnd\Models\Entity
 
         if (!empty($_FILES["pdf_uploaded"]["name"])) {
             $pdf = new Pdf();
-            $pdfFileName = $newItem->title . "-" . $newItem->id;
+            $pdfFileName = $newItem->getTitle() . "-" . $newItem->getID();
             $pdf->savePdfFile($pdfFileName);
         }
 

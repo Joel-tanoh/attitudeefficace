@@ -15,7 +15,8 @@
     "require": {
         "cocur/slugify": "^3.2",
         "altorouter/altorouter": "^1.2",
-        "intervention/image": "^2.5"
+        "intervention/image": "^2.5",
+        "fzaninotto/faker": "^1.9"
     },
     "require-dev": {
         "phploc/phploc": "^4.0",

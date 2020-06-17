@@ -54,22 +54,22 @@ class Administrateur extends User
         $rep->execute([$code]);
         $result = $rep->fetch();
 
-        $this->id = $result['id'];
-        $this->code = $result['code'];
-        $this->login = $result['login'];
-        $this->password = $result['password'];
-        $this->role = $result['role'];
-        $this->state = $result['state'];
-        $this->emailAddress = $result['email_address'];
-        $this->dayCreatedAt = $result["day_created_at"];
-        $this->hourCreatedAt = $result["hour_created_at"];
-        $this->dayUpdatedAt = $result["day_modified_at"];
-        $this->hourUpdatedAt = $result["hour_modified_at"];
-        $this->url = ADMIN_URL . '/' . self::TABLE_NAME . "/" . $this->code;
-        $this->avatarName = Utility::slugify($this->login) . "-" . $this->id . Image::EXTENSION;
-        $this->avatarPath = AVATARS_PATH . $this->avatarName;
-        $this->avatarSrc = AVATARS_DIR_URL . "/" . $this->avatarName;
-        $this->tableName = self::TABLE_NAME;
+        $this->id               = (int)$result['id'];
+        $this->code             = $result['code'];
+        $this->login            = $result['login'];
+        $this->password         = $result['password'];
+        $this->role             = (int)$result['role'];
+        $this->state            = (int)$result['state'];
+        $this->emailAddress     = $result['email_address'];
+        $this->dayCreatedAt     = $result["day_created_at"];
+        $this->hourCreatedAt    = $result["hour_created_at"];
+        $this->dayUpdatedAt     = $result["day_modified_at"];
+        $this->hourUpdatedAt    = $result["hour_modified_at"];
+        $this->url              = self::TABLE_NAME . "/" . $this->code;
+        $this->avatarName       = Utility::slugify($this->login) . "-" . $this->id . Image::EXTENSION;
+        $this->avatarPath       = AVATARS_PATH . $this->avatarName;
+        $this->avatarSrc        = AVATARS_DIR_URL . "/" . $this->avatarName;
+        $this->tableName        = self::TABLE_NAME;
     }
 
     /**
@@ -136,7 +136,7 @@ class Administrateur extends User
      */
     public function setRole($role)
     {
-        $this->set("role", $role, $this->tableName, "id", $this->id);
+        $this->set("role", $role, $this->tableName, "id", $this->getID());
         return true;
     }
 
@@ -147,7 +147,7 @@ class Administrateur extends User
      */
     public function delete()
     {
-        parent::bddManager()->delete(self::TABLE_NAME, "id", $this->id);
+        parent::bddManager()->delete(self::TABLE_NAME, "id", $this->getID());
         return true;
     }
 
@@ -172,6 +172,7 @@ class Administrateur extends User
         $rep = $pdo->prepare($query);
         $rep->execute([$login]);
         $counter = $rep->fetch();
+        
         return $counter['user'] == 1;
     }
 

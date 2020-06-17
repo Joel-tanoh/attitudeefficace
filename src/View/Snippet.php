@@ -97,27 +97,27 @@ HTML;
      * Retourne un listItemsContentHeader.
      * 
      * @param string $title
+     * @param string $action 
      * @param mixed  $itemsNumber
      * 
      * @return string
      */
-    public static function listItemsContentHeader(string $title = null, $itemsNumber = null)
+    public static function listItemsContentHeader(string $title = null, string $action = null, $itemsNumber = null)
     {
         $title = ucfirst($title);
         $contextMenu = self::contextMenu();
 
-        if ($itemsNumber) {
-            $itemsNumber = '<div class="badge bg-primary text-white px-2 py-1 rounded">' . $itemsNumber . '</div>';
-        } else {
-            $itemsNumber = null;
-        }
-        
+        $itemsNumber = '<div class="badge bg-primary text-white px-2 py-1 rounded">' . $itemsNumber . '</div>';
+
         return <<<HTML
         <div class="row mb-3">
             <div class="col-6">
-                <div class="d-flex align-items-center">
-                    <h3 class="mr-2">{$title}</h3>
-                    {$itemsNumber}
+                <div>
+                    <div class="d-flex align-items-center">
+                        <h3 class="mr-2">{$title}</h3>
+                        {$itemsNumber}
+                    </div>
+                    <span class="d-inline-block h6 bg-primary text-white rounded px-2 py-1">{$action}</span>
                 </div>
             </div>
             <div class="col-6">
@@ -132,7 +132,7 @@ HTML;
     /**
      * Retourne l'entête sur la page de lecture d'un item.
      * 
-     * @param \App\BackEnd\Models\Items\Item\ItemParent|\App\BackEnd\Models\Items\Item\ItemChild  $item
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item
      * 
      * @return string
      */
@@ -282,7 +282,7 @@ HTML;
         <div class="card mb-3">
             <div class="card-header bg-white">Données</div>
             <div class="card-body">
-                <div>Catégorie : {$item->getCategorie()}</div>
+                <div>Catégorie : {$item->showCategorie()}</div>
                 {$parent}
                 {$item->showDescription()}
                 {$suscriberNumber}

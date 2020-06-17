@@ -64,7 +64,7 @@ class User extends \App\BackEnd\Models\Entity
     /**
      * Role de l'utilisateur.
      * 
-     * @var string
+     * @var int
      */
     protected $role;
   

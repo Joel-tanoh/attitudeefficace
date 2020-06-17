@@ -3,7 +3,6 @@ div#connexion {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: rgb(240, 240, 240);
   font-size: .95rem;
 }
 div#connexion #container {

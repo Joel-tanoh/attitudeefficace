@@ -86,6 +86,18 @@ class Entity
     }
 
     /**
+     * Permet de récupérer une propriété de l'instance dans la base de données.
+     * 
+     * @param string $propName Le nom de la propriété.
+     * 
+     * @return mixed
+     */
+    protected function get(string $propName)
+    {
+        return self::bddManager()->get($propName, $this->tableName, "code", $this->code)[0][$propName];
+    }
+
+    /**
      * Retourne l'ID.
      * 
      * @return int
@@ -112,7 +124,7 @@ class Entity
      */
     public function getCategorie()
     {
-        return ucfirst(self::getCategorieFormated($this->get("categorie")));
+        return ucfirst(self::getCategorieFormated($this->get("categorie"), "pluriel"));
     }
 
     /**
@@ -294,19 +306,6 @@ class Entity
         return true;
     }
 
-    /**
-     * Permet de récupérer une propriété de l'instance dans la base de données.
-     * 
-     * @param string $propName Le nom de la propriété.
-     * 
-     * @return mixed
-     */
-    protected function get(string $propName)
-    {
-        return self::bddManager()->get($propName, $this->tableName, "code", $this->code)[0][$propName];
-    }
-
-
     ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
 
     /**
@@ -321,5 +320,14 @@ class Entity
 HTML;
     }
 
+    /**
+     * Affiche la catégorie.
+     * 
+     * @return string
+     */
+    public function showCategorie()
+    {
+        return ucfirst(self::getCategorieFormated($this->getCategorie()));
+    }
 
 }

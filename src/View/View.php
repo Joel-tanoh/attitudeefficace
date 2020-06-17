@@ -128,7 +128,7 @@ HTML;
             $itemsNumber = Item::countAllItems($categorie);
         }
 
-        $contentHeader = Snippet::listItemsContentHeader($title, $itemsNumber);
+        $contentHeader = Snippet::listItemsContentHeader($title, "Liste", $itemsNumber);
 
         if (empty($items)) {
             $notification = new Notification();
@@ -198,14 +198,14 @@ HTML;
 
         if ($categorie === "motivation-plus") {
             $formContent = Form::getForm("videos");
-            $title = "Motivation + &#8250 nouvelle vidéo";
+            $title = "Motivation +";
         } else {
             $formContent = Form::getForm($categorie);
-            $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel")) . " &#8250 Ajouter";
+            $title = ucfirst(Entity::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
         }
         
         $error = !empty($errors) ? $notification->errors($errors) : null;
-        $contentHeader = Snippet::listItemsContentHeader($title);
+        $contentHeader = Snippet::listItemsContentHeader($title, "Ajouter");
 
         return <<<HTML
         {$contentHeader}
@@ -232,10 +232,22 @@ HTML;
     }
 
     /**
+     * Affiche une vue pour les vidéos.
+     * 
+     * @param \App\BackEnd\Models\Items\ItemChild $item
+     */
+    public static function readVideo($item)
+    {
+        return <<<HTML
+
+HTML;
+    }
+
+    /**
      * Retourne la page de modification d'un item.
      * 
-     * @param $item      L'item qu'on veut modifier.
-     * @param string $categorie La catégorie ou la table de l'item qu'on veut00
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item
+     * @param string $categorie La catégorie ou la table de l'item qu'on veut
      *                          modifier.
      * @param array  $errors    Les erreurs à afficher dans le cas où la validation
      *                          des données retourne des erreurs.
@@ -249,9 +261,8 @@ HTML;
         $notification = new Notification();
         $error = !empty($errors) ? $notification->errors($errors) : null;
 
-        $title = $item->getTitle()
-                . ' <span class="h6 bg-primary text-white rounded p-1"> Editer</span>';
-        $listItemsContentHeader = Snippet::listItemsContentHeader($title);
+        $title = $item->getTitle();
+        $listItemsContentHeader = Snippet::listItemsContentHeader($title, "Editer");
 
         return <<<HTML
         {$listItemsContentHeader}
@@ -283,7 +294,7 @@ HTML;
 
         $error = null !== $error ? $notifier->error($error) : null;
         $title = Entity::getCategorieFormated($categorie, "puriel");
-        $listItemsContentHeader = Snippet::listItemsContentHeader($title);
+        $listItemsContentHeader = Snippet::listItemsContentHeader($title, "Supprimer");
 
         return <<<HTML
         {$listItemsContentHeader}

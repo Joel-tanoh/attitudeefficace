@@ -117,7 +117,7 @@ class ItemChild extends Item
         $parent = null;
 
         if ($this->parentID) {
-            if ($this->parentID === "-1") {
+            if ($this->parentID === -1) {
                 $parent = "Motivation plus";
             } else {
                 $result = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $this->parentID);
@@ -191,7 +191,7 @@ class ItemChild extends Item
             
             $newThis = new self($code);
                                                             
-            $slug = Utility::slugify($newThis->title) . '-' . $newThis->id;
+            $slug = Utility::slugify($newThis->title) . '-' . $newThis->getID();
             $newThis->set("slug", $slug, self::TABLE_NAME);
 
             $newThis->setRank((int)$rank);
@@ -237,29 +237,29 @@ class ItemChild extends Item
         $articleContent     = $_POST["article_content"]     ?? null;
         $author             = $_POST["author_name"]         ?? null;
         $provider           = $_POST["provider"]            ?? null;
-        $pages              = $_POST["pages"]               ?? null;
-        $price              = $_POST["price"]               ?? null;
-        $rank               = $_POST["rank"]                ?? null;
+        $pages              = (int)$_POST["pages"]          ?? null;
+        $price              = (int)$_POST["price"]          ?? null;
+        $rank               = (int)$_POST["rank"]           ?? null;
         $editionHome        = $_POST["edition_home"]        ?? null;
         $parutionYear       = $_POST["parution_year"]       ?? null;
         $youtubeVideoLink   = $_POST["youtube_video_link"]  ?? null;
         
-        if ($title === $this->title && !empty($_FILES["image_uploaded"]["name"])) {
-            $imageManager->saveImages($this->categorie . "-" . $this->slug);
-            $slug = $this->slug;
+        if ($title === $this->getTitle() && !empty($_FILES["image_uploaded"]["name"])) {
+            $imageManager->saveImages($this->getCategorie() . "-" . $this->getSlug());
+            $slug = $this->getSlug();
         }
 
         if ($title !== $this->title) {
 
-            $slug = Utility::slugify($title) .'-'. $this->id;
+            $slug = Utility::slugify($title) .'-'. $this->getID();
             $oldThumbsName = $this->getThumbsName();
-            $newThumbsName = $this->categorie . "-" . $slug;
+            $newThumbsName = $this->getCategorie() . "-" . $slug;
 
             if (empty($_FILES["image_uploaded"]["name"])) {
                 $imageManager->renameImages($oldThumbsName, $newThumbsName);
             } else {
 
-                if ($this->categorie === "mini-services") {
+                if ($this->getCategorie() === "mini-services") {
                     $imageManager->saveImages($newThumbsName, 340, 340);
                 } else {
                     $imageManager->saveImages($newThumbsName);
@@ -269,33 +269,33 @@ class ItemChild extends Item
             }
         }
 
-        $this->set("parent_id", $parentID, $this->tableName, "id", $this->id);
+        $this->set("parent_id", $parentID, $this->tableName, "id", $this->getID());
 
-        $this->set("title", $title, $this->tableName, "id", $this->id);
+        $this->set("title", $title, $this->tableName, "id", $this->getID());
         
-        $this->set("description", $description, $this->tableName, "id", $this->id);
+        $this->set("description", $description, $this->tableName, "id", $this->getID());
         
-        $this->set("slug", $slug, $this->tableName, "id", $this->id);
+        $this->set("slug", $slug, $this->tableName, "id", $this->getID());
         
-        $this->set("article_content", $articleContent, $this->tableName, "id", $this->id);
+        $this->set("article_content", $articleContent, $this->tableName, "id", $this->getID());
 
-        $this->set("author", $author, $this->tableName, "id", $this->id);
+        $this->set("author", $author, $this->tableName, "id", $this->getID());
 
-        $this->set("provider", $provider, $this->tableName, "id", $this->id);
+        $this->set("provider", $provider, $this->tableName, "id", $this->getID());
 
-        $this->set("pages", $pages, $this->tableName, "id", $this->id);
+        $this->set("pages", $pages, $this->tableName, "id", $this->getID());
 
-        $this->set("price", $price, $this->tableName, "id", $this->id);
+        $this->set("price", $price, $this->tableName, "id", $this->getID());
 
-        $this->set("price", (int)$price, $this->tableName, "id", $this->id);
+        $this->set("price", $price, $this->tableName, "id", $this->getID());
 
-        $this->setRank((int)$rank);
+        $this->setRank($rank);
 
-        $this->set("edition_home", $editionHome, $this->tableName, "id", $this->id);
+        $this->set("edition_home", $editionHome, $this->tableName, "id", $this->getID());
 
-        $this->set("parution_year", $parutionYear, $this->tableName, "id", $this->id);
+        $this->set("parution_year", $parutionYear, $this->tableName, "id", $this->getID());
 
-        $this->set("youtube_video_link", $youtubeVideoLink, $this->tableName, "id", $this->id);
+        $this->set("youtube_video_link", $youtubeVideoLink, $this->tableName, "id", $this->getID());
 
         $itemUpdated = $this->refresh();
 
@@ -408,7 +408,7 @@ HTML;
 
         $itemsNumber = ItemChild::count("mini-services");
 
-        $contentHeader = Snippet::listItemsContentHeader($title, $itemsNumber);
+        $contentHeader = Snippet::listItemsContentHeader($title, "Liste", $itemsNumber);
         $miniServiceCommandsResume = Snippet::miniServicesCommandsResume();
 
         if (empty($items)) {
@@ -457,7 +457,7 @@ HTML;
                     <div class="card">
                         <div class="card-header bg-white">Contenu de l'article</div>
                         <div class="card-body">
-                            <article>{$this->articleContent}</article>
+                            <article>{$this->getArticleContent()}</article>
                         </div>
                     </div>
                 </div>
@@ -473,10 +473,18 @@ HTML;
      */
     public function showParent()
     {
+        if ($this->parent !== null) {
+            $parentTitle = $this->getParent()->getTitle();
+            $parentCategorie = $this->getParent()->getCategorie();
+        } else {
+            $parentTitle = "Motivation +";
+            $parentCategorie = "Motivation +";
+        }
+
         return <<<HTML
         <div>
-            Parent : {$this->getParent()->getTitle()}
-            <span class="bg-primary p-1 rounded text-white text-small">{$this->getParent()->getCategorie()}</span>
+            Parent : {$parentTitle}
+            <span class="bg-primary p-1 rounded text-white text-small">{$parentCategorie}</span>
         </div>
 HTML;
     }
