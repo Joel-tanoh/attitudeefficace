@@ -443,7 +443,7 @@ class Item extends \App\BackEnd\Models\Entity
 
         if (!empty($_FILES["pdf_uploaded"]["name"])) {
             $pdf = new Pdf();
-            $pdfFileName = $newItem->getTitle() . "-" . $newItem->getID();
+            $pdfFileName = $newItem->getSlug();
             $pdf->savePdfFile($pdfFileName);
         }
 

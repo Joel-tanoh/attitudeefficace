@@ -61,7 +61,7 @@ class Pdf extends File
             if (!move_uploaded_file($_FILES["pdf_uploaded"]["tmp_name"], $destination)) {
                 throw new Exception("Echec de l'enregistrement du fichier Pdf");
             }
-        } 
+        }
     }
 
 }

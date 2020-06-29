@@ -21,7 +21,7 @@
  */
 function someoneIsConnected()
 {
-    return !empty($_COOKIE['admin_login']) || !empty($_SESSION['admin_login']) ? true : false;
+    return !empty($_COOKIE['attitude_efficace_administrator_login']) || !empty($_SESSION['attitude_efficace_administrator_login']) ? true : false;
 }
 
 /**

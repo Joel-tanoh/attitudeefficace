@@ -354,15 +354,32 @@ class ItemChild extends Item
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////// LES VUES ///////////////////////////////////////////////////////
     
-    /**
-     * Vue de création d'un item.
-     * 
-     * @return string
-     */
-    public static function createView(string $categorie = null, $errors = null)
-    {
+//     /**
+//      * Vue de création d'un item.
+//      * 
+//      * @return string
+//      */
+//     public static function createView(string $categorie = null, $errors = null)
+//     {
+//         $notification = new Notification();
+
+//         if ($categorie === "motivation-plus" || $categorie === "videos") {
+//             $formContent = Form::getForm("videos");
+//             $title = "Motivation +";
+//         } else {
+//             $formContent = Form::getForm($categorie);
+//             $title = ucfirst(parent::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
+//         }
         
-    }
+//         $error = !empty($errors) ? $notification->errors($errors) : null;
+//         $contentHeader = Snippet::listItemsContentHeader($title, "Ajouter");
+
+//         return <<<HTML
+//         {$contentHeader}
+//         {$error}
+//         {$formContent}
+// HTML;
+//     }
 
     /**
      * Retourne la page d'affichage d'un item enfant.

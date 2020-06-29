@@ -18,7 +18,9 @@ require_once ROOT_PATH . 'global' . DIRECTORY_SEPARATOR . 'constants.php';
 require_once ROOT_PATH . 'global' . DIRECTORY_SEPARATOR . 'functions.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
+use App\BackEnd\Cookie;
 use App\BackEnd\Models\Users\Administrateur;
+use App\BackEnd\Session;
 use App\View\Notification;
 use App\BackEnd\Utilities\Utility;
 use App\View\View;
@@ -36,38 +38,39 @@ try {
 
         if (isset($_POST['connexion'])) {
 
-            $loginputedInform   = $_POST["admin_login"];
-            $adminLogin         = htmlentities($_POST["admin_login"]);
+            $loginPutedInform   = $_POST["admin_login"];
+            $adminLogin         = mb_strtolower(htmlentities($_POST["admin_login"]));
             $adminPassword      = $_POST["admin_password"];
+            $activateCookie     = $_POST["activate_cookie"] ?? null;
 
             if (empty($adminLogin) || empty($adminPassword)) {
                 $error = $notification->inputsEmpty();
             } else {
-                $adminLogin = mb_strtolower($adminLogin);
 
-                if (Administrateur::loginIsset($adminLogin)) {
+                $admin = Administrateur::getByLogin($adminLogin);
 
-                    $admin = Administrateur::getByLogin($adminLogin);
-                    
+                if ($admin) {
+
                     if ($admin->isAuthentified($adminLogin, $adminPassword)) {
 
-                        $admin->setSession("admin_login");
+                        Session::setAdministratorSessionVar($admin);
 
-                        if ($activate_cookie == "oui") {
-                            $admin->setCookie("admin_login", $admin->getLogin());
+                        if ($activateCookie) {
+                            Cookie::setAdministratorCookieVar($admin);
                         }
-
+                              
                         Utility::header(ADMIN_URL);
+
                     } else {
-                        $error = $notification->errorLogin();
+                        $error = $notification->errorAuthentification();
                     }
 
                 } else {
-                    $error = $notification->errorLogin();
+                    $error = $notification->errorAuthentification();
                 }
             }
 
-            $adminLogin = $loginputedInform;
+            $adminLogin = $loginPutedInform;
         }
         
         $page = new PageBuilder($metaTitle, View::connexionFormView($adminLogin, $adminPassword, $error));

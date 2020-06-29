@@ -114,7 +114,7 @@ HTML;
      **/
     public function adminPage()
     {
-        $template = Template::navbarAndSidebarAndContainer( Navbar::adminNavBar(), Sidebar::adminSidebar(), $this->view );
+        $template = Template::navbarAndSidebarAndContainer( Navbar::AdministrationNavbar(), Sidebar::adminSidebar(), $this->view );
 
         return <<<HTML
         {$this->debutDePage("fr")}

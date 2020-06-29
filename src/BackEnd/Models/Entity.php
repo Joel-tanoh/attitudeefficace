@@ -134,7 +134,7 @@ class Entity
      */
     public static function getAllCategories()
     {
-        return array_merge(ItemParent::CATEGORIES, ItemChild::CATEGORIES);
+        return array_merge(ItemParent::CATEGORIES, ItemChild::CATEGORIES, ["motivation-plus"]);
     }
 
     /**

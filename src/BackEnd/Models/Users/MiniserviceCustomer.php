@@ -47,6 +47,8 @@ class MiniserviceCustomer extends Entity
      */
     const TABLE_NAME = "miniservices_customers";
 
+    const CATEGORIE = "miniservices_customers";
+
     /**
      * Constructeur d'un client de miniservice.
      * 
@@ -65,6 +67,7 @@ class MiniserviceCustomer extends Entity
         $this->emailAddress = $result["email_address"];
         $this->contact1 = $result["contact_1"];
         $this->contact2 = $result["contact_2"];
+        $this->categorie = self::CATEGORIE;
 
         /* On récupère les commandes éffectuées par le client */
         $result = parent::bddManager()->get("code", MiniserviceOrder::TABLE_NAME, "customer_id", $this->id);

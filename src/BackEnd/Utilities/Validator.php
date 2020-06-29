@@ -373,6 +373,7 @@ class Validator
         $this->toValidate["email"] = $email;
         if (!preg_match(self::EMAIL_REGEX, $email)) {
             $this->errors["email"] = $this->notifier->emailIsInvalid();
+            return false;
         }
     }
 

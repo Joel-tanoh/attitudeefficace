@@ -29,7 +29,7 @@ use App\BackEnd\Models\Items\Item;
 use App\View\Notification;
 
 try {
-    
+
     if (!someoneIsConnected()) { Utility::header(ADMIN_URL . "/connexion"); }
 
     $route = new Router(Router::getUrl());
@@ -40,15 +40,11 @@ try {
 
     elseif ($route->match( [Entity::getAllCategories()] )) $controller->listItems();
 
-    elseif ($route->match( "administrateurs" )) $controller->listAdmins();
-
-    elseif ($route->match( "motivation-plus")) $controller->listItems();
+    elseif ($route->match( "administrateurs" )) $controller->ListAdministrators();
 
     elseif ($route->match( "mini-services/commands" )) $controller->listMiniservicesCommands();
 
     elseif ($route->match( [Entity::getAllCategories(), "create"] )) $controller->createItem();
-
-    elseif ($route->match( "motivation-plus/create" )) $controller->createItem();
 
     elseif ($route->match( [Entity::getAllCategories(), Item::getAllSlugs()] )) $controller->readItem();
 
@@ -57,8 +53,6 @@ try {
     elseif ($route->match( [Entity::getAllCategories(), "delete"] )) $controller->deleteItems();
 
     elseif ($route->match( [Entity::getAllCategories(), Item::getAllSlugs(), "delete"] )) $controller->deleteItem();
-
-    elseif ($route->match( "motivation-plus/delete" )) $controller->deleteItems();
 
     else $controller->adminError404();
 

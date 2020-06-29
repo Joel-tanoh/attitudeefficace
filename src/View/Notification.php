@@ -71,9 +71,11 @@ HTML;
     public function error(string $message) : string
     {
         return <<<HTML
-        <div class="alert app-alert-danger d-flex align-items-center">
-            <i class="fas fa-exclamation-triangle text-danger mr-3"></i>
-            <div>{$message}</div>
+        <div class="row">
+            <div class="col-12 mx-2 alert app-alert-danger d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle text-danger mr-3"></i>
+                <div class="text-danger">{$message}</div>
+            </div>
         </div>
 HTML;
     }
@@ -142,7 +144,7 @@ HTML;
      */
     public function titleIsEmpty() : string
     {
-        return "Veuillez insérer un titre.";
+        return "Veuillez insérer un titre !";
     }
     
     /**
@@ -153,7 +155,7 @@ HTML;
      */
     public function titleContainsHTML() : string
     {
-        return "Veuillez vérifier que le titre ne contient pas de code HTML.";
+        return "Veuillez vérifier que le titre ne contient pas de code HTML !";
     }
 
     /**
@@ -163,7 +165,7 @@ HTML;
      */
     public function descriptionIsEmpty()
     {
-        return "Veuillez insérer une description.";
+        return "Veuillez insérer une description !";
     }
    
     /**
@@ -173,7 +175,7 @@ HTML;
      */
     public function descriptionContainsHTML()
     {
-        return "Veuillez vérifier que la description ne contient pas de code HTML.";
+        return "Veuillez vérifier que la description ne contient pas de code HTML !";
     }
 
     /**
@@ -184,7 +186,7 @@ HTML;
      */
     public function loginIsUsed() : string
     {
-        return "Ce login est déjà utilisé.";
+        return "Ce login est déjà utilisé !";
     }
 
     /**
@@ -194,7 +196,7 @@ HTML;
      */
     public function loginContainsHTML()
     {
-        return "Le login ne doit pas contenir de code HTML";
+        return "Le login ne doit pas contenir de code HTML !";
     }
 
     /**
@@ -204,7 +206,7 @@ HTML;
      */
     public function loginIsEmpty()
     {
-        return "Veuillez saisir un login.";
+        return "Veuillez saisir un login !";
     }
 
     /**
@@ -217,7 +219,7 @@ HTML;
      */
     public function isNotInt(string $name)
     {
-        return "Veuillez saisir une valeur correcte pour dans le champ " . $name;
+        return "Veuillez saisir une valeur correcte pour dans le champ " . $name . " !";
     }
 
     /**
@@ -228,7 +230,7 @@ HTML;
      */
     public function emailIsEmpty() : string
     {
-        return 'Veuillez saisir une adresse email!';
+        return 'Veuillez saisir une adresse email! !';
     }
      
     /**
@@ -260,7 +262,7 @@ HTML;
      */
     public function passwordIsEmpty()
     {
-        return "Veuillez saisir un mot de passe.";
+        return "Veuillez saisir un mot de passe !";
     }
 
     /**
@@ -270,7 +272,7 @@ HTML;
      */
     public function passwordLengthIsInvalid()
     {
-        return "Veuillez saisir un mot de passe de plus de 8 caractères.";
+        return "Veuillez saisir un mot de passe de plus de 8 caractères !";
     }
 
     /**
@@ -280,7 +282,7 @@ HTML;
      */
     public function confirmPasswordIsEmpty()
     {
-        return "Veuillez confirmer le mot de passe.";
+        return "Veuillez confirmer le mot de passe !";
     }
     
     /**
@@ -291,7 +293,7 @@ HTML;
      */
     public function passwordsNotIdentics() : string
     {
-        return "Veuillez vérifier que les mots de passes sont identiques.";
+        return "Veuillez vérifier que les mots de passes sont identiques !";
     }
     
     /**
@@ -311,7 +313,7 @@ HTML;
      * @author Joel
      * @return string [[Description]]
      */
-    public function errorLogin() : string
+    public function errorAuthentification() : string
     {
         return 'Vos identifiants sont incorrects, veuillez réessayer !';
     }
@@ -347,7 +349,7 @@ HTML;
      */
     public function descriptionLengthIsInvalid() : string
     {
-        return "La description ne doit pas excéder 400 caractères";
+        return "La description ne doit pas excéder 400 caractères !";
     }
     
     /**
@@ -423,7 +425,7 @@ HTML;
      */
     public function issetFormation() : string
     {
-        return "Une formation porte ce titre.";
+        return "Une formation porte ce titre !";
     }
 
     /**
@@ -445,7 +447,7 @@ HTML;
      */
     public function nombrePageIsInvalid() : string
     {
-        return "Veuillez entrer une valeur correcte pour le nombre de page.";
+        return "Veuillez entrer une valeur correcte pour le nombre de page !";
     }
 
     /**
@@ -468,7 +470,7 @@ HTML;
      */
     public function auteurNameIsInvalid() : string
     {
-        return "Veuillez saisir le nom de l'auteur et verifier qu'il n'excède pas 250 caractères.";
+        return "Veuillez saisir le nom de l'auteur et verifier qu'il n'excède pas 250 caractères !";
     }
 
     /**
@@ -480,7 +482,7 @@ HTML;
      */
     public function maisonEditionNameIsInvalid() : string
     {
-        return "Veuillez saisir le nom de la maison d'edition et verifier qu'elle n'excède pas 250 caractères.";
+        return "Veuillez saisir le nom de la maison d'edition et verifier qu'elle n'excède pas 250 caractères !";
     }
 
     /**
@@ -490,7 +492,7 @@ HTML;
      */
     public function videoLinkIsInvalid()
     {
-        return "Veuillez vérifier le lien de la vidéo de description.";
+        return "Veuillez vérifier le lien de la vidéo de description !";
     }
 
     /**
@@ -501,7 +503,7 @@ HTML;
      */
     public function imageIsInvalid()
     {
-        return "Veuillez charger une image de taille inférieure à 2 Mo.";
+        return "Veuillez charger une image de taille inférieure à 2 Mo !";
     }
 
     /**
@@ -511,7 +513,7 @@ HTML;
      */
     public function isNotPdfFile()
     {
-        return "Veuillez charger un fichier PDF.";
+        return "Veuillez charger un fichier PDF !";
     }
 
     /**
@@ -552,7 +554,7 @@ HTML;
      */
     public function articleContentIsEmpty()
     {
-        return "Veuillez saisir le contenu de l'article.";
+        return "Veuillez saisir le contenu de l'article !";
     }
 
 }

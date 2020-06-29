@@ -14,7 +14,9 @@
 
 namespace App\View;
 
+use App\BackEnd\Cookie;
 use App\BackEnd\Models\Users\Administrateur;
+use App\BackEnd\Session;
 
 /**
  * Perlet de gérer tout ce qui concerne la barre de navigation supérieure.
@@ -52,6 +54,24 @@ class Navbar extends View
         </nav>
 HTML;
     }
+    
+    /**
+     * Permet d'afficher le logo dans la navbar.
+     * 
+     * @param string $brandSrc        Le lien vers l'image.
+     * @param string $href  L'url exécuté lors du click sur le logo.
+     * @param string $caption  Le texte à afficher si l'image introuvable.
+     * 
+     * @return string
+     */
+    public static function navbarBrand(string $brandSrc, string $href = null, string $caption = null)
+    {
+        return <<<HTML
+        <a class="navbar-brand" href="{$href}">
+            <img src="{$brandSrc}" alt="{$caption}" class="brand">
+        </a>
+HTML;
+    }
 
     /**
      * Barre de navigation supérieure de la partie administration.
@@ -59,36 +79,18 @@ HTML;
      * @author Joel
      * @return string
      */
-    public static function adminNavBar()
+    public static function AdministrationNavbar()
     {
         $addItemsLinksView = self::addItemsLinksView();
-        $getAdminManagementButtonsView = self::getAdminManagementButtonsView();
+        $manageAdministratorsButtons = self::manageAdministratorsButtons();
 
         return <<<HTML
         <nav class="navbar fixed-top navbar-content bg-white border-bottom w-100 d-flex justify-content-end">
             <ul class="navbar-nav d-flex align-items-center flex-row">
                 {$addItemsLinksView}
-                {$getAdminManagementButtonsView}
+                {$manageAdministratorsButtons}
             </ul>
         </nav>
-HTML;
-    }
-    
-    /**
-     * Permet d'afficher le logo dans la navbar.
-     * 
-     * @param string $brand_src        Le lien vers l'image.
-     * @param string $click_direction  L'url exécuté lors du click sur le logo.
-     * @param string $alt_information  Le texte à afficher si l'image introuvable.
-     * 
-     * @return string
-     */
-    public static function navbarBrand(string $brand_src, string $click_direction = null, string $alt_information = null)
-    {
-        return <<<HTML
-        <a class="navbar-brand" href="{$click_direction}">
-            <img src="{$brand_src}" alt="{$alt_information}" class="brand">
-        </a>
 HTML;
     }
 
@@ -100,6 +102,7 @@ HTML;
     public static function addItemsLinksView()
     {
         $adminUrl = ADMIN_URL;
+
         return <<<HTML
         <li id="addButton" class="mr-3">
             <a class="add-button-icon">
@@ -107,19 +110,16 @@ HTML;
             </a>
             <ul class="add-button-content list-unstyled">
                 <li>
-                    <a href="{$adminUrl}/formations/create" class="text-primary">Formation</a>
+                    <a href="{$adminUrl}/articles/create" class="text-primary">Ecrire un article</a>
                 </li>
                 <li>
-                    <a href="{$adminUrl}/articles/create" class="text-primary">Article</a>
+                    <a href="{$adminUrl}/videos/create" class="text-primary">Ajouter une vidéo</a>
                 </li>
                 <li>
-                    <a href="{$adminUrl}/videos/create" class="text-primary">Vidéo</a>
+                    <a href="{$adminUrl}/livres/create" class="text-primary">Publier un livre</a>
                 </li>
                 <li>
-                    <a href="{$adminUrl}/livres/create" class="text-primary">Livre</a>
-                </li>
-                <li>
-                    <a href="{$adminUrl}/ebooks/create" class="text-primary">Ebook</a>
+                    <a href="{$adminUrl}/ebooks/create" class="text-primary">Ajouter un ebook</a>
                 </li>
             </ul>
         <li>
@@ -132,16 +132,15 @@ HTML;
      * @author Joel
      * @return string
      */
-    public static function getAdminManagementButtonsView()
+    public static function manageAdministratorsButtons()
     {
         $adminUrl = ADMIN_URL;
         
-        $login = $_SESSION["admin_login"] ?? $_COOKIE["admin_login"];
+        $login = Session::getAdministratorSessionVar() ?? Cookie::getAdministratorCookieVar();
 
         $adminUser = Administrateur::getByLogin($login);
 
-        $privateButtons = $adminUser->hasAllRights()
-            ? self::administrateurReservedActions() : null;
+        $privateButtons = self::administrateurReservedActions();
 
         $navbarUserAvatar = self::navbarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
 
@@ -164,18 +163,18 @@ HTML;
     /**
      * Retourne l'image miniature de l'utilisateur connecté dans la navbar.
      * 
-     * @param string $avatar_src
-     * @param string $alt_information
+     * @param string $avatarSrc
+     * @param string $caption
      * 
      * @param $user 
      * 
      * @return string
      */
-    public static function navbarUserAvatar(string $avatar_src, string $alt_information = null)
+    public static function navbarUserAvatar(string $avatarSrc, string $caption = null)
     {
         return <<<HTML
         <div>
-            <img src="{$avatar_src}" alt="{$alt_information}" class="navbar-user-avatar img-circle shdw mr-2"/>
+            <img src="{$avatarSrc}" alt="{$caption}" class="navbar-user-avatar img-circle shdw mr-2"/>
         </div>
 HTML;
     }
@@ -188,18 +187,24 @@ HTML;
      */
     private static function administrateurReservedActions()
     {
+        $login = Session::getAdministratorSessionVar() ?? Cookie::getAdministratorCookieVar();
+        $adminUser = Administrateur::getByLogin($login);
+
         $adminUrl = ADMIN_URL;
-        return <<<HTML
-        <li>
-            <a href="{$adminUrl}/administrateurs" class="text-primary">Liste</a>
-        </li>
-        <li>
-            <a href="{$adminUrl}/administrateurs/create" class="text-primary">Ajouter</a>
-        </li>
-        <li>
-            <a href="{$adminUrl}/administrateurs/delete" class="text-primary">Supprimer</a>
-        </li>
+
+        if ($adminUser->hasAllRights()) {
+            return <<<HTML
+            <li>
+                <a href="{$adminUrl}/administrateurs" class="text-primary">Lister les comptes</a>
+            </li>
+            <li>
+                <a href="{$adminUrl}/administrateurs/create" class="text-primary">Ajouter un nouveau compte</a>
+            </li>
+            <li>
+                <a href="{$adminUrl}/administrateurs/delete" class="text-primary">Supprimer un compte</a>
+            </li>
 HTML;
+        }
     }
 
     /**

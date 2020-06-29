@@ -18,6 +18,6 @@ require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 session_start();
 session_unset();
 session_destroy();
-setcookie('admin_login', '', 0);
+setcookie('attitude_efficace_administrator_login', '', 0);
 header("location: " . ADMIN_URL);
 exit();

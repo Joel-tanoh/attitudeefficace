@@ -19,7 +19,14 @@ class Administrateur extends User
      * 
      * @var string
      */
-    const TABLE_NAME = "admins";
+    const TABLE_NAME = "administrators";
+
+    /**
+     * Catégorie.
+     * 
+     * @var string
+     */
+    const CATEGORIE = "administrateurs";
 
     /**
      * Url de la catégorie.
@@ -70,6 +77,7 @@ class Administrateur extends User
         $this->avatarPath       = AVATARS_PATH . $this->avatarName;
         $this->avatarSrc        = AVATARS_DIR_URL . "/" . $this->avatarName;
         $this->tableName        = self::TABLE_NAME;
+        $this->categorie        = self::CATEGORIE;
     }
 
     /**
@@ -198,12 +206,12 @@ class Administrateur extends User
         $rep->execute([mb_strtolower($emailAddress)]);
         $result = $rep->fetch();
 
-        return new self($result["code"]);
+        if ($result["code"]) return new self($result["code"]);
+        else return false;
     }
 
     /**
-     * Retourne le login et le mot de passe de l'administrateur en prenant en
-     * paramètre le login.
+     * Instancie un nouvel administrateur grâce à son login qui est unique.
      * 
      * @param string $login [[Description]]
      * 
@@ -221,12 +229,11 @@ class Administrateur extends User
                 ->returnQueryString();
 
         $rep = $pdo->prepare($query);
-
         $rep->execute([mb_strtolower($login)]);
-
         $result = $rep->fetch();
     
-        return new self($result["code"]);
+        if ($result["code"]) return new self($result["code"]);
+        else return false;
     }
 
     /**

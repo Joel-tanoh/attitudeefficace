@@ -171,7 +171,7 @@ HTML;
      * 
      * @return string
      */
-    public static function listAdmins($admins)
+    public static function ListAdministrators($admins)
     {
         if (empty($admins)) {
             $notification = new Notification();

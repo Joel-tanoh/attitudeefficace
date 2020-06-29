@@ -42,13 +42,19 @@ class Form extends View
      */
     public static function getForm($categorie, $item = null)
     {
-        if ($categorie === "administrateurs") $formContent = self::addAdminUserForm($item);
-        elseif (Item::isParentCategorie($categorie)) $formContent = self::parentForm($item, $categorie);
-        elseif ($categorie === "videos") $formContent = self::addVideoForm($item);
+        if ($categorie === "administrateurs") return self::addAdminUserForm($item);
+
+        elseif (Item::isParentCategorie($categorie)) $formContent = self::addParentForm($item, $categorie);
+
+        elseif ($categorie === "articles") $formContent = self::addArticleForm();
+
+        elseif ($categorie === "videos"|| $categorie === "motivation-plus") $formContent = self::addVideoForm($item);
+
         elseif ($categorie === "mini-services") $formContent = self::addMiniserviceForm($item, $categorie);
-        elseif (Item::isChildCategorie($categorie)) $formContent = self::childForm($item, $categorie);
+
+        elseif (Item::isChildCategorie($categorie)) $formContent = self::addChildForm($item, $categorie);
+
         else Utility::header(ADMIN_URL);
-        $submitButton = self::submitButton('enregistrement', 'Enregistrer');
 
         return self::returnForm($formContent);
     }
@@ -62,12 +68,12 @@ class Form extends View
      */
     public static function addAdminUserForm($admin = null)
     {
-        $form_content = self::loginInput($admin, "col-12 form-control");
-        $form_content .= self::passwordInput("col-12 form-control");
-        $form_content .= self::confirmPasswordInput("col-12 form-control");
-        $form_content .= self::emailInput($admin, "col-12 form-control");
-        $form_content .= self::chooseAdminAccountType();
-        $form_content .= self::avatarInput();
+        $formContent = self::loginInput($admin, "col-12 form-control");
+        $formContent .= self::passwordInput("col-12 form-control");
+        $formContent .= self::confirmPasswordInput("col-12 form-control");
+        $formContent .= self::emailInput($admin, "col-12 form-control");
+        $formContent .= self::chooseAdministratorRole();
+        $formContent .= self::avatarInput();
         $submitButton = self::submitButton('enregistrement', 'Enregistrer');
 
         return <<<HTML
@@ -76,7 +82,7 @@ class Form extends View
                 <div class="card">
                     <div class="card-body">
                         <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
-                            {$form_content}
+                            {$formContent}
                             {$submitButton}
                         </form>
                     </div>
@@ -94,35 +100,14 @@ HTML;
      * 
      * @return string Le formulaire.
      */
-    public static function parentForm($item = null, string $categorie)
+    public static function addParentForm($item = null, string $categorie)
     {
-        $prix_label = <<<HTML
+        $priceLabel = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         accéder à cet élément</p>
 HTML;
-        return self::commonItemsInformations($item, $prix_label, $categorie);
-    }
- 
-    /**
-     * Formulaire d'un item enfant.
-     * 
-     * @param mixed  $item 
-     * @param string $categorie
-     * 
-     * @return string Le formulaire.
-     */
-    public static function childForm($item = null, string $categorie = null)
-    {
-        $prix_label = <<<HTML
-        Prix :
-        <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
-        avoir accès à cet élément</p>
-HTML;
-
-        return 
-            self::commonItemsInformations($item, $prix_label, $categorie) .
-            self::articleContentTextarea($item, $categorie);
+        return self::commonItemsInformations($item, $priceLabel, $categorie);
     }
 
     /**
@@ -134,7 +119,7 @@ HTML;
      */
     public static function addFormationForm($item = null)
     {
-        $prix_label = <<<HTML
+        $priceLabel = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         avoir accès à cet élément</p>
@@ -143,18 +128,18 @@ HTML;
         $titleInput = self::titleInput($item);
         $descriptionTextarea = self::descriptionTextarea($item);
         $videoInput = self::videoInput($item);
-        $prixInput = self::prixInput($item, $prix_label);
+        $prixInput = self::prixInput($item, $priceLabel);
         $rankInput = self::rankInput($item, "formations");
         $imageInput = self::imageInput();
         $notifyUserBox = self::notifyUsersBox();
 
         return <<<HTML
         <div class="row mb-2">
-            <div class="col-md-7">
+            <div class="col-md-8">
                 {$titleInput}
                 {$descriptionTextarea}
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 {$prixInput}
                 {$rankInput}
                 {$videoInput}
@@ -162,6 +147,71 @@ HTML;
                 {$notifyUserBox}
             </div>
         </div>
+HTML;
+    }
+
+    /**
+     * Formulaire d'un item enfant.
+     * 
+     * @param mixed  $item 
+     * @param string $categorie
+     * 
+     * @return string Le formulaire.
+     */
+    public static function addChildForm($item = null, string $categorie = null)
+    {
+        $priceLabel = <<<HTML
+        Prix :
+        <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
+        avoir accès à cet élément</p>
+HTML;
+
+        return 
+            self::commonItemsInformations($item, $priceLabel, $categorie) .
+            self::articleContentTextarea($item, $categorie);
+    }
+
+    /**
+     * Formulaire d'un item enfant.
+     * 
+     * @param mixed  $item 
+     * @param string $categorie
+     * 
+     * @return string Le formulaire.
+     */
+    public static function addArticleForm($item = null, string $categorie = null)
+    {
+        $priceLabel = <<<HTML
+        Prix :
+        <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
+        avoir accès à cet élément</p>
+HTML;
+        $selectParent = self::selectParent("videos");
+        $titleInput = self::titleInput($item);
+        $descriptionTextarea = self::descriptionTextarea($item);
+        $videoInput = self::videoInput($item);
+        $prixInput = self::prixInput($item, $priceLabel);
+        $rankInput = self::rankInput($item, "videos");
+        $imageInput = self::imageInput();
+        $notifyUserBox = self::notifyUsersBox();
+        $articleTextarea = self::articleContentTextarea($item, "articles");
+
+        return <<<HTML
+        <div class="row">
+            <div class="col-md-8">
+                {$selectParent}
+                {$titleInput}
+                {$descriptionTextarea}
+            </div>
+            <div class="col-md-4">
+                {$videoInput}
+                {$imageInput}
+                {$prixInput}
+                {$rankInput}
+                {$notifyUserBox}
+            </div>
+        </div>
+        {$articleTextarea}
 HTML;
     }
 
@@ -174,7 +224,7 @@ HTML;
      */
     public static function addVideoForm($item = null)
     {
-        $prix_label = <<<HTML
+        $priceLabel = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         avoir accès à cet élément</p>
@@ -183,20 +233,20 @@ HTML;
         $titleInput = self::titleInput($item);
         $descriptionTextarea = self::descriptionTextarea($item);
         $videoInput = self::videoInput($item);
-        $prixInput = self::prixInput($item, $prix_label);
+        $prixInput = self::prixInput($item, $priceLabel);
         $rankInput = self::rankInput($item, "videos");
         $imageInput = self::imageInput();
         $notifyUserBox = self::notifyUsersBox();
 
         return <<<HTML
         <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-8">
                 {$selectParent}
                 {$titleInput}
-                {$descriptionTextarea}
                 {$videoInput}
+                {$descriptionTextarea}
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 {$prixInput}
                 {$rankInput}
                 {$imageInput}
@@ -216,14 +266,13 @@ HTML;
      */
     public static function addMiniserviceForm($item = null, string $categorie = null)
     {
-        $mini_service_label = <<<HTML
+        $miniservicePriceLabel = <<<HTML
         Prix :
         <p class="notice">
             Cette somme sera affichée aux utilisateurs qui voudront ce service
         </p>
 HTML;
-        $form_content = self::commonItemsInformations($item, $mini_service_label, $categorie);
-        return $form_content;
+        return self::commonItemsInformations($item, $miniservicePriceLabel, $categorie);
     }
 
     /**
@@ -232,19 +281,19 @@ HTML;
      * 
      * @param mixed  $item       L'item à passer en paramètre si c'est dans le
      *                           cas de la modification d'un item.
-     * @param string $prix_label 
+     * @param string $priceLabel 
      * @param string $categorie  
      * 
      * @return string
      */
-    public static function commonItemsInformations($item = null, $prix_label = null, $categorie = null)
+    public static function commonItemsInformations($item = null, $priceLabel = null, $categorie = null)
     {
         $uploadPdf = $categorie === "ebooks" ? true : false;
         $selectParent = self::selectParent($categorie);
         $titleInput = self::titleInput($item);
         $descriptionTextarea = self::descriptionTextarea($item);
         $videoInput = self::videoInput($item);
-        $prixInput = self::prixInput($item, $prix_label);
+        $prixInput = self::prixInput($item, $priceLabel);
         $rankInput = self::rankInput($item, $categorie);
         $imageInput = self::imageInput();
         $pdfFileInput = self::pdfFileInput($uploadPdf);
@@ -252,12 +301,12 @@ HTML;
 
         return <<<HTML
         <div class="row mb-2">
-            <div class="col-md-7">
+            <div class="col-12 col-md-8">
                 {$selectParent}
                 {$titleInput}
                 {$descriptionTextarea}
             </div>
-            <div class="col-md-5">
+            <div class="col-12 col-md-4">
                 {$videoInput}
                 {$prixInput}
                 {$rankInput}
@@ -341,7 +390,7 @@ HTML;
      * 
      * @return string
      */
-    public static function chooseAdminAccountType()
+    public static function chooseAdministratorRole()
     {
         $label = self::label("", "Type de compte :");
         $adminRadio = self::radio("role", "3", "Administrateur");
@@ -469,15 +518,15 @@ HTML;
      */
     public static function articleContentTextarea($item = null, string $categorie = null)
     {
-        $article_content = null !== $item ? $item->getArticleContent() : $categorie === "articles" ? "" : null;
+        $articleContent = null !== $item ? $item->getArticleContent() : $categorie === "articles" ? "" : null;
 
         extract($_POST);
 
-        $textarea = self::textarea('article_content', "summernote", null, $article_content);
+        $textarea = self::textarea('article_content', "summernote", null, $articleContent);
 
-        if (null !== $article_content) {
+        if (null !== $articleContent) {
             return <<<HTML
-            <div class="row">
+            <div class="row mt-3">
                 <div class="col-12">
                     <div class="form-group">
                         {$textarea}
@@ -503,12 +552,16 @@ HTML;
         extract($_POST);
 
         $labelAndInput =
-            self::label("Prix", $label) .
-            self::number('price', 'Prix', $price, "Prix", "col-12 form-control", 0);
+            self::label("Prix", $label)
+            . self::number('price', 'Prix', $price, "Prix", "col-12 form-control", 0);
 
         return <<<HTML
         <div class="form-group">
-            {$labelAndInput}
+            <div class="card">
+                <div class="card-body">
+                    {$labelAndInput}
+                </div>
+            </div>
         </div>
 HTML;
     }
@@ -548,7 +601,11 @@ HTML;
 
         return <<<HTML
         <div class="form-group">
-            {$labelAndInput}
+            <div class="card">
+                <div class="card-body">
+                    {$labelAndInput}
+                </div>
+            </div>
         </div>
 HTML;
     }
@@ -575,7 +632,11 @@ HTML;
 
         return <<<HTML
         <div class="form-group">
-            {$labelAndInput}
+            <div class="card">
+                <div class="card-body">
+                    {$labelAndInput}
+                </div>
+            </div>
         </div>
 HTML;
     }
@@ -589,11 +650,15 @@ HTML;
     {
         $labelAndInput = 
             self::label("avatarUploaded", "Importer un avatar :") .
-            self::FileInput("avatar_uploaded", "avatarUploaded");
+            self::fileInput("avatar_uploaded", "avatarUploaded");
 
         return <<<HTML
         <div class="form-group">
-            {$labelAndInput}
+            <div class="card">
+                <div class="card-body">
+                    {$labelAndInput}
+                </div>
+            </div>
         </div>
 HTML;
     }
@@ -610,11 +675,15 @@ HTML;
     {
         $labelAndInput = 
             self::label("imageUploaded", "Importer une image de couverture :") .
-            self::FileInput("image_uploaded", "imageUploaded");
+            self::fileInput("image_uploaded", "imageUploaded");
 
         return <<<HTML
         <div class="form-group">
-            {$labelAndInput}
+            <div class="card">
+                <div class="card-body">
+                    {$labelAndInput}
+                </div>
+            </div>
         </div>
 HTML;
     }
@@ -631,12 +700,16 @@ HTML;
     {
         $labelAndInput =
             self::label("pdfUploaded", "Importer un fichier PDF :") .
-            self::FileInput("pdf_uploaded", "pdfUploaded");
+            self::fileInput("pdf_uploaded", "pdfUploaded");
 
         if ($pdf_uploaded) {
             return <<<HTML
             <div class="form-group">
-                {$labelAndInput}
+                <div class="card">
+                    <div class="card-body">
+                        {$labelAndInput}
+                    </div>
+                </div>
             </div>
 HTML;
         }
@@ -707,32 +780,24 @@ HTML;
     /**
      * Retourne le formulaire.
      * 
-     * @param string $form_content 
+     * @param string $formContent 
      * 
      * @return string
      */
-    private static function returnForm($form_content)
+    private static function returnForm($formContent)
     {
         $submitButton = self::submitButton('enregistrement', 'Enregistrer');
-        if ($form_content) {
+        if ($formContent) {
             return <<<HTML
-            <div class="row mb-3">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="myForm" method="post" enctype="multipart/form-data"
-                             action="{$_SERVER['REQUEST_URI']}">
-                                {$form_content}
-                                <div class="row">
-                                    <div class="col-12">
-                                        {$submitButton}
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+            <form id="myForm" method="post" enctype="multipart/form-data"
+                action="{$_SERVER['REQUEST_URI']}" class="mb-3">
+                {$formContent}
+                <div class="row">
+                    <div class="col-12">
+                        {$submitButton}
                     </div>
                 </div>
-            </div>
+            </form>
 HTML;
         }
     }
@@ -741,23 +806,20 @@ HTML;
      * Affiche la liste des items parents pour en choisir un comme parent de
      * l'item enfant que l'utlisateur veut créer.
      * 
-     * @param string $categorie 
-     * 
      * @return string
      */
-    private static function parentList($categorie = null)
+    private static function parentList()
     {
         $options = null;
-        $bddManager = Entity::bddManager();
-        $items = $bddManager->get("code", ItemParent::TABLE_NAME);
+        $items = ItemParent::getAllItems();
+
         foreach ($items as $item) {
-            $item = Entity::createObjectByCategorieAndCode($categorie, $item["code"]);
             $options .= '<option value="'. $item->getID() . '">';
             $options .= ucfirst($item->getTitle());
-            $options .= ' - ';
-            $options .= '<span class="italic">'. ucfirst($item->getCategorie()) . '</span>';
+            $options .= ' - ' . ucfirst($item->getCategorie());
             $options .= '</option>';
         }
+
         return $options;
     }
 
@@ -770,7 +832,7 @@ HTML;
      * 
      * @return string
      */
-    private static function FileInput(string $name = null, string $id = null, string $class = null)
+    private static function fileInput(string $name = null, string $id = null, string $class = null)
     {
         $labelAndInput = 
             self::input("file", $name, $id, null, null, "custom-file-input") .

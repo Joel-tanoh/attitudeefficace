@@ -29,5 +29,30 @@ use App\BackEnd\Bdd\BddManager;
 
 class ServiceProvider extends User
 {
+    /**
+     * Nom de la table dans la base de données.
+     * 
+     * @var string
+     */
+    const TABLE_NAME = "services_providers";
     
+    /**
+     * Retourne une instance de suscriber.
+     * 
+     * @param string $emailAddress
+     * 
+     * @return self
+     */
+    public static function getByEmail(string $emailAddress)
+    {
+        $query = "SELECT code FROM " . self::TABLE_NAME . " WHERE email_address = ?";
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$emailAddress]);
+        $result = $rep->fetch();
+
+        if ($result["code"]) {
+            return new self($result["code"]);
+        }
+    }
+
 }

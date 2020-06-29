@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  ven. 12 juin 2020 à 17:55
+-- Généré le :  sam. 20 juin 2020 à 11:10
 -- Version du serveur :  5.7.19
 -- Version de PHP :  7.1.9
 
@@ -19,17 +19,17 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données :  `attitudeefficace`
+-- Base de données :  `attitude_efficace`
 --
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `admins`
+-- Structure de la table `administrators`
 --
 
-DROP TABLE IF EXISTS `admins`;
-CREATE TABLE IF NOT EXISTS `admins` (
+DROP TABLE IF EXISTS `administrators`;
+CREATE TABLE IF NOT EXISTS `administrators` (
   `id` int(8) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) COLLATE utf8_bin NOT NULL,
   `login` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -46,10 +46,10 @@ CREATE TABLE IF NOT EXISTS `admins` (
 ) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
--- Déchargement des données de la table `admins`
+-- Déchargement des données de la table `administrators`
 --
 
-INSERT INTO `admins` (`id`, `code`, `login`, `password`, `email_address`, `role`, `birth_day`, `state`, `created_at`, `updated_at`) VALUES
+INSERT INTO `administrators` (`id`, `code`, `login`, `password`, `email_address`, `role`, `birth_day`, `state`, `created_at`, `updated_at`) VALUES
 (1, 'u1s73YMd1rToMd', 'joel', '$2y$10$NlCt2e.XtG8DmZFYiSB0suGNVX6G0ZeNLny6mdLAriyTUnxXgMQge', 'joel.developpeur@gmail.com', 3, NULL, 'activé', '2019-10-01 08:22:06', NULL),
 (7, 'ITyPZnLwd', 'benoit', '$2y$10$XxpT8MxPW4VUFFtNuWWwS.diIqFvN1bnUUx9Sw4/J3CwNXvvrJA22', 'benoitkoua2015@gmail.com', 2, NULL, 'activé', '2020-04-14 11:04:26', '2020-04-14 11:04:26');
 
@@ -83,15 +83,7 @@ CREATE TABLE IF NOT EXISTS `items_child` (
   `views` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UN_CODE` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=88 DEFAULT CHARSET=utf8;
-
---
--- Déchargement des données de la table `items_child`
---
-
-INSERT INTO `items_child` (`id`, `code`, `categorie`, `parent_id`, `title`, `description`, `slug`, `article_content`, `author`, `provider`, `pages`, `price`, `rank`, `edition_home`, `parution_year`, `created_at`, `updated_at`, `posted_at`, `youtube_video_link`, `views`) VALUES
-(87, 't2VuO9', 'videos', -1, 'test', 'Description de ce test', 'test-87', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-06-12 13:49:58', '2020-06-12 13:50:10', NULL, '', 0),
-(83, 'zLMhEUsI', 'mini-services', 0, 'Développement personnel', 'Bon développeur', 'developpement-personnel-83', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-06-12 11:59:22', '2020-06-12 13:50:50', NULL, '', 0);
+) ENGINE=MyISAM AUTO_INCREMENT=94 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -115,15 +107,7 @@ CREATE TABLE IF NOT EXISTS `items_parent` (
   `views` int(11) DEFAULT '0',
   `youtube_video_link` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=128 DEFAULT CHARSET=utf8;
-
---
--- Déchargement des données de la table `items_parent`
---
-
-INSERT INTO `items_parent` (`id`, `code`, `categorie`, `title`, `description`, `slug`, `price`, `rank`, `created_at`, `updated_at`, `posted_at`, `views`, `youtube_video_link`) VALUES
-(125, 'oLbHQC5p', 'etapes', 'bien penser', 'une belle description', 'bien-penser-125', 0, 1, '2020-06-12 12:01:20', '2020-06-12 12:01:21', NULL, 0, ''),
-(127, '8La0fgr', 'themes', 'Développement personnel', 'Une belle description', 'developpement-personnel-127', 0, 1, '2020-06-12 14:16:39', '2020-06-12 14:16:53', NULL, 0, '');
+) ENGINE=MyISAM AUTO_INCREMENT=138 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 

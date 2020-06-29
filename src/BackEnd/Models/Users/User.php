@@ -211,6 +211,8 @@ class User extends \App\BackEnd\Models\Entity
      */
     public function getRole()
     {
+        // Il faut gérer le rôle des fournisseurs de servie //
+
         if ($this->role === "1") return "utilisateur";
         if ($this->role === "2") return "administrateur 1";
         if ($this->role === "3") return "administrateur 2";
@@ -300,40 +302,6 @@ class User extends \App\BackEnd\Models\Entity
     }
 
     /**
-     * Initalise les variables de sessions.
-     * 
-     * @param string $sessionKey 
-     * 
-     * @return void
-     */
-    public function setSession($sessionKey)
-    {
-        $_SESSION[$sessionKey] = ucfirst($this->getLogin());
-    }
-
-    /**
-     * Initialise les variables de cookie.
-     * 
-     * @param mixed  $cookieKey La clé identifiant le cookie.
-     * @param mixed  $value     La valeur
-     * @param string $domain 
-     * 
-     * @return void
-     */
-    public function setCookie($cookieKey, $value, $domain = null)
-    {
-        setcookie(
-            $cookieKey,
-            ucfirst($value),
-            time()+(30*24*3600),
-            null,
-            $domain,
-            false,
-            true
-        );
-    }
-
-    /**
      * Retourne les activités effectuée par l'utilisateur.
      * 
      * @return void
@@ -362,7 +330,6 @@ class User extends \App\BackEnd\Models\Entity
     {
         return $this->contact2;
     }
-
     
     ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
 

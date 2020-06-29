@@ -38,11 +38,25 @@ class Suscriber extends User
     const TABLE_NAME = "suscribers";
 
     /**
+     * Catégorie.
+     * 
+     * @var string
+     */
+    const CATEGORIE = "suscribers";
+
+    /**
+     * Url de la catégorie.
+     * 
+     * @var string
+     */
+    const URL = ADMIN_URL."/". self::CATEGORIE;
+
+    /**
      * Les items auxquels le suscriber a souscrit
      * 
      * @var array
      */
-    private $subscribed_items = [];
+    private $suscribedItems = [];
 
     /**
      * Constructeur.
@@ -63,23 +77,24 @@ class Suscriber extends User
         $rep->execute([$code]);
         $result = $rep->fetch();
 
-        $this->id = $result["id"];
-        $this->code = $result["code"];
-        $this->lastName = $result["last_name"];
-        $this->firstNames = $result["first_names"];
-        $this->password = $result["password"];
-        $this->email_address = $result["email_address"];
-        $this->role = $result["role"];
-        $this->contact_1 = $result["contact_1"];
-        $this->contact_2 = $result["contact_2"];
-        $this->state = $result["state"];
+        $this->id               = $result["id"];
+        $this->code             = $result["code"];
+        $this->lastName         = $result["last_name"];
+        $this->firstNames       = $result["first_names"];
+        $this->password         = $result["password"];
+        $this->emailAddress     = $result["email_address"];
+        $this->role             = $result["role"];
+        $this->contact1         = $result["contact_1"];
+        $this->contact2         = $result["contact_2"];
+        $this->state            = $result["state"];
+        $this->categorie        = self::CATEGORIE;
 
-        // Les items auxquel le suscriber a souscrit
+        // Les items auxquels le suscriber a souscrit
         $result = parent::bddManager()->get("id", Subscription::TABLE_NAME, "suscriber_id", $this->id);
         foreach ($result as $item) {
             $code = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $result["id"]);
             $item = new ItemParent($code["code"]);
-            $this->subscribed_items[] = $item;
+            $this->suscribedItems[] = $item;
         }
     }
 
@@ -90,7 +105,7 @@ class Suscriber extends User
      */
     public function getSuscribedItems()
     {
-        return $this->subscribed_items;
+        return $this->suscribedItems;
     }
 
     /**
@@ -131,6 +146,25 @@ class Suscriber extends User
         $rep = parent::connect()->prepare($query);
         $rep->execute([$this->getID(), $item->getID()]);
         return $rep->fetch()["subscription_date"];
+    }
+
+    /**
+     * Retourne une instance de suscriber grâce à son adresse email.
+     * 
+     * @param string $emailAddress
+     * 
+     * @return self
+     */
+    public static function getByEmail(string $emailAddress)
+    {
+        $query = "SELECT code FROM " . self::TABLE_NAME . " WHERE email_address = ?";
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$emailAddress]);
+        $result = $rep->fetch();
+
+        if ($result["code"]) {
+            return new self($result["code"]);
+        }
     }
 
 }

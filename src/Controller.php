@@ -101,11 +101,11 @@ class Controller{
      * 
      * @return void
      */
-    public function listAdmins()
+    public function ListAdministrators()
     {
         $metaTitle = "Administrateurs";
         $admins = Administrateur::getAll(2);
-        $page = new PageBuilder($metaTitle, View::listAdmins($admins));
+        $page = new PageBuilder($metaTitle, View::ListAdministrators($admins));
         echo $page->adminPage();
     }
 
