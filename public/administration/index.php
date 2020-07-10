@@ -50,6 +50,8 @@ try {
 
     elseif ($route->match( [Entity::getAllCategories(), Item::getAllSlugs(), "edit"] ) ) $controller->editItem();
 
+    elseif ($route->match( [Entity::getAllCategories(), Item::getAllSlugs(), "post"] ) ) $controller->postItem();
+
     elseif ($route->match( [Entity::getAllCategories(), "delete"] )) $controller->deleteItems();
 
     elseif ($route->match( [Entity::getAllCategories(), Item::getAllSlugs(), "delete"] )) $controller->deleteItem();

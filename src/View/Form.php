@@ -815,8 +815,7 @@ HTML;
 
         foreach ($items as $item) {
             $options .= '<option value="'. $item->getID() . '">';
-            $options .= ucfirst($item->getTitle());
-            $options .= ' - ' . ucfirst($item->getCategorie());
+            $options .= ucfirst($item->getTitle()) . ' - ' . ucfirst($item->showCategorie());
             $options .= '</option>';
         }
 

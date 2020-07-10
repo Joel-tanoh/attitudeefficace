@@ -219,8 +219,7 @@ class ItemParent extends Item
      */
     public static function create(string $categorie)
     {
-        $code = Utility::generateCode();
-
+        $code               = Utility::generateCode();
         $title              = htmlspecialchars($_POST["title"]);
         $description        = htmlspecialchars($_POST["description"]);
         $rank               = $_POST["rank"]                ?? null;
@@ -244,59 +243,6 @@ class ItemParent extends Item
 
             return $newThis;
         }
-    }
-
-    /**
-     * Mets à jour un item parent.
-     * 
-     * @param
-     * 
-     * @return void
-     */
-    public function update()
-    {
-        $imageManager = new Image();
-
-        $title              = htmlspecialchars($_POST["title"]);
-        $description        = htmlspecialchars($_POST["description"]);
-        $rank               = $_POST["rank"]                ?? null;
-        $price              = $_POST["price"]               ?? null;
-        $youtubeVideoLink   = $_POST["youtube_video_link"]  ?? null;
-        
-        if ($title === $this->getTitle() && !empty($_FILES["image_uploaded"]["name"])) {
-            $imageManager->saveImages($this->getCategorie() . "-" . $this->getSlug());
-            $slug = $this->getSlug();
-        }
-
-        if ($title !== $this->getTitle()) {
-
-            $slug = Utility::slugify($title) . '-' . $this->getID();
-            $oldThumbsName = $this->getThumbsName();
-            $newThumbsName = $this->getCategorie() . "-" . $slug;
-
-            if (empty($_FILES["image_uploaded"]["name"])) {
-                $imageManager->renameImages($oldThumbsName, $newThumbsName);
-            } else {
-                $imageManager->saveImages($newThumbsName);
-                $imageManager->deleteImages($oldThumbsName);
-            }
-        }
-
-        $this->set("title", $title, $this->tableName, "id", $this->getID());
-        
-        $this->set("description", $description, $this->tableName, "id", $this->getID());
-
-        $this->set("slug", $slug, $this->tableName, "id", $this->getID());
-        
-        $this->set("price", (int)$price, $this->tableName, "id", $this->getID());
-
-        $this->setRank((int)$rank);
-
-        $this->set("youtube_video_link", $youtubeVideoLink, $this->tableName, "id", $this->getID());
-
-        $itemUpdated = $this->refresh();
-
-        Utility::header($itemUpdated->getUrl("administrate"));
     }
 
     /**
@@ -370,16 +316,6 @@ HTML;
 HTML;
     }
 
-    /**
-     * Vue de mise à jour d'un item parent.
-     * 
-     * @return string
-     */
-    public function updateView($errors = null)
-    {
-        
-    }
-    
     /**
      * Affiche les cartes des articles, des vidéos, des ebooks et des livres.
      * 
@@ -472,7 +408,8 @@ HTML;
     {
         return <<<HTML
         <div>
-            Nombre d'inscrit : {$this->getSuscribersNumber()}
+            Nombre d'inscrit :
+            <span class="badge bg-orange text-white">{$this->getSuscribersNumber()}</span>
         </div>
 HTML;
     }

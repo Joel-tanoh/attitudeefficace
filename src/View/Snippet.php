@@ -73,14 +73,14 @@ HTML;
     /**
      * Affiche la vidéo de description de l'instance passé en paramètre.
      * 
-     * @param string $youtube_video_link L'identifiant de la vidéos sur Youtube.
+     * @param string $youtubeVideoLink L'identifiant de la vidéos sur Youtube.
      * 
      * @return string
      */
-    public static function showVideo(string $youtube_video_link = null)
+    public static function showVideo(string $youtubeVideoLink = null)
     {
-        if (null !== $youtube_video_link) {
-            $result = self::youtubeIframe($youtube_video_link);
+        if (null !== $youtubeVideoLink) {
+            $result = self::youtubeIframe($youtubeVideoLink);
         } else {
             $result = self::noVideoBox();
         }
@@ -156,17 +156,16 @@ HTML;
      * Retourne les boutons pour publier, supprimer ou modifier l'instance.
      * 
      * @param $item          L'objet pour lequel on doit afficher le bouton.
-     * @param bool $edit_button   
-     * @param bool $post_button   
-     * @param bool $share_button  
-     * @param bool $delete_button 
      * 
      * @return string
      */
-    public static function manageButtons($item)
+    public static function manageButtons(\App\BackEnd\Models\Items\Item $item)
     {
         $buttons = self::button($item->getUrl("edit"), null, "btn-primary", null, "far fa-edit");
-        $buttons .= self::button($item->getUrl("post"), null, "btn-success", null, "fas fa-reply");
+
+        if (null === $item->getPostedAt())
+            $buttons .= self::button($item->getUrl("post"), null, "btn-success", null, "fas fa-reply");
+
         $buttons .= self::button($item->getUrl("delete"), null, "btn-danger", null, "fas fa-trash-alt");
         
         return <<<HTML
@@ -220,11 +219,11 @@ HTML;
         return <<<HTML
         <div class="row mb-3">
             <div class="col-12 col-md-6">
-                {$showThumbs}
-                {$videoBox}
+                {$showBddData}
             </div>
             <div class="col-12 col-md-6">
-                {$showBddData}
+                {$showThumbs}
+                {$videoBox}
             </div>
         </div>
 HTML;
@@ -269,7 +268,7 @@ HTML;
      * Retourne une vue qui affiche l'ensemble des données principales
      * pour l'item passé en paramètre.
      * 
-     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item 
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item
      * 
      * @return string
      */
@@ -282,14 +281,15 @@ HTML;
         <div class="card mb-3">
             <div class="card-header bg-white">Données</div>
             <div class="card-body">
-                <div>Catégorie : {$item->showCategorie()}</div>
+                {$item->showCategorie()}
                 {$parent}
                 {$item->showDescription()}
                 {$suscriberNumber}
-                <div>Prix : {$item->getPrice()}</div>
-                <div>Date de création : {$item->getCreatedAt()}</div>
-                <div>Date de mise à jour : {$item->getUpdatedAt()}</div>
+                {$item->showPrice()}
                 {$item->showViews()}
+                {$item->showCreatedAt()}
+                {$item->showUpdatedAt()}
+                {$item->showPostedAt()}
             </div>
         </div>
 HTML;
@@ -380,14 +380,14 @@ HTML;
     /**
      * Retourne le vue pour lire la vidéo issue de Youtube.
      * 
-     * @param string $youtube_video_link
+     * @param string $youtubeVideoLink
      * 
      * @return string
      */
-    private static function youtubeIframe(string $youtube_video_link)
+    private static function youtubeIframe(string $youtubeVideoLink)
     {
         return <<<HTML
-        <iframe src="https://www.youtube.com/embed/{$youtube_video_link}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+        <iframe src="https://www.youtube.com/embed/{$youtubeVideoLink}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen class="w-100 video" style="height:20rem"></iframe>
 HTML;
     }

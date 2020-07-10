@@ -15,7 +15,10 @@
 
 namespace App\View;
 
+use App\BackEnd\Models\Entity;
+use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Models\Users\Administrateur;
+use App\BackEnd\Utilities\Utility;
 
 /**
  * Permet de gérer les barres de menu sur le coté.
@@ -152,19 +155,28 @@ HTML;
      * la classe pour l'icône fontawesome et le texte qui sera affiché dans la
      * sidebar.
      * 
-     * @param string $href              Le lien vers lequel le bouton va diriger.
-     * @param string $fontawesome_class La classe fontawesome pour l'icône.
-     * @param string $text              Le texte qui sera visible dans la sidebar.
+     * @param string $href                 Le lien vers lequel le bouton va diriger.
+     * @param string $fontawesomeIconClass La classe fontawesome pour l'icône.
+     * @param string $caption              Le texte qui sera visible dans la sidebar.
      * 
      * @return string
      */
-    private static function setLink(string $href, string $fontawesome_class, string $text)
+    private static function setLink(string $href, string $fontawesomeIconClass, string $caption)
     {
+        $badge = null;
+
+        if ($caption !== "Aller vers le site"
+            && $caption !== "Tableau de bord"
+        ) {
+            $badge = '<span class="badge badge-success">' . Item::countAllItems(Utility::slugify($caption)) . '</span>';
+        }
+
         return <<<HTML
         <a class="py-2 px-4" href="{$href}">
             <div class="row">
-                <span class="col-2"><i class="{$fontawesome_class} fa-lg"></i></span>
-                <span class="col-9">{$text}</span>
+                <span class="col-2"><i class="{$fontawesomeIconClass} fa-lg"></i></span>
+                <span class="col-9">{$caption}</span>
+                {$badge}
             </div>
         </a>
 HTML;

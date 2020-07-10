@@ -16,7 +16,6 @@ use App\BackEnd\Models\Users\Administrateur;
 use App\BackEnd\Utilities\Validator;
 use App\BackEnd\Utilities\Utility;
 use App\BackEnd\Utilities\VisitManager;
-use App\View\ModelsView\ChildView;
 use App\View\PageBuilder;
 use App\View\View;
 use App\View\Notification;
@@ -30,6 +29,8 @@ class Controller{
 
     private $url;
     private $categorie;
+    private $itemIdentifier;
+    private $action;
 
     /**
      * Permet d'instancier un controlleur.
@@ -42,6 +43,8 @@ class Controller{
     {
         $this->url = $url;
         $this->categorie = !empty($this->url[0]) ? $this->url[0] : null;
+        $this->itemIdentifier = !empty($this->url[1]) ? $this->url[1] : null;
+        $this->action = !empty($this->url[2]) ? $this->url[2] : null;
     }
 
     /**
@@ -54,7 +57,7 @@ class Controller{
         $metaTitle = "Bienvenu sur " . APP_NAME;
         $page = new PageBuilder($metaTitle, View::publicAccueilView());
         VisitManager::appVisitCounter();
-        echo $page->publicPage();
+        $page->publicPage();
     }
 
     /**
@@ -66,7 +69,7 @@ class Controller{
     {
         $metaTitle = "Tableau de bord";
         $page = new PageBuilder($metaTitle, View::administrattionDashboard());
-        echo $page->adminPage();
+        $page->adminPage();
     }
       
     /**
@@ -93,7 +96,7 @@ class Controller{
         }
 
         $page = new PageBuilder($metaTitle, $view);
-        echo $page->adminPage();
+        $page->adminPage();
     }
 
     /**
@@ -106,7 +109,7 @@ class Controller{
         $metaTitle = "Administrateurs";
         $admins = Administrateur::getAll(2);
         $page = new PageBuilder($metaTitle, View::ListAdministrators($admins));
-        echo $page->adminPage();
+        $page->adminPage();
     }
 
     /**
@@ -119,7 +122,7 @@ class Controller{
         $metaTitle = "Mini services &#8250 Commandes";
         $commands = MiniserviceOrder::getAll();
         $page = new PageBuilder($metaTitle, View::listMiniservicesOrders($commands));
-        echo $page->adminPage();
+        $page->adminPage();
     }
 
     /**
@@ -150,7 +153,7 @@ class Controller{
         $view = View::createItem($this->categorie, $errors);
 
         $page = new PageBuilder($metaTitle, $view);
-        echo $page->adminPage();
+        $page->adminPage();
     }
 
     /**
@@ -162,11 +165,11 @@ class Controller{
     {
         $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
 
-        $metaTitle = ucfirst($item->getCategorie()) . ' &#8250; ' . ucfirst($item->getTitle());
+        $metaTitle = ucfirst(Entity::getCategorieFormated($item->getCategorie())) . ' &#8250; ' . ucfirst($item->getTitle());
 
         $page = new PageBuilder($metaTitle, View::readItem($item));
 
-        echo $page->adminPage();
+        $page->adminPage();
     }
 
     /**
@@ -178,7 +181,7 @@ class Controller{
     {
         $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
         $errors = null;
-        $metaTitle = ucfirst($item->getCategorie()) . " &#8250 " . ucfirst($item->getTitle()) . " &#8250 Editer";
+        $metaTitle = ucfirst(Entity::getCategorieFormated($item->getCategorie())) . " &#8250 " . ucfirst($item->getTitle()) . " &#8250 Editer";
 
         if (isset($_POST["enregistrement"])) {
             $validator = new Validator($_POST);
@@ -190,7 +193,7 @@ class Controller{
         }
 
         $page = new PageBuilder($metaTitle, View::updateItem($item, $this->categorie, $errors));
-        echo $page->adminPage();
+        $page->adminPage();
     }
 
     /**
@@ -222,7 +225,7 @@ class Controller{
         }
 
         $page = new PageBuilder($metaTitle, View::deleteItems($toDelete, $this->categorie, $error));
-        echo $page->adminPage();
+        $page->adminPage();
     }
 
     /**
@@ -232,10 +235,22 @@ class Controller{
      */
     public function deleteItem()
     {
-        $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
+        $item = Entity::getObjectBy("slug", $this->itemIdentifier, Entity::getTableName($this->categorie), $this->categorie);
         if ($item->delete()) {
             Utility::header(ADMIN_URL . "/" . $this->categorie);
         }
+    }
+
+    /**
+     * Controlleur qui gère le post (publication d'un item).
+     * 
+     * @return void
+     */
+    public function postItem()
+    {
+        $item = Entity::getObjectBy("slug", $this->itemIdentifier, Entity::getTableName($this->categorie), $this->categorie);
+        dump($item);
+        die();
     }
 
     /**
@@ -248,7 +263,7 @@ class Controller{
     {
         $metaTitle = "Page non trouvée";
         $page = new PageBuilder($metaTitle, View::adminError404View());
-        echo $page->adminPage();
+        $page->adminPage();
     }
 
     /**
@@ -261,7 +276,7 @@ class Controller{
     {
         $metaTitle = "Page non trouvée";
         $page = new PageBuilder($metaTitle, View::publicError404View());
-        echo $page->publicPage();
+        $page->publicPage();
     }
 
 }

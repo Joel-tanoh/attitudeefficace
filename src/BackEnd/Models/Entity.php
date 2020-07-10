@@ -35,7 +35,7 @@ use App\BackEnd\Models\Users\Administrateur;
  * @license  url.com license_name
  * @link     Link
  */
-class Entity
+abstract class Entity
 {
     /**
      * ID de l'instance dans la base de données
@@ -86,25 +86,13 @@ class Entity
     }
 
     /**
-     * Permet de récupérer une propriété de l'instance dans la base de données.
-     * 
-     * @param string $propName Le nom de la propriété.
-     * 
-     * @return mixed
-     */
-    protected function get(string $propName)
-    {
-        return self::bddManager()->get($propName, $this->tableName, "code", $this->code)[0][$propName];
-    }
-
-    /**
      * Retourne l'ID.
      * 
      * @return int
      */
     public function getID()
     {
-        return (int)$this->get("id");
+        return (int)$this->id;
     }
 
     /**
@@ -114,7 +102,7 @@ class Entity
      */
     public function getCode()
     {
-        return $this->get("code");
+        return $this->code;
     }
 
     /**
@@ -124,9 +112,9 @@ class Entity
      */
     public function getCategorie()
     {
-        return ucfirst(self::getCategorieFormated($this->get("categorie"), "pluriel"));
+        return $this->categorie;
     }
-
+ 
     /**
      * Retourne toutes les catégories.
      * 
@@ -306,6 +294,7 @@ class Entity
         return true;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
 
     /**
@@ -327,7 +316,11 @@ HTML;
      */
     public function showCategorie()
     {
-        return ucfirst(self::getCategorieFormated($this->getCategorie()));
+        $categorie = ucfirst(self::getCategorieFormated($this->getCategorie()));
+
+        return <<<HTML
+        <div>Catégorie : <span class="badge badge-primary">{$categorie}</span></div>
+HTML;
     }
 
 }

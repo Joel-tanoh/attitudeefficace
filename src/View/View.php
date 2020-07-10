@@ -217,7 +217,7 @@ HTML;
     /**
      * Retourne la vue pour lire un item.
      * 
-     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item Objet
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item
      * 
      * @return string
      */
@@ -232,7 +232,7 @@ HTML;
     }
 
     /**
-     * Affiche une vue pour les vidéos.
+     * Affiche une vue spéciale pour les vidéos.
      * 
      * @param \App\BackEnd\Models\Items\ItemChild $item
      */

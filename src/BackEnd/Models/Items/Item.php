@@ -2,7 +2,6 @@
 
 namespace App\BackEnd\Models\Items;
 
-use App\BackEnd\Bdd\SqlQueryFormater;
 use App\BackEnd\Models\Items\ItemParent;
 use App\BackEnd\Models\Items\ItemChild;
 use App\BackEnd\Utilities\Utility;
@@ -14,7 +13,7 @@ use App\BackEnd\Files\Pdf;
  * 
  * @author Joel <joel.developpeur@gmail.com>
  */
-class Item extends \App\BackEnd\Models\Entity
+abstract class Item extends \App\BackEnd\Models\Entity
 {
     /**
      * Nom/titre de l'instance
@@ -24,7 +23,7 @@ class Item extends \App\BackEnd\Models\Entity
     protected $title;
 
     /**
-     * Slug de l'instance  
+     * Slug de l'instance
      * 
      * @var string
      */
@@ -94,7 +93,7 @@ class Item extends \App\BackEnd\Models\Entity
     public function getTitle()
     {
         if ($this->title) {
-            return ucfirst($this->title);
+            return $this->title;
         } else {
             return "Motivation plus";
         }
@@ -117,7 +116,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getDescription() 
     {
-        return nl2br(ucfirst(trim($this->description)));
+        return $this->description;
     }
 
     /**
@@ -137,9 +136,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function getPrice()  
     {
-        $money = "F CFA";
-
-        return $this->price . " " . $money;
+        return $this->price;
     }
 
     /**
@@ -164,22 +161,6 @@ class Item extends \App\BackEnd\Models\Entity
     public function getUpdatedAt(string $precision = null)
     {
         return Utility::convertDate($this->updatedAt, $precision);
-    }
-
-    /**
-     * Permet de poster l'item courant.
-     * 
-     * @return bool
-     */
-    public function post()
-    {
-        $query = "UPDATE " . $this->tableName
-                . " SET posted_at = " . date("Y-m-d H:i:s")
-                . " WHERE id = " . $this->id;
-
-        parent::connect()->query($query);
-
-        return true;
     }
 
     /**
@@ -290,7 +271,7 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function isPosted()
     {
-        return $this->postedAt ? "Posté(e)" : "Non posté(e)";
+        return $this->postedAt ? true : false;
     }
 
     /**
@@ -350,6 +331,22 @@ class Item extends \App\BackEnd\Models\Entity
     public function isChild()
     {
         return in_array($this->categorie, ItemChild::CATEGORIES);
+    }
+
+    /**
+     * Permet de poster l'item courant.
+     * 
+     * @return bool
+     */
+    public function post()
+    {
+        $query = "UPDATE " . $this->tableName
+                . " SET posted_at = " . date("Y-m-d H:i:s")
+                . " WHERE id = " . $this->id;
+
+        parent::connect()->query($query);
+
+        return true;
     }
 
     /**
@@ -452,6 +449,82 @@ class Item extends \App\BackEnd\Models\Entity
         Utility::header($newItem->getUrl("administrate"));
     }
 
+    /**
+     * Mets à jour un item.
+     * 
+     * @param 
+     * 
+     * @return self
+     */
+    public function update()
+    {
+        $imageManager = new Image();
+
+        $title              = htmlspecialchars($_POST["title"]);
+        $description        = htmlspecialchars($_POST["description"]);
+        $parentID           = $_POST["parent_id"]           ?? null;
+        $articleContent     = $_POST["article_content"]     ?? null;
+        $author             = $_POST["author_name"]         ?? null;
+        $provider           = $_POST["provider"]            ?? null;
+        $pages              = isset($_POST["pages"]) ? (int)$_POST["pages"] : null;
+        $price              = isset($_POST["price"]) ? (int)$_POST["price"] : null;
+        $rank               = isset($_POST["rank"]) ? (int)$_POST["rank"] : null;
+        $editionHome        = $_POST["edition_home"]        ?? null;
+        $parutionYear       = $_POST["parution_year"]       ?? null;
+        $youtubeVideoLink   = $_POST["youtube_video_link"]  ?? null;
+        
+        if ($title === $this->getTitle()) {
+            $slug = $this->getSlug();
+
+            if (!empty($_FILES["image_uploaded"]["name"])) {
+                $imageManager->saveImages($this->getCategorie() . "-" . $this->getSlug());
+            }
+        } else {
+            $slug = Utility::slugify($title) .'-'. $this->getID();
+            $oldThumbsName = $this->getThumbsName();
+            $newThumbsName = $this->getCategorie() . "-" . $slug;
+
+            if (empty($_FILES["image_uploaded"]["name"])) {
+                $imageManager->renameImages($oldThumbsName, $newThumbsName);
+            } else {
+
+                if ($this->getCategorie() === "mini-services") {
+                    $imageManager->saveImages($newThumbsName, 340, 340);
+                } else {
+                    $imageManager->saveImages($newThumbsName);
+                }
+
+                $imageManager->deleteImages($oldThumbsName);
+            }
+        }
+
+        $this->set("title", $title, $this->tableName, "id", $this->getID());
+        
+        $this->set("description", $description, $this->tableName, "id", $this->getID());
+        
+        $this->set("slug", $slug, $this->tableName, "id", $this->getID());
+        
+        $this->set("price", $price, $this->tableName, "id", $this->getID());
+
+        $this->set("youtube_video_link", $youtubeVideoLink, $this->tableName, "id", $this->getID());
+
+        $this->setRank($rank);
+
+        if ($this->isChild()) {
+            $this->set("parent_id", $parentID, $this->tableName, "id", $this->getID());
+            $this->set("article_content", $articleContent, $this->tableName, "id", $this->getID());
+            $this->set("edition_home", $editionHome, $this->tableName, "id", $this->getID());
+            $this->set("parution_year", $parutionYear, $this->tableName, "id", $this->getID());
+            $this->set("author", $author, $this->tableName, "id", $this->getID());
+            $this->set("provider", $provider, $this->tableName, "id", $this->getID());
+            $this->set("pages", $pages, $this->tableName, "id", $this->getID());
+        }
+
+        $itemUpdated = $this->refresh();
+
+        Utility::header($itemUpdated->getUrl("administrate"));
+    }
+    
     /**
      * Supprime plusieurs items.
      * 
@@ -656,9 +729,11 @@ class Item extends \App\BackEnd\Models\Entity
      */
     public function showTitle()
     {
+        $categorie = ucfirst(parent::getCategorieFormated($this->getCategorie()));
+
         return <<<HTML
         <div class="d-flex align-items-center">
-            <span class="h6 p-1 bg-primary text-white rounded mr-2">{$this->getCategorie()} &#8250</span>
+            <span class="h6 p-1 bg-primary text-white rounded mr-2">{$categorie} &#8250</span>
             <h2>{$this->getTitle()}</h2>
         </div>
 HTML;
@@ -688,8 +763,73 @@ HTML;
     {
         return <<<HTML
         <div>
-            Vue {$this->getViews()} fois
+            Vue :
+            <span class="badge bg-orange text-white">{$this->getViews()}</span>
         </div>
+HTML;
+    }
+
+    /**
+     * Affiche le prix d'un item
+     * 
+     * @return string
+     */
+    public function showPrice()
+    {
+        $devise = "F CFA";
+        $prix = $this->getPrice() == 0 ? "Gratuit" : $this->getPrice() . $devise;
+
+        return <<<HTML
+        <div>
+            Prix : 
+            <span class="badge bg-orange text-white">{$prix}</span>
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche la date de création d'un item
+     * 
+     * @return string
+     */
+    public function showCreatedAt()
+    {
+        return <<<HTML
+        <div>
+            Crée le {$this->getCreatedAt()}
+        </div>
+HTML;
+    }
+
+    /**
+     * Affiche la date de modification (mise à jour)
+     * 
+     * @return string
+     */
+    public function showUpdatedAt()
+    {
+        if (null !== $this->getUpdatedAt()) {
+            return <<<HTML
+            <div>Mis à jour le {$this->getUpdatedAt()}</div>
+HTML;
+        }
+    }
+
+    /**
+     * Affiche la de publication (de post)
+     * 
+     * @return string
+     */
+    public function showPostedAt()
+    {
+        if ($this->isPosted()) {
+            return <<<HTML
+            <div>Posté le {$this->getPostedAt()}</div>
+HTML;
+        }
+
+        return <<<HTML
+        <div>Posté : non</div>
 HTML;
     }
 

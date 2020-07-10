@@ -93,7 +93,7 @@ class PageBuilder extends View
     {
         $template = Template::navbarAndContainerAndFooter(Navbar::publicNavbar(), $this->view, Footer::publicFooter());
 
-        return <<<HTML
+        echo <<<HTML
         {$this->debutDePage("fr")}
         <head>
             {$this->metaData()}
@@ -116,13 +116,13 @@ HTML;
     {
         $template = Template::navbarAndSidebarAndContainer( Navbar::AdministrationNavbar(), Sidebar::adminSidebar(), $this->view );
 
-        return <<<HTML
+        echo <<<HTML
         {$this->debutDePage("fr")}
         <head>
             {$this->metaData()}
             {$this->adminCss()}
         </head>
-        <body id="adminPart" class="bg-blueish">
+        <body id="adminSite" class="bg-blueish">
             {$template}
             {$this->adminJs()}
         </body>
@@ -137,13 +137,13 @@ HTML;
      */
     public function connexionPage()
     {
-        return <<<HTML
+        echo <<<HTML
         {$this->debutDePage("fr")}
         <head>
             {$this->metaData()}
             {$this->adminCss()}  
         </head>
-        <body id="adminPart">
+        <body id="adminSite">
             {$this->view}
             {$this->adminJs()}
         </body>

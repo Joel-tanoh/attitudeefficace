@@ -105,6 +105,10 @@ class Utility
      */
     public static function convertDate($date, string $precision = null) 
     {
+        if (null === $date) {
+            return null;
+        }
+        
         list($date, $time) = explode(" ", $date);
         list($year, $month, $day) = explode("-", $date);
         list($hour, $min, $sec) = explode(":", $time);

@@ -192,6 +192,7 @@ class ItemChild extends Item
             $newThis = new self($code);
                                                             
             $slug = Utility::slugify($newThis->title) . '-' . $newThis->getID();
+            
             $newThis->set("slug", $slug, self::TABLE_NAME);
 
             $newThis->setRank((int)$rank);
@@ -219,89 +220,6 @@ class ItemChild extends Item
             return $newThis;
         }
     }
-
-    /**
-     * Mets à jour un item enfant.
-     * 
-     * @param 
-     * 
-     * @return self
-     */
-    public function update()
-    {
-        $imageManager = new Image();
-
-        $title              = htmlspecialchars($_POST["title"]);
-        $description        = $_POST["description"];
-        $parentID           = $_POST["parent_id"]           ?? null;
-        $articleContent     = $_POST["article_content"]     ?? null;
-        $author             = $_POST["author_name"]         ?? null;
-        $provider           = $_POST["provider"]            ?? null;
-        $pages              = (int)$_POST["pages"]          ?? null;
-        $price              = (int)$_POST["price"]          ?? null;
-        $rank               = (int)$_POST["rank"]           ?? null;
-        $editionHome        = $_POST["edition_home"]        ?? null;
-        $parutionYear       = $_POST["parution_year"]       ?? null;
-        $youtubeVideoLink   = $_POST["youtube_video_link"]  ?? null;
-        
-        if ($title === $this->getTitle() && !empty($_FILES["image_uploaded"]["name"])) {
-            $imageManager->saveImages($this->getCategorie() . "-" . $this->getSlug());
-            $slug = $this->getSlug();
-        }
-
-        if ($title !== $this->title) {
-
-            $slug = Utility::slugify($title) .'-'. $this->getID();
-            $oldThumbsName = $this->getThumbsName();
-            $newThumbsName = $this->getCategorie() . "-" . $slug;
-
-            if (empty($_FILES["image_uploaded"]["name"])) {
-                $imageManager->renameImages($oldThumbsName, $newThumbsName);
-            } else {
-
-                if ($this->getCategorie() === "mini-services") {
-                    $imageManager->saveImages($newThumbsName, 340, 340);
-                } else {
-                    $imageManager->saveImages($newThumbsName);
-                }
-
-                $imageManager->deleteImages($oldThumbsName);
-            }
-        }
-
-        $this->set("parent_id", $parentID, $this->tableName, "id", $this->getID());
-
-        $this->set("title", $title, $this->tableName, "id", $this->getID());
-        
-        $this->set("description", $description, $this->tableName, "id", $this->getID());
-        
-        $this->set("slug", $slug, $this->tableName, "id", $this->getID());
-        
-        $this->set("article_content", $articleContent, $this->tableName, "id", $this->getID());
-
-        $this->set("author", $author, $this->tableName, "id", $this->getID());
-
-        $this->set("provider", $provider, $this->tableName, "id", $this->getID());
-
-        $this->set("pages", $pages, $this->tableName, "id", $this->getID());
-
-        $this->set("price", $price, $this->tableName, "id", $this->getID());
-
-        $this->set("price", $price, $this->tableName, "id", $this->getID());
-
-        $this->setRank($rank);
-
-        $this->set("edition_home", $editionHome, $this->tableName, "id", $this->getID());
-
-        $this->set("parution_year", $parutionYear, $this->tableName, "id", $this->getID());
-
-        $this->set("youtube_video_link", $youtubeVideoLink, $this->tableName, "id", $this->getID());
-
-        $itemUpdated = $this->refresh();
-
-        Utility::header($itemUpdated->getUrl("administrate"));
-    }
-    
     /**
      * Retourne toutes les catégories des Items parents.
      * 
@@ -351,35 +269,9 @@ class ItemChild extends Item
     }
 
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////// LES VUES ///////////////////////////////////////////////////////
-    
-//     /**
-//      * Vue de création d'un item.
-//      * 
-//      * @return string
-//      */
-//     public static function createView(string $categorie = null, $errors = null)
-//     {
-//         $notification = new Notification();
-
-//         if ($categorie === "motivation-plus" || $categorie === "videos") {
-//             $formContent = Form::getForm("videos");
-//             $title = "Motivation +";
-//         } else {
-//             $formContent = Form::getForm($categorie);
-//             $title = ucfirst(parent::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-//         }
-        
-//         $error = !empty($errors) ? $notification->errors($errors) : null;
-//         $contentHeader = Snippet::listItemsContentHeader($title, "Ajouter");
-
-//         return <<<HTML
-//         {$contentHeader}
-//         {$error}
-//         {$formContent}
-// HTML;
-//     }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///                                      LES VUES                                                   ////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Retourne la page d'affichage d'un item enfant.
@@ -396,19 +288,6 @@ class ItemChild extends Item
         {$showData}
         {$this->showArticle()}
 HTML;
-    }
-
-    /**
-     * Vue de mise à jour d'un item.
-     * 
-     * @param string $categorie
-     * @param string $errors
-     * 
-     * @return string
-     */
-    public function updateView($errors = null)
-    {
-        
     }
 
     /**
