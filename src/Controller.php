@@ -67,8 +67,7 @@ class Controller{
      */
     public function dashboard()
     {
-        $metaTitle = "Tableau de bord";
-        $page = new PageBuilder($metaTitle, View::administrattionDashboard());
+        $page = new PageBuilder(null, View::administrattionDashboard());
         $page->adminPage();
     }
       
@@ -82,20 +81,17 @@ class Controller{
         $items = Item::getAll($this->categorie);
 
         if ($this->categorie === "mini-services") {
-            $metaTitle = "Mes mini services";
             $view = ItemChild::listMiniservices($items);
 
         } elseif ($this->categorie === "motivation-plus") {
-            $metaTitle = "Motivation plus";
             $items = Item::getMotivationPlusVideos();
             $view = View::listItems($items, $this->categorie);
 
         } else {
-            $metaTitle = "Mes " . Entity::getCategorieFormated($this->categorie, "pluriel");
             $view = View::listItems($items, $this->categorie);
         }
 
-        $page = new PageBuilder($metaTitle, $view);
+        $page = new PageBuilder(null, $view);
         $page->adminPage();
     }
 
@@ -106,9 +102,8 @@ class Controller{
      */
     public function ListAdministrators()
     {
-        $metaTitle = "Administrateurs";
         $admins = Administrateur::getAll(2);
-        $page = new PageBuilder($metaTitle, View::ListAdministrators($admins));
+        $page = new PageBuilder(null, View::ListAdministrators($admins));
         $page->adminPage();
     }
 
@@ -119,9 +114,8 @@ class Controller{
      */
     public function listMiniservicesCommands()
     {
-        $metaTitle = "Mini services &#8250 Commandes";
         $commands = MiniserviceOrder::getAll();
-        $page = new PageBuilder($metaTitle, View::listMiniservicesOrders($commands));
+        $page = new PageBuilder(null, View::listMiniservicesOrders($commands));
         $page->adminPage();
     }
 
@@ -133,12 +127,6 @@ class Controller{
     public function createItem()
     {
         $errors = null;
-        
-        if ($this->categorie === "motivation-plus") {
-            $metaTitle = "Motivation plus &#8250 nouvelle vidéo";
-        } else {
-            $metaTitle = Entity::getCreateItemPageTitle($this->categorie);
-        }
 
         if (isset($_POST['enregistrement'])) {
 
@@ -152,7 +140,7 @@ class Controller{
         
         $view = View::createItem($this->categorie, $errors);
 
-        $page = new PageBuilder($metaTitle, $view);
+        $page = new PageBuilder(null, $view);
         $page->adminPage();
     }
 
@@ -165,9 +153,7 @@ class Controller{
     {
         $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
 
-        $metaTitle = ucfirst(Entity::getCategorieFormated($item->getCategorie())) . ' &#8250; ' . ucfirst($item->getTitle());
-
-        $page = new PageBuilder($metaTitle, View::readItem($item));
+        $page = new PageBuilder(null, View::readItem($item));
 
         $page->adminPage();
     }
@@ -181,7 +167,6 @@ class Controller{
     {
         $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
         $errors = null;
-        $metaTitle = ucfirst(Entity::getCategorieFormated($item->getCategorie())) . " &#8250 " . ucfirst($item->getTitle()) . " &#8250 Editer";
 
         if (isset($_POST["enregistrement"])) {
             $validator = new Validator($_POST);
@@ -192,7 +177,7 @@ class Controller{
             }
         }
 
-        $page = new PageBuilder($metaTitle, View::updateItem($item, $this->categorie, $errors));
+        $page = new PageBuilder(null, View::updateItem($item, $this->categorie, $errors));
         $page->adminPage();
     }
 
@@ -207,10 +192,8 @@ class Controller{
         $bddManager = Entity::bddManager();
         
         if ($this->categorie === "motivation-plus") {
-            $metaTitle = "Motivation plus &#8250 supprimer";
             $toDelete = $bddManager->get("code", ItemChild::TABLE_NAME, "parent_id", "-1");
         } else {
-            $metaTitle = "Supprimer des " . Entity::getCategorieFormated($this->categorie, "pluriel");
             $toDelete = $bddManager->get("code", Entity::getTableName($this->categorie), "categorie", $this->categorie);
         }
 
@@ -224,7 +207,7 @@ class Controller{
             }
         }
 
-        $page = new PageBuilder($metaTitle, View::deleteItems($toDelete, $this->categorie, $error));
+        $page = new PageBuilder(null, View::deleteItems($toDelete, $this->categorie, $error));
         $page->adminPage();
     }
 
@@ -249,8 +232,22 @@ class Controller{
     public function postItem()
     {
         $item = Entity::getObjectBy("slug", $this->itemIdentifier, Entity::getTableName($this->categorie), $this->categorie);
-        dump($item);
-        die();
+        if ($item->post()) {
+            Utility::header($item->getUrl("administrate"));
+        }
+    }
+
+    /**
+     * Controlleur qui gère le post (publication d'un item).
+     * 
+     * @return void
+     */
+    public function unpostItem()
+    {
+        $item = Entity::getObjectBy("slug", $this->itemIdentifier, Entity::getTableName($this->categorie), $this->categorie);
+        if ($item->unpost()) {
+            Utility::header($item->getUrl("administrate"));
+        }
     }
 
     /**
@@ -261,8 +258,7 @@ class Controller{
      */
     public function adminError404()
     {
-        $metaTitle = "Page non trouvée";
-        $page = new PageBuilder($metaTitle, View::adminError404View());
+        $page = new PageBuilder(null, View::adminError404View());
         $page->adminPage();
     }
 
@@ -274,7 +270,7 @@ class Controller{
      */
     public function publicError404()
     {
-        $metaTitle = "Page non trouvée";
+        $metaTitle = "Page non trouvée !";
         $page = new PageBuilder($metaTitle, View::publicError404View());
         $page->publicPage();
     }

@@ -50,7 +50,7 @@ class Template extends View
         <section>
             {$sidebar}
         </section>
-        <div class="container-fluid pt-3 pr-4" id="container-with-fixed-sidebar-and-navbar">
+        <div class="container-fluid mb-3 pt-3 pr-4" id="containerWithFixedSidebarNavbar">
             {$container_content}
         </div>
 HTML;

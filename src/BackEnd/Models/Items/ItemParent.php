@@ -276,7 +276,7 @@ class ItemParent extends Item
      * 
      * @return int
      */
-    public static function count(string $categorie = null)
+    public static function countAllItems(string $categorie = null)
     {
         return count(self::getAllItems($categorie));
     }
@@ -326,13 +326,11 @@ HTML;
         return <<<HTML
         <div class="row mb-3">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-body py-3">
-                        {$this->showChildrenByCategorie('articles')}
-                        {$this->showChildrenByCategorie('videos')}
-                        {$this->showChildrenByCategorie('ebooks')}
-                        {$this->showChildrenByCategorie('livres')}
-                    </div>
+                <div class="bg-white p-3">
+                    {$this->showChildrenByCategorie('articles')}
+                    {$this->showChildrenByCategorie('videos')}
+                    {$this->showChildrenByCategorie('ebooks')}
+                    {$this->showChildrenByCategorie('livres')}
                 </div>
             </div>
         </div>
@@ -407,10 +405,10 @@ HTML;
     public function showSuscribersNumber()
     {
         return <<<HTML
-        <div>
-            Nombre d'inscrit :
-            <span class="badge bg-orange text-white">{$this->getSuscribersNumber()}</span>
-        </div>
+        <tr>
+            <td>Nombre d'inscrit</td>
+            <td>{$this->getSuscribersNumber()}</td>
+        </tr>
 HTML;
     }
 

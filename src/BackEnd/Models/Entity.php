@@ -114,7 +114,50 @@ abstract class Entity
     {
         return $this->categorie;
     }
- 
+
+    /**
+     * Retourne l'url pour localier l'élément.
+     * 
+     * @param string $action L'url retourne change en fonction de la chaîne
+     *                       de caractère passée en paramètre. Les chaînes autorisées sont
+     *                       administration, edit, post, share, delete.
+     * 
+     * @return string
+     */
+    public function getUrl(string $action = null)
+    {
+        $url = $this->categorie . "/" . $this->slug;
+        $administrateUrl = ADMIN_URL . "/" . $url;
+
+        if (null === $action) {
+            return $url;
+        }
+
+        elseif ($action === "public") {
+            return PUBLIC_URL . "/" . $url;
+        }
+
+        elseif ($action === "administrate") {
+            return $administrateUrl;
+        }
+
+        elseif ($action === "edit") {
+            return $administrateUrl . "/edit";
+        }
+
+        elseif ($action === "post") {
+            return $administrateUrl . '/post';
+        }
+
+        elseif ($action === "unpost") {
+            return $administrateUrl . '/unpost';
+        }
+
+        elseif ($action === "delete") {
+            return $administrateUrl . "/delete";
+        }
+    }
+
     /**
      * Retourne toutes les catégories.
      * 
@@ -270,7 +313,12 @@ abstract class Entity
     }
 
     /**
-     * Mets à jour une propriété de l'élément.
+     * Mets à jour une propriété de l'élément. Par défaut le nom de la table est
+     * la propriété $tableName, le nom de la colonne utilisée pour identifier
+     * l'élément à mettre à jour est l'id et sa valeur est celle de la propriété id,
+     * mais on peut passer un autre nom de colonne identifiant (exemple : code).
+     * Si le nom de la propriété identifiant l'élément est le code, alors la valeur de
+     * $identifierColValue sera égale à la propriété code.
      * 
      * @param string $colToUpdate        La colonne qu'on veut mettre à jour.
      * @param mixed  $valueToPut         La valeur à insérer dans lcette colonne.
@@ -282,16 +330,26 @@ abstract class Entity
      * 
      * @return bool
      */
-    protected function set(string $colToUpdate, $valueToPut, string $tableName = null, string $identifierColName = null, $identifierColValue = null) : bool
+    protected function set(string $colToUpdate, $valueToPut, string $tableName = null, string $identifierColName = "id", $identifierColValue = null) : bool
     {
-        if (null === $identifierColValue) $identifierColValue = $this->id;
         if (null === $tableName) $tableName = $this->tableName;
-        if (null === $identifierColName) $identifierColName = "id";
+        if ($identifierColName === "code") $identifierColValue = $this->code;
+        if (null === $identifierColValue) $identifierColValue = $this->id;
 
         self::bddManager()->update($colToUpdate, $valueToPut, $tableName, $identifierColName, $identifierColValue);
         self::bddManager()->update("updated_at", date("Y-m-d H:i:s"), $tableName, $identifierColName, $identifierColValue);
 
         return true;
+    }
+
+    /**
+     * Permet de rafraichir un item.
+     * 
+     * @return self
+     */
+    protected function refresh()
+    {
+        return self::createObjectByCategorieAndCode($this->categorie, $this->code);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -319,7 +377,10 @@ HTML;
         $categorie = ucfirst(self::getCategorieFormated($this->getCategorie()));
 
         return <<<HTML
-        <div>Catégorie : <span class="badge badge-primary">{$categorie}</span></div>
+        <tr>
+            <td>Catégorie</td>
+            <td>{$categorie}</td>
+        </tr>
 HTML;
     }
 

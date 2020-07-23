@@ -16,7 +16,6 @@
 namespace App\BackEnd\Models\Items;
 
 use App\BackEnd\Bdd\SqlQueryFormater;
-use App\BackEnd\Files\Image;
 use App\BackEnd\Utilities\Utility;
 use App\Router;
 use App\View\Notification;
@@ -76,7 +75,7 @@ class ItemChild extends Item
         $query = $sqlQuery
             ->select("id, code, categorie, parent_id, title, description, slug, article_content")
             ->select("author, provider, pages, price, rank, edition_home, parution_year, created_at")
-            ->select("updated_at, youtube_video_link, views")
+            ->select("posted_at, updated_at, youtube_video_link, views")
             ->from(self::TABLE_NAME)
             ->where("code = ?")
             ->returnQueryString();
@@ -102,6 +101,7 @@ class ItemChild extends Item
         $this->parutionYear = $result['parution_year'];
         $this->createdAt = $result['created_at'];
         $this->updatedAt = $result['updated_at'];
+        $this->postedAt = $result['posted_at'];
         $this->youtubeVideoLink = $result['youtube_video_link'];
         $this->views = (int)$result["views"];
         $this->tableName = self::TABLE_NAME;
@@ -263,11 +263,10 @@ class ItemChild extends Item
      * 
      * @return int
      */
-    public static function count(string $categorie = null)
+    public static function countAllItems(string $categorie = null)
     {
         return count(self::getAllItems($categorie));
     }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///                                      LES VUES                                                   ////////
@@ -284,6 +283,7 @@ class ItemChild extends Item
         $showData = Snippet::showData($this);
 
         return <<<HTML
+        <div id="res"></div>
         {$readItemContentHeader}
         {$showData}
         {$this->showArticle()}
@@ -302,7 +302,7 @@ HTML;
     {
         $title = ucfirst(parent::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
 
-        $itemsNumber = ItemChild::count("mini-services");
+        $itemsNumber = self::countAllItems("mini-services");
 
         $contentHeader = Snippet::listItemsContentHeader($title, "Liste", $itemsNumber);
         $miniServiceCommandsResume = Snippet::miniServicesCommandsResume();
@@ -371,17 +371,17 @@ HTML;
     {
         if ($this->parent !== null) {
             $parentTitle = $this->getParent()->getTitle();
-            $parentCategorie = $this->getParent()->getCategorie();
+            $parentCategorie = " / " . $this->getParent()->getCategorie();
         } else {
             $parentTitle = "Motivation +";
-            $parentCategorie = "Motivation +";
+            $parentCategorie = null;
         }
 
         return <<<HTML
-        <div>
-            Parent : {$parentTitle}
-            <span class="bg-primary p-1 rounded text-white text-small">{$parentCategorie}</span>
-        </div>
+        <tr>
+            <td>Parent</td>
+            <td>: {$parentTitle} {$parentCategorie}</td>
+        </tr>
 HTML;
     }
 

@@ -75,10 +75,10 @@ class Image extends File
      * 
      * @return bool
      */
-    public function saveImages(string $imageName, int $width = 1280, int $height = 720)
+    public static function saveImages(string $imageName, int $width = 1280, int $height = 720)
     {
-        $this->save($imageName, THUMBS_PATH, $width, $height);
-        $this->save($imageName, ORIGINALS_THUMBS_PATH);
+        self::save($imageName, THUMBS_PATH, $width, $height);
+        self::save($imageName, ORIGINALS_THUMBS_PATH);
         return true;
     }
 
@@ -89,9 +89,9 @@ class Image extends File
      * 
      * @return void
      */
-    public function saveAvatar($avatarName)
+    public static function saveAvatar($avatarName)
     {
-        $this->save($avatarName, AVATARS_PATH, 150, 150);
+        self::save($avatarName, AVATARS_PATH, 150, 150);
         return true;
     }
 
@@ -106,16 +106,19 @@ class Image extends File
      * 
      * @return bool
      */
-    private function save(string $imageName, string $dirPath, int $imageWidth = null, int $imageHeight = null)
+    private static function save(string $imageName, string $dirPath, int $imageWidth = null, int $imageHeight = null)
     {
         if (!file_exists($dirPath)) {
             mkdir($dirPath);
         }
+
         $manager = new ImageManager();
         $manager = $manager->make($_FILES['image_uploaded']['tmp_name']);
+
         if (null !== $imageWidth && null !== $imageHeight){
             $manager->fit($imageWidth, $imageHeight);
         }
+
         $manager->save($dirPath . $imageName . self::EXTENSION);
         return true;
     }
@@ -128,7 +131,7 @@ class Image extends File
      * 
      * @return bool
      */
-    public function renameImages($oldName, $newName)
+    public static function renameImages($oldName, $newName)
     {
         $oldThumbs = THUMBS_PATH . $oldName;
         $newThumbs = THUMBS_PATH . $newName . self::EXTENSION;
@@ -147,7 +150,7 @@ class Image extends File
      * 
      * @return bool
      */
-    public function deleteImages($imageName)
+    public static function deleteImages($imageName)
     {
         $oldThumbsPath = THUMBS_PATH . $imageName;
         if (file_exists($oldThumbsPath)) {

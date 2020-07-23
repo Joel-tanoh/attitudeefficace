@@ -42,7 +42,7 @@ class Form extends View
      */
     public static function getForm($categorie, $item = null)
     {
-        if ($categorie === "administrateurs") return self::addAdminUserForm($item);
+        if ($categorie === "administrateurs") return self::addAdministratorForm($item);
 
         elseif (Item::isParentCategorie($categorie)) $formContent = self::addParentForm($item, $categorie);
 
@@ -66,7 +66,7 @@ class Form extends View
      * 
      * @return string
      */
-    public static function addAdminUserForm($admin = null)
+    public static function addAdministratorForm($admin = null)
     {
         $formContent = self::loginInput($admin, "col-12 form-control");
         $formContent .= self::passwordInput("col-12 form-control");
@@ -444,7 +444,7 @@ HTML;
     {
         if (null !== $categorie && Item::isChildCategorie($categorie) && $categorie !== "mini-services") {
             $label = self::label("selectParentList", "Choisir le parent :");
-            $parentListOptions = self::parentList("themes", "Thèmes");
+            $parentListOptions = self::parentList();
 
             return <<<HTML
             <div id="chooseParentBox" class="mb-2">
@@ -723,27 +723,27 @@ HTML;
      */
     public static function notifyUsersBox()
     {
-        return <<<HTML
-        <div class="card p-3">
-            <div class="mb-2">Envoyer une notification à :</div>
-            <div class="custom-control custom-radio">
-                <input class="custom-control-input" type="radio" id="informAll" name="notify_users" value="all">
-                <label for="informAll" class="custom-control-label">tous les utilisateurs :</label>
-                <p class="notice">Les emails seront envoyés à tous les utilisateurs</p>
-            </div>
-            <div class="custom-control custom-radio">
-                <input class="custom-control-input" type="radio" id="customRadio2" name="notify_users" value="newsletter">
-                <label for="customRadio2" class="custom-control-label">que la newsletter :</label>
-                <p class="notice">Les emails seront envoyés qu'aux abonnés à la newsletter</p>
-            </div>
-            <div class="custom-control custom-radio">
-                <input class="custom-control-input" type="radio" id="customRadio3" name="notify_users" value="suscribers">
-                <label for="customRadio3" class="custom-control-label">que les souscrivants :</label>
-                <p class="notice">Les emails seront envoyés qu'à ceux qui sont abonnés à une
-                    formation ou à une étape</p>
-            </div>
-        </div>
-HTML;
+//         return <<<HTML
+//         <div class="card p-3">
+//             <div class="mb-2">Envoyer une notification à :</div>
+//             <div class="custom-control custom-radio">
+//                 <input class="custom-control-input" type="radio" id="informAll" name="notify_users" value="all">
+//                 <label for="informAll" class="custom-control-label">tous les utilisateurs :</label>
+//                 <p class="notice">Les emails seront envoyés à tous les utilisateurs</p>
+//             </div>
+//             <div class="custom-control custom-radio">
+//                 <input class="custom-control-input" type="radio" id="customRadio2" name="notify_users" value="newsletter">
+//                 <label for="customRadio2" class="custom-control-label">que la newsletter :</label>
+//                 <p class="notice">Les emails seront envoyés qu'aux abonnés à la newsletter</p>
+//             </div>
+//             <div class="custom-control custom-radio">
+//                 <input class="custom-control-input" type="radio" id="customRadio3" name="notify_users" value="suscribers">
+//                 <label for="customRadio3" class="custom-control-label">que les souscrivants :</label>
+//                 <p class="notice">Les emails seront envoyés qu'à ceux qui sont abonnés à une
+//                     formation ou à une étape</p>
+//             </div>
+//         </div>
+// HTML;
     }
 
     /**
@@ -815,7 +815,7 @@ HTML;
 
         foreach ($items as $item) {
             $options .= '<option value="'. $item->getID() . '">';
-            $options .= ucfirst($item->getTitle()) . ' - ' . ucfirst($item->showCategorie());
+            $options .= ucfirst($item->getTitle()) . ' - ' . ucfirst($item->getCategorie());
             $options .= '</option>';
         }
 

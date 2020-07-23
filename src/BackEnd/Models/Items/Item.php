@@ -7,13 +7,14 @@ use App\BackEnd\Models\Items\ItemChild;
 use App\BackEnd\Utilities\Utility;
 use App\BackEnd\Files\Image;
 use App\BackEnd\Files\Pdf;
+use App\BackEnd\Models\Entity;
 
 /**
  * Fichier de classe de gestion des Items.
  * 
  * @author Joel <joel.developpeur@gmail.com>
  */
-abstract class Item extends \App\BackEnd\Models\Entity
+abstract class Item extends Entity
 {
     /**
      * Nom/titre de l'instance
@@ -95,7 +96,7 @@ abstract class Item extends \App\BackEnd\Models\Entity
         if ($this->title) {
             return $this->title;
         } else {
-            return "Motivation plus";
+            return "motivation plus";
         }
     }
 
@@ -185,8 +186,9 @@ abstract class Item extends \App\BackEnd\Models\Entity
      */
     public function getVideoLink(string $hostedPlateform = null)
     {
-        if ($hostedPlateform === "youtube")
+        if ($hostedPlateform === "youtube" && null !== $this->youtubeVideoLink) {
             return $this->youtubeVideoLink;
+        }
     }
 
     /**
@@ -257,8 +259,8 @@ abstract class Item extends \App\BackEnd\Models\Entity
      */
     public function getClassement()
     {
-        if ($this->rank == 0 || $this->rank == null) {
-            return "Non classé";
+        if (null === $this->rank || $this->rank == 0) {
+            return "non classé";
         } else {
             return $this->rank == 1 ? $this->rank . " er" : $this->rank . " eme";
         }
@@ -272,45 +274,6 @@ abstract class Item extends \App\BackEnd\Models\Entity
     public function isPosted()
     {
         return $this->postedAt ? true : false;
-    }
-
-    /**
-     * Retourne l'url pour localier l'élément.
-     * 
-     * @param string $action L'url retourne change en fonction de la chaîne
-     *                       de caractère passée en paramètre. Les chaînes autorisées sont
-     *                       administration, edit, post, share, delete.
-     * 
-     * @return string
-     */
-    public function getUrl(string $action = null)
-    {
-        $url = $this->categorie . "/" . $this->slug;
-        $administrateUrl = ADMIN_URL . "/" . $url;
-
-        if (null === $action) {
-            return $url;
-        }
-
-        elseif ($action === "public") {
-            return PUBLIC_URL . "/" . $url;
-        }
-
-        elseif ($action === "administrate") {
-            return $administrateUrl;
-        }
-
-        elseif ($action === "edit") {
-            return $administrateUrl . "/edit";
-        }
-
-        elseif ($action === "post") {
-            return $administrateUrl . '/post';
-        }
-
-        elseif ($action === "delete") {
-            return $administrateUrl . "/delete";
-        }
     }
 
     /**
@@ -334,18 +297,24 @@ abstract class Item extends \App\BackEnd\Models\Entity
     }
 
     /**
-     * Permet de poster l'item courant.
+     * Permet de poster l'item courant, c'est à dire l'afficher sur la partie publique du site.
      * 
      * @return bool
      */
     public function post()
     {
-        $query = "UPDATE " . $this->tableName
-                . " SET posted_at = " . date("Y-m-d H:i:s")
-                . " WHERE id = " . $this->id;
+        $this->set("posted_at", date("Y-m-d H:i:s"), $this->tableName, "id", $this->id);
+        return true;
+    }
 
-        parent::connect()->query($query);
-
+    /**
+     * Permet de ne plus poster (ne plus rendre public) un item.
+     * 
+     * @return bool
+     */
+    public function unpost()
+    {
+        $this->set("posted_at", null, $this->tableName, "id", $this->id);
         return true;
     }
 
@@ -369,8 +338,7 @@ abstract class Item extends \App\BackEnd\Models\Entity
      */
     public function deleteImage()
     {
-        $imageManager = new Image();
-        $imageManager->deleteImages($this->getThumbsName());
+        Image::deleteImages($this->getThumbsName());
     }
 
     /**
@@ -428,20 +396,18 @@ abstract class Item extends \App\BackEnd\Models\Entity
         }
 
         if (!empty($_FILES["image_uploaded"]["name"])) {
-            $imageManager = new Image();
             $imageName = $newItem->getCategorie() . "-" . $newItem->getSlug();
 
             if ($newItem->getCategorie() === "mini-services") {
-                $imageManager->saveImages($imageName, 340, 340);
+                Image::saveImages($imageName, 340, 340);
             } else {
-                $imageManager->saveImages($imageName);
+                Image::saveImages($imageName);
             }
         }
 
         if (!empty($_FILES["pdf_uploaded"]["name"])) {
-            $pdf = new Pdf();
             $pdfFileName = $newItem->getSlug();
-            $pdf->savePdfFile($pdfFileName);
+            Pdf::savePdfFile($pdfFileName);
         }
 
         $newItem = $newItem->refresh();
@@ -477,7 +443,7 @@ abstract class Item extends \App\BackEnd\Models\Entity
             $slug = $this->getSlug();
 
             if (!empty($_FILES["image_uploaded"]["name"])) {
-                $imageManager->saveImages($this->getCategorie() . "-" . $this->getSlug());
+                Image::saveImages($this->getCategorie() . "-" . $this->getSlug());
             }
         } else {
             $slug = Utility::slugify($title) .'-'. $this->getID();
@@ -485,7 +451,7 @@ abstract class Item extends \App\BackEnd\Models\Entity
             $newThumbsName = $this->getCategorie() . "-" . $slug;
 
             if (empty($_FILES["image_uploaded"]["name"])) {
-                $imageManager->renameImages($oldThumbsName, $newThumbsName);
+                Image::renameImages($oldThumbsName, $newThumbsName);
             } else {
 
                 if ($this->getCategorie() === "mini-services") {
@@ -626,16 +592,6 @@ abstract class Item extends \App\BackEnd\Models\Entity
     }
 
     /**
-     * Permet de rafraichir un item.
-     * 
-     * @return self
-     */
-    protected function refresh()
-    {
-        return self::createObjectByCategorieAndCode($this->categorie, $this->code);
-    }
-
-    /**
      * Incrémente le nombre de visite de l'instance.
      * 
      * @return bool
@@ -708,14 +664,12 @@ abstract class Item extends \App\BackEnd\Models\Entity
      */
     public static function countAllItems(string $categorie = null)
     {
-        if (null === $categorie) {
-            return ItemParent::count($categorie) + ItemChild::count($categorie);
-
-        } elseif (self::isParentCategorie($categorie)) {
-            return ItemParent::count($categorie);
-
+        if (self::isParentCategorie($categorie)) {
+            return ItemParent::countAllItems($categorie);
+        } elseif (self::isChildCategorie($categorie)) {
+            return ItemChild::countAllItems($categorie);
         } else {
-            return ItemChild::count($categorie);
+            return ItemParent::countAllItems($categorie) + ItemChild::countAllItems($categorie);
         }
     }
 
@@ -733,8 +687,8 @@ abstract class Item extends \App\BackEnd\Models\Entity
 
         return <<<HTML
         <div class="d-flex align-items-center">
-            <span class="h6 p-1 bg-primary text-white rounded mr-2">{$categorie} &#8250</span>
-            <h2>{$this->getTitle()}</h2>
+            <span class="mr-2">{$categorie} &#8250</span>
+            <span>{$this->getTitle()}</span>
         </div>
 HTML;
     }
@@ -747,10 +701,10 @@ HTML;
     public function showDescription()
     {
         return <<<HTML
-        <div class="my-2">
-            <p class="m-0">Description :</p>
-            <p>{$this->getDescription()}</p>
-        </div>
+        <tr>
+            <td>Description</td>
+            <td>{$this->getDescription()}</td>
+        </tr>
 HTML;
     }
 
@@ -762,10 +716,10 @@ HTML;
     public function showViews()
     {
         return <<<HTML
-        <div>
-            Vue :
-            <span class="badge bg-orange text-white">{$this->getViews()}</span>
-        </div>
+        <tr>
+            <td>Vue</td>
+            <td>{$this->getViews()}</td>
+        </tr>
 HTML;
     }
 
@@ -780,10 +734,10 @@ HTML;
         $prix = $this->getPrice() == 0 ? "Gratuit" : $this->getPrice() . $devise;
 
         return <<<HTML
-        <div>
-            Prix : 
-            <span class="badge bg-orange text-white">{$prix}</span>
-        </div>
+        <tr>
+            <td>Prix</td>
+            <td>{$prix}</td>
+        </tr>
 HTML;
     }
 
@@ -795,9 +749,10 @@ HTML;
     public function showCreatedAt()
     {
         return <<<HTML
-        <div>
-            Crée le {$this->getCreatedAt()}
-        </div>
+        <tr>
+            <td>Date de création</td>
+            <td>{$this->getCreatedAt()}</td>
+        </tr>
 HTML;
     }
 
@@ -810,7 +765,10 @@ HTML;
     {
         if (null !== $this->getUpdatedAt()) {
             return <<<HTML
-            <div>Mis à jour le {$this->getUpdatedAt()}</div>
+            <tr>
+                <td>Date de mise à jour</td>
+                <td>{$this->getUpdatedAt()}</td>
+            </tr>
 HTML;
         }
     }
@@ -824,12 +782,18 @@ HTML;
     {
         if ($this->isPosted()) {
             return <<<HTML
-            <div>Posté le {$this->getPostedAt()}</div>
+            <tr>
+                <td>Date de publication</td>
+                <td>{$this->getPostedAt()}</td>
+            </tr>
 HTML;
         }
 
         return <<<HTML
-        <div>Posté : non</div>
+        <tr>
+            <td>Publié</td>
+            <td>non</td>
+        </tr>
 HTML;
     }
 

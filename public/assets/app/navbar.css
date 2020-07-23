@@ -7,13 +7,13 @@
 }
 .add-button-icon {
     padding: .3rem .5rem;
-    border-radius: .1rem;
-    background-color: rgba(176,220,239,.3);
+    border-radius: .5rem;
+    /* background-color: rgba(176,220,239,.3); */
     cursor: pointer;
     transition: .1s;
 }
 .add-button-icon:hover {
-    background-color: rgba(77, 197, 248, 0.3);
+    background-color: rgba(145, 211, 255, 0.24);
 }
 .add-button-content {
     display: none;

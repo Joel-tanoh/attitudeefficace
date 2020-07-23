@@ -274,7 +274,7 @@ HTML;
     /**
      * Retourne la page de suppression de plusieurs items selon la catégorie.
      * 
-     * @param Entity  $items     La liste des items qu'on veut supprimer.
+     * @param array  $items     La liste des items qu'on veut supprimer.
      * @param string $categorie La catégorie des items à supprimer.
      * @param string $error     Au cas où il y'a une erreur à afficher.
      * 

@@ -1,1 +1,5 @@
-1 - Gérer le post et le delete coté serveur et en Js
+- Gérer le post en Js
+
+- Gérer le non post des items
+
+- Gérer l'affichage des snippets de vidéos : le snippet s'affiche quand il n'y pas de vidéos.

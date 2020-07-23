@@ -11,9 +11,6 @@ namespace App\View;
 use App\Router;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\MiniserviceOrder;
-use App\View\ModelsView\ParentView;
-use App\View\ModelsView\ChildView;
-use App\View\ModelsView\ItemView;
 
 /**
  * Gère les fragments de code.
@@ -22,36 +19,6 @@ use App\View\ModelsView\ItemView;
  */
 class Snippet extends View
 {
-    /**
-     * Retourne un tableau sur la page de suppression d'items.
-     * 
-     * @param mixed $items
-     * @param string $categorie
-     * 
-     * @return string
-     */
-    public static function deleteItemsTable($items, string $categorie)
-    {
-        $tableRows = '';
-        $submitButton = Form::submitButton("suppression", "Supprimer");
-
-        foreach($items as $item) {
-            $item = Entity::createObjectByCategorieAndCode($categorie, $item["code"]);
-            $tableRows .= self::deleteItemsTableRow($item);
-        }
-
-        return <<<HTML
-        <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
-            <table class="table mb-3">
-                <thead>
-                    <th><input type="checkbox" id="checkAllItemsForDelete"></th><th>Titre</th>
-                </thead>
-                {$tableRows}
-            </table>
-            {$submitButton}
-        </form>
-HTML;
-    }
 
     /**
      * Affiche l'avatar d'un utilisateur.
@@ -79,16 +46,16 @@ HTML;
      */
     public static function showVideo(string $youtubeVideoLink = null)
     {
-        if (null !== $youtubeVideoLink) {
-            $result = self::youtubeIframe($youtubeVideoLink);
-        } else {
+        if (null == $youtubeVideoLink || $youtubeVideoLink == "") {
             $result = self::noVideoBox();
+        } else {
+            $result = self::youtubeIframe($youtubeVideoLink);
         }
 
         return <<<HTML
-        <div class="card mb-3 mb-md-0">
-            <div class="card-header bg-white">Vidéo descriptive</div>
-            <div class="card-body p-0">{$result}</div>
+        <div class="bg-white">
+            <div class="border-bottom p-2">Vidéo descriptive</div>
+            <div class="p-2">{$result}</div>
         </div>
 HTML;
     }
@@ -143,10 +110,12 @@ HTML;
         return <<<HTML
         <div class="row mb-3">
             <div class="col-12">
+            <div class="bg-white p-2">
                 <div class="d-flex justify-content-between align-items-center">
                     {$item->showTitle()}
                     {$manageButtons}
                 </div>
+            </div>
             </div>
         </div>
 HTML;
@@ -155,18 +124,21 @@ HTML;
     /**
      * Retourne les boutons pour publier, supprimer ou modifier l'instance.
      * 
-     * @param $item          L'objet pour lequel on doit afficher le bouton.
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item L'objet pour lequel on doit afficher le bouton.
      * 
      * @return string
      */
-    public static function manageButtons(\App\BackEnd\Models\Items\Item $item)
+    public static function manageButtons($item)
     {
-        $buttons = self::button($item->getUrl("edit"), null, "btn-primary", null, "far fa-edit");
+        $buttons = self::button($item->getUrl("edit"), "Editer", null, null, "fas fa-edit", "editButton");
 
-        if (null === $item->getPostedAt())
-            $buttons .= self::button($item->getUrl("post"), null, "btn-success", null, "fas fa-reply");
+        if ($item->isPosted()) {
+            $buttons .= self::button($item->getUrl("unpost"), "Ne plus poster", "text-success", null, "fas fa-times", "unpostButton");
+        } else {
+            $buttons .= self::button($item->getUrl("post"), "Poster", null, "text-success", "fas fa-reply", "postButton");
+        }
 
-        $buttons .= self::button($item->getUrl("delete"), null, "btn-danger", null, "fas fa-trash-alt");
+        $buttons .= self::button($item->getUrl("delete"), "Supprimer", null, "text-danger", "fas fa-trash-alt", "deleteItemButton");
         
         return <<<HTML
         <div class="float-sm-right">
@@ -185,14 +157,14 @@ HTML;
     {
         $bddManager = Entity::bddManager();
 
-        $new_commands_nbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME, "state", "nouvelle");
-        $newCommandsBoxInfo = Card::boxInfo($new_commands_nbr, "Nouvelles commandes", ADMIN_URL . "/mini-services/commands/new", "success");
+        $newCommandsNbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME, "state", "news");
+        $newCommandsBoxInfo = Card::boxInfo($newCommandsNbr, "Nouvelles commandes", ADMIN_URL . "/mini-services/commands/new", "success");
         
-        $waiting_commands_nbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME, "state", "en attente");
-        $waitingCommandsBoxInfo = Card::boxInfo($waiting_commands_nbr, "Commandes en attente", ADMIN_URL . "/mini-services/commands/en_attente", "warning");
+        $waitingCommandsNbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME, "state", "en attente");
+        $waitingCommandsBoxInfo = Card::boxInfo($waitingCommandsNbr, "Commandes en attente", ADMIN_URL . "/mini-services/commands/waiting", "warning");
         
-        $all_commands_nbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME);
-        $allCommandsBoxInfo = Card::boxInfo($all_commands_nbr, "Commandes totales", ADMIN_URL . "/mini-services/commands", "primary");
+        $allCommandsNbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME);
+        $allCommandsBoxInfo = Card::boxInfo($allCommandsNbr, "Commandes totales", ADMIN_URL . "/mini-services/commands/all", "primary");
 
         return <<<HTML
         <div class="row px-2">
@@ -206,15 +178,15 @@ HTML;
     /**
      * Affiche les données.
      * 
-     * @param \App\BackEnd\Models\Items\Item $item L'item dont on affiche les données.
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item L'item dont on affiche les données.
      * 
      * @return string
      */
     public static function showData($item)
     {
+        $showBddData = self::showBddData($item);
         $showThumbs = self::showThumbs($item);
         $videoBox = self::showVideo($item->getVideoLink("youtube"));
-        $showBddData = self::showBddData($item);
 
         return <<<HTML
         <div class="row mb-3">
@@ -278,20 +250,78 @@ HTML;
         $parent = $item->isChild() ? $item->showParent() : null;
 
         return <<<HTML
-        <div class="card mb-3">
-            <div class="card-header bg-white">Données</div>
-            <div class="card-body">
-                {$item->showCategorie()}
-                {$parent}
-                {$item->showDescription()}
-                {$suscriberNumber}
-                {$item->showPrice()}
-                {$item->showViews()}
-                {$item->showCreatedAt()}
-                {$item->showUpdatedAt()}
-                {$item->showPostedAt()}
-            </div>
-        </div>
+        <table class="table bg-white p-3 mb-3">
+            {$item->showCategorie()}
+            {$parent}
+            {$item->showPrice()}
+            {$item->showViews()}
+            {$item->showCreatedAt()}
+            {$item->showUpdatedAt()}
+            {$item->showPostedAt()}
+            {$suscriberNumber}
+            {$item->showDescription()}
+        </table>
+
+HTML;
+    }
+
+    /**
+     * Table qui permet de lister les éléménts.
+     * 
+     * @return string
+     */
+    public static function listingTable($items)
+    {
+        return <<<HTML
+        <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
+            <table class="table mb-3">
+                <thead>
+                    <th><input type="checkbox" id="checkAllItemsForDelete"></th><th>Titre</th>
+                </thead>
+            </table>
+        </form>
+HTML;
+    }
+
+    /**
+     * Une ligne du tableau qui liste les éléments.
+     * 
+     * @return string
+     */
+    public function tableRow()
+    {
+
+    }
+
+    /**
+     * Retourne un tableau sur la page de suppression d'items dans lequel les éléments sont
+     * affichés par ligne afin de les supprimer.
+     * 
+     * @param mixed $items
+     * @param string $categorie
+     * 
+     * @return string
+     */
+    public static function deleteItemsTable($items, string $categorie)
+    {
+        $tableRows = '';
+        $submitButton = Form::submitButton("suppression", "Supprimer");
+
+        foreach($items as $item) {
+            $item = Entity::createObjectByCategorieAndCode($categorie, $item["code"]);
+            $tableRows .= self::deleteItemsTableRow($item);
+        }
+
+        return <<<HTML
+        <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
+            <table class="table mb-3">
+                <thead>
+                    <th><input type="checkbox" id="checkAllItemsForDelete"></th><th>Titre</th>
+                </thead>
+                {$tableRows}
+            </table>
+            {$submitButton}
+        </form>
 HTML;
     }
 
@@ -357,22 +387,22 @@ HTML;
      * 
      * @param string $href 
      * @param string $caption 
-     * @param string $btn_class 
-     * @param string $caption_class 
-     * @param string $fa_icon_class 
+     * @param string $btnClass 
+     * @param string $captionClass
+     * @param string $faIconClass
      *
      * @return string
      */
-    public static function button(string $href, string $caption = null, string $btn_class = null, string $caption_class = null, string $fa_icon_class = null)
+    public static function button(string $href, string $caption = null, string $btnClass = null, string $captionClass = null, string $faIconClass = null, string $id = null)
     {
-        if (null !== $fa_icon_class) {
-            $fa_icon_class = '<i class="' . $fa_icon_class. '"></i>';
+        if (null !== $faIconClass) {
+            $faIconClass = '<i class="' . $faIconClass. '"></i>';
         }
 
         return <<<HTML
-        <a class="btn {$btn_class}" href="{$href}">
-            {$fa_icon_class}
-            <span class="{$caption_class}">{$caption}</span>
+        <a class="{$btnClass}" href="{$href}" id="{$id}">
+            {$faIconClass}
+            <span class="{$captionClass}">{$caption}</span>
         </a>
 HTML;
     }
@@ -432,9 +462,9 @@ HTML;
     private static function thumbs(\App\BackEnd\Models\Items\Item $item)
     {
         return <<<HTML
-        <div class="card">
-            <div class="card-header bg-white">Image de couverture</div>
-            <div class="card-body p-0">
+        <div>
+            <div class="bg-white p-2">Image de couverture</div>
+            <div>
                 <img src="{$item->getOriginalThumbsSrc()}" alt="{$item->getTitle()}" class="img-fluid"/>
             </div>
         </div>          
@@ -449,10 +479,8 @@ HTML;
     private static function noThumbsBox()
     {
         return <<<HTML
-        <div class="card">
-            <div class="card-body">
-                Aucune image de couverture.
-            </div>
+        <div>
+            Aucune image de couverture.
         </div>
 HTML;
     }
@@ -466,10 +494,8 @@ HTML;
     private static function noVideoBox()
     {
         return <<<HTML
-        <div class="card">
-            <div class="card-body">
-                Aucune vidéo.
-            </div>
+        <div>
+            Aucune vidéo.
         </div>
 HTML;
     }

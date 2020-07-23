@@ -29,35 +29,35 @@ use App\View\Template;
  */
 class PageBuilder extends View
 {
-    private $meta_title;
+    private $metaTitle;
     private $description;
     private $view;
 
     /**
      * Permet de créer une page.
      * 
-     * @param string $meta_title  Le titre qui sera affiché dans la page.
+     * @param string $metaTitle  Le titre qui sera affiché dans la page.
      * @param string $view        Le contenu de la page qui sera affiché dans
      *                            la page.
      * @param string $description La description de la page.
      */
-    public function __construct(string $meta_title = null, string $view = null, string $description = null)
+    public function __construct(string $metaTitle = null, string $view = null, string $description = null)
     {
-        $this->meta_title = $meta_title;
+        $this->metaTitle = $metaTitle;
         $this->description = $description;
         $this->view = $view;
     }
 
     /**
-     * Permet de modifier le meta_title de la page.
+     * Permet de modifier le metaTitle de la page.
      * 
-     * @param string $meta_title
+     * @param string $metaTitle
      * 
      * @return void
      */
-    public function setMetaTitle(string $meta_title)
+    public function setMetaTitle(string $metaTitle)
     {
-        $this->meta_title = $meta_title;
+        $this->metaTitle = $metaTitle;
     }
 
     /**
@@ -115,6 +115,7 @@ HTML;
     public function adminPage()
     {
         $template = Template::navbarAndSidebarAndContainer( Navbar::AdministrationNavbar(), Sidebar::adminSidebar(), $this->view );
+        $this->metaTitle = APP_NAME . ' - Administration';
 
         echo <<<HTML
         {$this->debutDePage("fr")}
@@ -179,7 +180,7 @@ HTML;
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <meta http-equiv="refresh" content="">
-        <title>{$this->meta_title}</title>
+        <title>{$this->metaTitle}</title>
         {$this->appIcon()}
 HTML;
     }
@@ -193,8 +194,8 @@ HTML;
     {
         $logos_dir = LOGOS_DIR_URL;
         return <<<HTML
-        <link rel="icon" href="{$logos_dir}/favicon.ico" type="image/x-icon">
-        <link rel="shortcut icon" href="{$logos_dir}/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="{$logos_dir}/favicon.svg" type="image/x-icon">
+        <link rel="shortcut icon" href="{$logos_dir}/favicon.svg" type="image/x-icon">
 HTML;
     }
 

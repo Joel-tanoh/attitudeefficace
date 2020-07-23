@@ -1,10 +1,19 @@
 $(document).ready(function(){
  
+  function getHttpRexquest () {
+		if (window.XMLHttpRequest) { // Mozilla, Safari, IE7+...
+			return new XMLHttpRequest();
+		}
+		else if (window.ActiveXObject) { // IE 6 et antérieurs
+			return ActiveXObject("Microsoft.XMLHTTP");
+		}
+	}
+  
   // Initialize Select2 Elements
   $('.select2').select2();
 
   // Editor CkEditor
-	// ClassicEditor
+  // ClassicEditor
   //   .create( document.querySelector( '#editor' ), {
   //     toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ]
   //   } )

@@ -201,7 +201,7 @@ Date:   Mon May 25 11:19:54 2020 +0000
 Author: Joel-tanoh <Joel-tanoh@users.noreply.github.com>
 Date:   Sat May 23 12:04:58 2020 +0000
 
-    Vérificartion de la création d'un item enfant partie 1
+    Vérification de la création d'un item enfant partie 1
 
 [33mcommit 504ec11775ea573c94fe4b4799bc7c85c08f9ef7[m
 Author: Joel-tanoh <Joel-tanoh@users.noreply.github.com>

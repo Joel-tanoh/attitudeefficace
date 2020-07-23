@@ -54,7 +54,7 @@ class Pdf extends File
      * 
      * @return true
      */
-    public function savePdfFile($pdfName)
+    public static function savePdfFile($pdfName)
     {
         $destination = PDF_PATH . $pdfName . Pdf::EXTENSION;
         if (!empty($_FILES["pdf_uploaded"]["name"])) {

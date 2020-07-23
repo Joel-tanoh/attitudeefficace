@@ -54,24 +54,6 @@ class Navbar extends View
         </nav>
 HTML;
     }
-    
-    /**
-     * Permet d'afficher le logo dans la navbar.
-     * 
-     * @param string $brandSrc        Le lien vers l'image.
-     * @param string $href  L'url exécuté lors du click sur le logo.
-     * @param string $caption  Le texte à afficher si l'image introuvable.
-     * 
-     * @return string
-     */
-    public static function navbarBrand(string $brandSrc, string $href = null, string $caption = null)
-    {
-        return <<<HTML
-        <a class="navbar-brand" href="{$href}">
-            <img src="{$brandSrc}" alt="{$caption}" class="brand">
-        </a>
-HTML;
-    }
 
     /**
      * Barre de navigation supérieure de la partie administration.
@@ -81,17 +63,45 @@ HTML;
      */
     public static function AdministrationNavbar()
     {
-        $addItemsLinksView = self::addItemsLinksView();
-        $manageAdministratorsButtons = self::manageAdministratorsButtons();
+        $utilsBar = self::utilsBar();
 
         return <<<HTML
         <nav class="navbar fixed-top navbar-content bg-white border-bottom w-100 d-flex justify-content-end">
             <ul class="navbar-nav d-flex align-items-center flex-row">
-                {$addItemsLinksView}
-                {$manageAdministratorsButtons}
+                {$utilsBar}
             </ul>
         </nav>
 HTML;
+    }
+
+    /**
+     * Permet d'afficher le logo dans la navbar.
+     * 
+     * @param string $brandSrc        Le lien vers l'image.
+     * @param string $href  L'url exécuté lors du click sur le logo.
+     * @param string $caption  Le texte à afficher si l'image introuvable.
+     * 
+     * @return string
+     */
+    private static function navbarBrand(string $brandSrc, string $href = null, string $caption = null)
+    {
+        return <<<HTML
+        <a class="navbar-brand" href="{$href}">
+            <img src="{$brandSrc}" alt="{$caption}" class="brand">
+        </a>
+HTML;
+    }
+
+    /**
+     * Barre d'outils de la barre de navigation de la partie admin
+     * 
+     * @return string
+     */
+    private static function utilsBar()
+    {
+        return self::addItemsLinksView()
+            . self::manageAdministratorsButtons()
+        ;
     }
 
     /**
@@ -99,16 +109,16 @@ HTML;
      * 
      * @return string code HTML
      */
-    public static function addItemsLinksView()
+    private static function addItemsLinksView()
     {
         $adminUrl = ADMIN_URL;
 
         return <<<HTML
         <li id="addButton" class="mr-3">
-            <a class="add-button-icon">
+            <a class="add-button-icon border">
                 <i class="fas fa-plus"></i>
             </a>
-            <ul class="add-button-content list-unstyled">
+            <ul class="add-button-content list-unstyled border">
                 <li>
                     <a href="{$adminUrl}/articles/create" class="text-primary">Ecrire un article</a>
                 </li>
@@ -127,12 +137,12 @@ HTML;
     }
 
     /**
-     * Bouton administrateur se trouvant dans la TopBar.
+     * Bouton administrateur se trouvant dans la navbar pour gérer les liens.
      * 
      * @author Joel
      * @return string
      */
-    public static function manageAdministratorsButtons()
+    private static function manageAdministratorsButtons()
     {
         $adminUrl = ADMIN_URL;
         
@@ -140,7 +150,7 @@ HTML;
 
         $adminUser = Administrateur::getByLogin($login);
 
-        $privateButtons = self::administrateurReservedActions();
+        $privateButtons = self::administratorReservedActions();
 
         $navbarUserAvatar = self::navbarUserAvatar($adminUser->getAvatarSrc(), $adminUser->getLogin());
 
@@ -166,11 +176,9 @@ HTML;
      * @param string $avatarSrc
      * @param string $caption
      * 
-     * @param $user 
-     * 
      * @return string
      */
-    public static function navbarUserAvatar(string $avatarSrc, string $caption = null)
+    private static function navbarUserAvatar(string $avatarSrc, string $caption = null)
     {
         return <<<HTML
         <div>
@@ -185,7 +193,7 @@ HTML;
      * 
      * @return string
      */
-    private static function administrateurReservedActions()
+    private static function administratorReservedActions()
     {
         $login = Session::getAdministratorSessionVar() ?? Cookie::getAdministratorCookieVar();
         $adminUser = Administrateur::getByLogin($login);
@@ -215,6 +223,7 @@ HTML;
     private static function publicNavbarLinks()
     {
         $public_url = PUBLIC_URL;
+
         return <<<HTML
         <ul class="navbar-nav">
             <li class="nav-item">
