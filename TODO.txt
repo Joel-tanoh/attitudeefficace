@@ -1,5 +1,7 @@
 - Gérer le post en Js
 
 - Gérer le non post des items
-
-- Gérer l'affichage des snippets de vidéos : le snippet s'affiche quand il n'y pas de vidéos.
+    créer la route
+    créer la méthode dans le controlleur
+    créer un vue (si nécessaire)
+    créer la méthode au niveau de la classe concernée

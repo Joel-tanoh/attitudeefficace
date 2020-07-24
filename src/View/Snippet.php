@@ -227,8 +227,8 @@ HTML;
      */
     public static function contextMenu()
     {
-        $createButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", null, "btn-success", null, "fas fa-plus");
-        $deleteItemsButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", null, "btn-danger", null, "fas fa-trash-alt");
+        $createButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", null, "btn btn-success", null, "fas fa-plus");
+        $deleteItemsButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", null, "btn btn-danger", null, "fas fa-trash-alt");
 
         return <<<HTML
         {$createButton}

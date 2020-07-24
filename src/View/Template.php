@@ -37,11 +37,11 @@ class Template extends View
      * 
      * @param mixed $navbar
      * @param mixed $sidebar
-     * @param mixed $container_content
+     * @param mixed $content
      * 
      * @return string
      */
-    public static function navbarAndSidebarAndContainer($navbar = null, $sidebar = null, $container_content = null)
+    public static function navbarAndSidebarAndContainer($navbar = null, $sidebar = null, $content = null)
     {
         return <<<HTML
         <header>
@@ -51,7 +51,9 @@ class Template extends View
             {$sidebar}
         </section>
         <div class="container-fluid mb-3 pt-3 pr-4" id="containerWithFixedSidebarNavbar">
-            {$container_content}
+            <div id="content">
+                {$content}
+            </div>
         </div>
 HTML;
     }
@@ -60,19 +62,19 @@ HTML;
      * Disposition de page avec une navbar, un contenu et un footer.
      * 
      * @param string $navbar
-     * @param string $container_content
+     * @param string $content
      * @param string $footer
      * 
      * @return string
      */
-    public static function navbarAndContainerAndFooter($navbar = null, $container_content = null, $footer = null)
+    public static function navbarAndContainerAndFooter($navbar = null, $content = null, $footer = null)
     {
         return <<<HTML
         <header>
             {$navbar}
         </header>
         <section class="container">
-            {$container_content}
+            {$content}
         </section>
         <footer>
             {$footer}
@@ -84,18 +86,18 @@ HTML;
      * Une template avec une navbar fixe et le contenu.
      * 
      * @param mixed $navbar
-     * @param mixed $container_content
+     * @param mixed $content
      * 
      * @return string
      */
-    public static function fixedNavbarAndContainer($navbar = null, $container_content = null)
+    public static function fixedNavbarAndContainer($navbar = null, $content = null)
     {
         return <<<HTML
         <header>
             {$navbar}
         </header>
-        <div class="container">
-            {$container_content}
+        <div id="content" class="container">
+            {$content}
         </div>
 HTML;
     }
@@ -105,18 +107,18 @@ HTML;
      * le contenu de la page et le footer.
      * 
      * @param string $sidebar La barre de gauche à fixer.
-     * @param mixed  $container_content Le contenu à afficher à code de la sidebar.
+     * @param mixed  $content Le contenu à afficher à code de la sidebar.
      * 
      * @return string
      */
-    public static function fixedSidebarAndContainer($sidebar = null, $container_content = null)
+    public static function fixedSidebarAndContainer($sidebar = null, $content = null)
     {
         return <<<HTML
         <section>
             {$sidebar}
         </section>
-        <div id="container_content">
-            {$container_content}
+        <div id="content" class="container">
+            {$content}
         </div>
 HTML;
     }
@@ -125,15 +127,15 @@ HTML;
      * Retourne la disposition de la page principale de la partie
      * publique.
      * 
-     * @param mixed $container_content
+     * @param mixed $content
      * 
      * @return string
      */
-    public static function singleColumn($container_content = null)
+    public static function singleColumn($content = null)
     {
         return <<<HTML
-        <div class="container">
-            {$container_content}
+        <div id="content" class="container">
+            {$content}
         </div>
 HTML;
     }

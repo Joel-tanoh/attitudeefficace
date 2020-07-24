@@ -61,7 +61,7 @@ class SideBar extends View
             <i class="fas fa-bars" id="btn"></i>
             <i class="fas fa-bars" id="cancel"></i>
         </label>
-        <div class="sidebar d-lg-none">
+        <div id="smallScreenSidebar" class="sidebar d-lg-none">
             {$sidebarBrand}
             {$searchBar}
             {$links}
@@ -86,7 +86,7 @@ HTML;
             <i class="fas fa-bars" id="btn"></i>
             <i class="fas fa-bars" id="cancel"></i>
         </label>
-        <div class="sidebar d-none d-lg-block">
+        <div id="largeScreenSidebar" class="sidebar d-none d-lg-block">
             {$sidebarBrand}
             {$searchBar}
             {$links}
@@ -135,17 +135,17 @@ HTML;
      */
     private static function links()
     {
-        $links = self::setLink(PUBLIC_URL, "fas fa-home", "Aller vers le site");
-        $links .= self::setLink(ADMIN_URL, "fas fa-desktop", "Tableau de bord");
-        $links .= self::setLink(ADMIN_URL."/formations", "fas fa-box", "Formations");
-        $links .= self::setLink(ADMIN_URL."/themes", "fas fa-box", "Thèmes");
-        $links .= self::setLink(ADMIN_URL."/etapes", "fas fa-box", "Etapes");
-        $links .= self::setLink(ADMIN_URL."/motivation-plus", "fas fa-tv", "Motivation plus");
-        $links .= self::setLink(ADMIN_URL."/articles", "fas fa-pen-square", "Articles");
-        $links .= self::setLink(ADMIN_URL."/videos", "fas fa-video", "Vidéos");
-        $links .= self::setLink(ADMIN_URL."/livres", "fas fa-book", "Livres");
-        $links .= self::setLink(ADMIN_URL."/ebooks", "fas fa-book", "Ebooks");
-        $links .= self::setLink(ADMIN_URL."/mini-services", "fas fa-shopping-basket", "Mini services");
+        $links = self::setLink(null, "fas fa-home", "Aller vers le site");
+        $links .= self::setLink("administration", "fas fa-desktop", "Tableau de bord");
+        $links .= self::setLink("administration/formations", "fas fa-box", "Formations");
+        $links .= self::setLink("administration/themes", "fas fa-box", "Thèmes");
+        $links .= self::setLink("administration/etapes", "fas fa-box", "Etapes");
+        $links .= self::setLink("administration/motivation-plus", "fas fa-tv", "Motivation plus");
+        $links .= self::setLink("administration/articles", "fas fa-pen-square", "Articles");
+        $links .= self::setLink("administration/videos", "fas fa-video", "Vidéos");
+        $links .= self::setLink("administration/livres", "fas fa-book", "Livres");
+        $links .= self::setLink("administration/ebooks", "fas fa-book", "Ebooks");
+        $links .= self::setLink("administration/mini-services", "fas fa-shopping-basket", "Mini services");
 
         return $links;
     }
@@ -161,7 +161,7 @@ HTML;
      * 
      * @return string
      */
-    private static function setLink(string $href, string $fontawesomeIconClass, string $caption)
+    private static function setLink(string $href = null, string $fontawesomeIconClass = null, string $caption = null)
     {
         $badge = null;
 
@@ -174,8 +174,8 @@ HTML;
         return <<<HTML
         <a class="py-2 px-4" href="{$href}">
             <div class="row">
-                <span class="col-2"><i class="{$fontawesomeIconClass} fa-lg"></i></span>
-                <span class="col-9">{$caption}</span>
+                <span class="col-3"><i class="{$fontawesomeIconClass} fa-lg"></i></span>
+                <span class="col-8">{$caption}</span>
                 {$badge}
             </div>
         </a>

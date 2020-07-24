@@ -174,11 +174,14 @@ HTML;
      */
     private function metaData()
     {
+        $base = PUBLIC_URL;
+
         return <<<HTML
         <meta charset="utf-8">
-        <meta name="description" content="{$this->description}">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta name="description" content="{$this->description}">
+        <base href="{$base}">
         <meta http-equiv="refresh" content="">
         <title>{$this->metaTitle}</title>
         {$this->appIcon()}

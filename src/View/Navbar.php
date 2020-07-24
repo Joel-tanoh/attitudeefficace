@@ -111,7 +111,7 @@ HTML;
      */
     private static function addItemsLinksView()
     {
-        $adminUrl = ADMIN_URL;
+        $adminUrl = "administration";
 
         return <<<HTML
         <li id="addButton" class="mr-3">
@@ -144,7 +144,7 @@ HTML;
      */
     private static function manageAdministratorsButtons()
     {
-        $adminUrl = ADMIN_URL;
+        $adminUrl = "administration";
         
         $login = Session::getAdministratorSessionVar() ?? Cookie::getAdministratorCookieVar();
 
@@ -198,7 +198,7 @@ HTML;
         $login = Session::getAdministratorSessionVar() ?? Cookie::getAdministratorCookieVar();
         $adminUser = Administrateur::getByLogin($login);
 
-        $adminUrl = ADMIN_URL;
+        $adminUrl = "administration";
 
         if ($adminUser->hasAllRights()) {
             return <<<HTML
