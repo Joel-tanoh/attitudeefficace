@@ -40,7 +40,7 @@ try {
 
     elseif ($route->match( [Entity::getAllCategories()] )) $controller->listItems();
 
-    elseif ($route->match( "administrateurs" )) $controller->ListAdministrators();
+    elseif ($route->match( "administrateurs" )) $controller->listAdministrators();
 
     elseif ($route->match( "mini-services/commands" )) $controller->listMiniservicesCommands();
 

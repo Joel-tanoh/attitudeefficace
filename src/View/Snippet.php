@@ -77,7 +77,7 @@ HTML;
         $itemsNumber = '<div class="badge bg-primary text-white px-2 py-1 rounded">' . $itemsNumber . '</div>';
 
         return <<<HTML
-        <div class="row mb-3">
+        <div class="row mb-2">
             <div class="col-6">
                 <div>
                     <div class="d-flex align-items-center">
@@ -130,19 +130,21 @@ HTML;
      */
     public static function manageButtons($item)
     {
-        $buttons = self::button($item->getUrl("edit"), "Editer", null, null, "fas fa-edit", "editButton");
+        $buttons = self::button($item->getUrl("edit"), "Editer", "text-success mr-1", null, "fas fa-edit mr-1", "editButton");
 
         if ($item->isPosted()) {
-            $buttons .= self::button($item->getUrl("unpost"), "Ne plus poster", "text-success", null, "fas fa-times", "unpostButton");
+            $buttons .= self::button($item->getUrl("unpost"), "Ne plus poster", "text-warning mr-1", null, "fas fa-times mr-1", "unpostButton");
         } else {
-            $buttons .= self::button($item->getUrl("post"), "Poster", null, "text-success", "fas fa-reply", "postButton");
+            $buttons .= self::button($item->getUrl("post"), "Poster", null, "text-warning mr-1", "fas fa-reply mr-1", "postButton");
         }
 
         $buttons .= self::button($item->getUrl("delete"), "Supprimer", null, "text-danger", "fas fa-trash-alt", "deleteItemButton");
         
         return <<<HTML
-        <div class="float-sm-right">
-            {$buttons}
+        <div>
+            <div class="d-flex">
+                {$buttons}
+            </div>
         </div>
 HTML;
     }
@@ -227,12 +229,51 @@ HTML;
      */
     public static function contextMenu()
     {
-        $createButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", null, "btn btn-success", null, "fas fa-plus");
+        $createButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", null, "btn btn-success mr-1", null, "fas fa-plus");
         $deleteItemsButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", null, "btn btn-danger", null, "fas fa-trash-alt");
 
         return <<<HTML
-        {$createButton}
-        {$deleteItemsButton}
+        <div class="d-flex flex-row">
+            {$createButton}
+            {$deleteItemsButton}
+        </div>
+HTML;
+    }
+
+    /**
+     * Table qui permet de lister les éléménts.
+     * 
+     * @return string
+     */
+    public static function listingTable($items)
+    {
+        $itemsList = null;
+        foreach($items as $item) {
+            $itemsList .= self::listingItemsRow($item);
+        }
+
+        $actionsRow = self::listingItemsTableActionsRow();
+
+        return <<<HTML
+        <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
+            <div class="row">
+                <div class="col-12">
+                    <table class="table border bg-white">
+                        <thead>
+                            <th><input type="checkbox" id="checkAllItems"> Tout cocher</th>
+                            <th>Titre</th>
+                            <th>Description</th>
+                            <th>Date de création</th>
+                        </thead>
+                        <tbody>
+                            {$actionsRow}
+                            {$itemsList}
+                            {$actionsRow}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </form>
 HTML;
     }
 
@@ -263,34 +304,6 @@ HTML;
         </table>
 
 HTML;
-    }
-
-    /**
-     * Table qui permet de lister les éléménts.
-     * 
-     * @return string
-     */
-    public static function listingTable($items)
-    {
-        return <<<HTML
-        <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
-            <table class="table mb-3">
-                <thead>
-                    <th><input type="checkbox" id="checkAllItemsForDelete"></th><th>Titre</th>
-                </thead>
-            </table>
-        </form>
-HTML;
-    }
-
-    /**
-     * Une ligne du tableau qui liste les éléments.
-     * 
-     * @return string
-     */
-    public function tableRow()
-    {
-
     }
 
     /**
@@ -400,9 +413,8 @@ HTML;
         }
 
         return <<<HTML
-        <a class="{$btnClass}" href="{$href}" id="{$id}">
-            {$faIconClass}
-            <span class="{$captionClass}">{$caption}</span>
+        <a class="d-flex flex-row justify-content-center align-items-center {$btnClass}" href="{$href}" id="{$id}">
+            {$faIconClass} <span class="{$captionClass}">{$caption}</span>
         </a>
 HTML;
     }
@@ -497,6 +509,47 @@ HTML;
         <div>
             Aucune vidéo.
         </div>
+HTML;
+    }
+
+    /**
+     * Retourne une ligne dans le tableau de suppression des éléments.
+     * 
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item
+     * 
+     * @return string
+     */
+    private static function listingItemsRow($item)
+    {
+        $itemManageButtons = self::manageButtons($item);
+
+        return <<<HTML
+        <tr>
+            <td><input type="checkbox" name="codes[]" id="{$item->getSlug()}" value="{$item->getCode()}"></td>
+            <td><label for="{$item->getSlug()}"> <a href="{$item->getUrl('administrate')}">{$item->getTitle()}</a></label></td>
+            <td>
+                <label for="{$item->getSlug()}">{$item->getDescription(50)}</label>
+                {$itemManageButtons}
+            </td>
+            <td><label for="{$item->getSlug()}">{$item->getCreatedAt()}</label></td>
+        </tr>
+HTML;
+    }
+
+    /**
+     * Ligne qui permet de faire des actions sur le tableau qiui liste les items.
+     * 
+     * @return string
+     */
+    public static function listingItemsTableActionsRow()
+    {
+        return <<<HTML
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><input class="btn-sm btn-danger" name="suppression" type="submit" value="Supprimer"></td>
+        </tr>
 HTML;
     }
 

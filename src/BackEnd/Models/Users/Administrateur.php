@@ -303,17 +303,19 @@ class Administrateur extends User
         }
 
         return <<<HTML
-        <div>
-            <table class="table border">
-                <thead class="thead-light">
-                    <th>Login</th>
-                    <th>Role</th>
-                    <th>Adresse email</th>
-                </thead>
-                <tbody>
-                    {$list}
-                </tbody>
-            </table>
+        <div class="row">
+            <div class="col-12">
+                <table class="table border bg-white">
+                    <thead class="thead-light">
+                        <th>Login</th>
+                        <th>Role</th>
+                        <th>Adresse email</th>
+                    </thead>
+                    <tbody>
+                        {$list}
+                    </tbody>
+                </table>
+            </div>
         </div>
 HTML;
     }

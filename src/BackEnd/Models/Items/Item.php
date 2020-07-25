@@ -113,10 +113,15 @@ abstract class Item extends Entity
     /**
      * Retourne la description de l'élément courant.
      * 
+     * @param int $charsNumber Le nombre de caractères à retourner.
+     * 
      * @return string
      */
-    public function getDescription() 
+    public function getDescription(int $charsNumber = null) 
     {
+        if ($charsNumber) {
+            return substr($this->description, 0, $charsNumber);
+        }
         return $this->description;
     }
 
@@ -645,7 +650,7 @@ abstract class Item extends Entity
     public static function getAll(string $categorie = null)
     {
         if (null === $categorie) {
-            return array_merge(ItemParent::getAllItems($categorie), ItemChild::getAllItems($categorie));
+            return array_merge(ItemParent::getAllItems(), ItemChild::getAllItems());
 
         } elseif (self::isParentCategorie($categorie)) {
             return ItemParent::getAllItems($categorie);
@@ -696,14 +701,16 @@ HTML;
     /**
      * Affiche la description de l'item
      * 
+     * @param int $charsNumber Le nom de caractère à afficher.
+     * 
      * @return string
      */
-    public function showDescription()
+    public function showDescription(int $charsNumber = null)
     {
         return <<<HTML
         <tr>
             <td>Description</td>
-            <td>{$this->getDescription()}</td>
+            <td>{$this->getDescription($charsNumber)}</td>
         </tr>
 HTML;
     }

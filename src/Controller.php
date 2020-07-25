@@ -100,10 +100,10 @@ class Controller{
      * 
      * @return void
      */
-    public function ListAdministrators()
+    public function listAdministrators()
     {
         $admins = Administrateur::getAll(2);
-        $page = new PageBuilder(null, View::ListAdministrators($admins));
+        $page = new PageBuilder(null, View::listAdministrators($admins));
         $page->adminPage();
     }
 

@@ -128,8 +128,6 @@ HTML;
             $itemsNumber = Item::countAllItems($categorie);
         }
 
-        $contentHeader = Snippet::listItemsContentHeader($title, "Liste", $itemsNumber);
-
         if (empty($items)) {
             $notification = new Notification();
             $content =
@@ -140,8 +138,10 @@ HTML;
                 .'</div>'
             ;
         } else {
-            $content = Template::gridOfCards($items);
+            $content = Snippet::listingTable($items);
         }
+
+        $contentHeader = Snippet::listItemsContentHeader($title, "Liste", $itemsNumber);
 
         return <<<HTML
         {$contentHeader}
@@ -171,7 +171,7 @@ HTML;
      * 
      * @return string
      */
-    public static function ListAdministrators($admins)
+    public static function listAdministrators($admins)
     {
         if (empty($admins)) {
             $notification = new Notification();

@@ -250,7 +250,7 @@ class ItemParent extends Item
      * 
      * @param string $categorie Un filtre sur la catégorie.
      * 
-     * @return array Unt tableau contenant tous les objets parent.
+     * @return array Unt tableau contenant tous les objets parent sous forme d'objets.
      */
     public static function getAllItems(string $categorie = null)
     {

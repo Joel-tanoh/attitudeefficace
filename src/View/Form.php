@@ -774,7 +774,7 @@ HTML;
      */
     public static function submitButton(string $name = null,  string $text = null, string $class = null)
     {
-        return self::button("submit", $name, $text, "btn-primary");
+        return self::button("submit", $name, $text, "btn-sm btn-success");
     }
 
     /**
@@ -1029,7 +1029,7 @@ HTML;
     public static function button(string $type = null, string $name = null,  string $text = null, string $class = null)
     {
         return <<<HTML
-		<button type="{$type}" name="{$name}" class="btn {$class}">{$text}</button>
+		<button type="{$type}" name="{$name}" class="{$class}">{$text}</button>
 HTML;
     }
 
