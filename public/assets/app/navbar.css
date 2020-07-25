@@ -8,7 +8,6 @@
 .add-button-icon {
     padding: .3rem .5rem;
     border-radius: .5rem;
-    /* background-color: rgba(176,220,239,.3); */
     cursor: pointer;
     transition: .1s;
 }

@@ -335,7 +335,7 @@ HTML;
         $searchBar = Form::input("search", "recherche", "rechercheInput", null, "Rechercher", "app-search-bar-input p-1");
 
         return <<<HTML
-        <div class="app-search-bar bg-white mx-3 mt-3 mb-4 pl-2">
+        <div class="app-search-bar bg-white mx-3 mt-3 mb-2 pl-2">
             <form action="" method="post" class="d-flex justify-content-between">
                 {$searchBar}
                 <button type="submit" class="app-search-bar-button">

@@ -15,9 +15,7 @@
 
 namespace App\View;
 
-use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\Item;
-use App\BackEnd\Models\Users\Administrateur;
 use App\BackEnd\Utilities\Utility;
 
 /**
@@ -39,29 +37,26 @@ class SideBar extends View
      */
     public static function adminSidebar()
     {
-        return
-            self::smallScreenSideBar() .
-            self::largeScreenSideBar();
+        return self::sidebar();
     }
 
     /**
-     * SideBar qui est visible sur les petits écrans.
+     * SideBar qui est visible sur les grands écrans.
      * 
      * @return string 
      **/
-    public static function smallScreenSideBar()
+    public static function sidebar()
     {
         $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
         $searchBar = Snippet::searchBar();
         $links = self::links();
 
         return <<<HTML
-        <input class="d-lg-none" type="checkbox" id="check">
-        <label class="d-lg-none" for="check">
-            <i class="fas fa-bars" id="btn"></i>
-            <i class="fas fa-bars" id="cancel"></i>
+        <input type="checkbox" id="check">
+        <label for="check">
+            <i class="fas fa-bars" id="commandSidebar"></i>
         </label>
-        <div id="smallScreenSidebar" class="sidebar d-lg-none">
+        <div id="sidebar" class="sidebar">
             {$sidebarBrand}
             {$searchBar}
             {$links}
@@ -81,12 +76,35 @@ HTML;
         $links = self::links();
 
         return <<<HTML
-        <input type="checkbox" id="check" checked> 
-        <label class="d-lg-none" for="check">
-            <i class="fas fa-bars" id="btn"></i>
-            <i class="fas fa-bars" id="cancel"></i>
+        <input type="checkbox" id="check" checked>
+        <label for="check">
+            <i class="fas fa-bars" id="commandSidebar"></i>
         </label>
-        <div id="largeScreenSidebar" class="sidebar d-none d-lg-block">
+        <div id="sidebar" class="sidebar d-none d-lg-block">
+            {$sidebarBrand}
+            {$searchBar}
+            {$links}
+        </div>
+HTML;
+    }
+
+    /**
+     * SideBar qui est visible sur les petits écrans.
+     * 
+     * @return string 
+     **/
+    public static function smallScreenSideBar()
+    {
+        $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
+        $searchBar = Snippet::searchBar();
+        $links = self::links();
+
+        return <<<HTML
+        <input type="checkbox" id="check" class="d-lg-none">
+        <label for="check">
+            <i class="fas fa-bars" id="commandSidebar"></i>
+        </label>
+        <div id="sidebar" class="sidebar d-lg-none">
             {$sidebarBrand}
             {$searchBar}
             {$links}
@@ -105,8 +123,8 @@ HTML;
     public static function sidebarBrand(string $brandSrc, string $href = null) : string
     {
         return <<<HTML
-        <a class="brand" href="{$href}">
-            <img src="{$brandSrc}" alt="Attitude efficace" class="brand sidebar-brand m-3">
+        <a class="brand text-center" href="{$href}">
+            <img src="{$brandSrc}" alt="Attitude efficace" class="brand sidebar-brand mb-2">
         </a>
 HTML;
     }
@@ -114,16 +132,16 @@ HTML;
     /**
      * Peremet d'afficher l'avatar de l'utilisateur dans la sidebar.
      * 
-     * @param string $avatar_src
-     * @param string $alt_information
+     * @param string $avatarSrc
+     * @param string $altText
      * 
      * @return string
      */
-    public static function sidebarUserAvatar(string $avatar_src, string $alt_information = null)
+    public static function sidebarUserAvatar(string $avatarSrc, string $altText = null)
     {
         return <<<HTML
         <div class="text-center my-2">
-            <img src="{$avatar_src}" alt="{$alt_information}" class="sidebar-user-avatar img-circle img-fluid"/>
+            <img src="{$avatarSrc}" alt="{$altText}" class="sidebar-user-avatar img-circle img-fluid"/>
         </div>
 HTML;
     }

@@ -18,5 +18,17 @@ $(document).ready(function(){
 	$('.add-button-icon').click( function () {
 		$('.add-button-content').toggle('fast');
 	});
+
+	
+	let sidebarShadow = document.getElementById("sidebarShadow")
+	let checkSidebar = document.getElementById("check")
+
+	checkSidebar.addEventListener("click", function(){
+		// if (checkSidebar.checked === true) {
+		// 	alert("la sidebar est ouverte")
+		// } else {
+		// 	alert("La sidebar est fermée")
+		// }
+	})
 	
 });
