@@ -709,7 +709,7 @@ HTML;
     {
         return <<<HTML
         <tr>
-            <td>Description</td>
+            <td>Description :</td>
             <td>{$this->getDescription($charsNumber)}</td>
         </tr>
 HTML;
@@ -724,7 +724,7 @@ HTML;
     {
         return <<<HTML
         <tr>
-            <td>Vue</td>
+            <td>Vue :</td>
             <td>{$this->getViews()}</td>
         </tr>
 HTML;
@@ -742,7 +742,7 @@ HTML;
 
         return <<<HTML
         <tr>
-            <td>Prix</td>
+            <td>Prix :</td>
             <td>{$prix}</td>
         </tr>
 HTML;
@@ -757,7 +757,7 @@ HTML;
     {
         return <<<HTML
         <tr>
-            <td>Date de création</td>
+            <td>Date de création :</td>
             <td>{$this->getCreatedAt()}</td>
         </tr>
 HTML;
@@ -773,7 +773,7 @@ HTML;
         if (null !== $this->getUpdatedAt()) {
             return <<<HTML
             <tr>
-                <td>Date de mise à jour</td>
+                <td>Date de mise à jour :</td>
                 <td>{$this->getUpdatedAt()}</td>
             </tr>
 HTML;
@@ -790,7 +790,7 @@ HTML;
         if ($this->isPosted()) {
             return <<<HTML
             <tr>
-                <td>Date de publication</td>
+                <td>Date de publication :</td>
                 <td>{$this->getPostedAt()}</td>
             </tr>
 HTML;
@@ -798,7 +798,7 @@ HTML;
 
         return <<<HTML
         <tr>
-            <td>Publié</td>
+            <td>Publié :</td>
             <td>non</td>
         </tr>
 HTML;

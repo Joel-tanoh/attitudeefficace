@@ -126,8 +126,8 @@ class User extends \App\BackEnd\Models\Entity
     public function setAvatar()
     {
         $image = new Image();
-        $avatar_name = $this->getLogin() ."-". $this->getID();
-        $image->saveAvatar($avatar_name);
+        $avatarName = $this->getLogin() ."-". $this->getID();
+        $image->saveAvatar($avatarName);
     }
     
     /**
@@ -211,8 +211,6 @@ class User extends \App\BackEnd\Models\Entity
      */
     public function getRole()
     {
-        // Il faut gérer le rôle des fournisseurs de servie //
-
         if ($this->role === "1") return "utilisateur";
         if ($this->role === "2") return "administrateur 1";
         if ($this->role === "3") return "administrateur 2";
@@ -285,7 +283,7 @@ class User extends \App\BackEnd\Models\Entity
      */
     public function getAvatarSrc()
     {
-        return file_exists($this->avatarPath) ? $this->avatar_src : Image::DEFAULT_AVATAR;
+        return file_exists($this->avatarPath) ? $this->avatarSrc : Image::DEFAULT_AVATAR;
     }
 
     /**

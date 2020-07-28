@@ -281,10 +281,116 @@ class ItemParent extends Item
         return count(self::getAllItems($categorie));
     }
 
+    /**
+     * Retourne les items postés en fonction de la catégorie.
+     * 
+     * @param string $categorie La catégorie des items postés qu'on veut récupérer.
+     * 
+     * @return array $itemsPosted Un tableau qui contient les items objets
+     */
+    public static function getPosted(string $categorie = null)
+    {
+        $query = "SELECT code from " . self::TABLE_NAME
+            . " WHERE categorie = ?"
+            . " AND posted_at IS NOT NULL";
+        
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$categorie]);
+        $result = $rep->fecthAll();
+
+        $itemsPosted = [];
+
+        foreach($result as $item) {
+            $item = new self($item["code"]);
+            $itemsPosted[] = $item;
+        }
+
+        return $itemsPosted;
+    }
+
+    /**
+     * Retourne les items qui ont été vus.
+     * 
+     * @param string $categorie La catégorie des items vus qu'on veut récupérer.
+     * 
+     * @return array $itemsPosted Un tableau qui contient les items objets
+     */
+    public static function getViewed(string $categorie = null)
+    {
+        $query = "SELECT code from " . self::TABLE_NAME
+            . " WHERE categorie = ?"
+            . " AND views != 0";
+        
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$categorie]);
+        $result = $rep->fecthAll();
+
+        $itemsViewed = [];
+
+        foreach($result as $item) {
+            $item = new self($item["code"]);
+            $itemsViewed[] = $item;
+        }
+
+        return $itemsViewed;
+    }
+
+    /**
+     * Retourne les items qui sont gratuits.
+     * 
+     * @param string $categorie La catégorie des items gratuits qu'on veut récupérer.
+     * 
+     * @return array $itemsFree Un tableau qui contient les items objets
+     */
+    public static function getFree(string $categorie = null)
+    {
+        $query = "SELECT code from " . self::TABLE_NAME
+            . " WHERE categorie = ?"
+            . " AND price = 0";
+        
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$categorie]);
+        $result = $rep->fecthAll();
+
+        $itemsFree = [];
+
+        foreach($result as $item) {
+            $item = new self($item["code"]);
+            $itemsFree[] = $item;
+        }
+
+        return $itemsFree;
+    }
+
+    /**
+     * Rétourne les items qui ont une vidéo de description.
+     * 
+     * @param string $categorie La catégorie des items qu'on veut récupérer.
+     * 
+     * @return array $itemsWithVideo Un tableau qui contient les items objets
+     */
+    public static function getItemsWithVideo(string $categorie = null)
+    {
+        $query = "SELECT code from " . self::TABLE_NAME
+            . " WHERE categorie = ?"
+            . " AND youtube_video_link IS NOT NULL";
+        
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$categorie]);
+        $result = $rep->fecthAll();
+
+        $items = [];
+
+        foreach($result as $item) {
+            $item = new self($item["code"]);
+            $items[] = $item;
+        }
+
+        return $items;
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////// LES VUES ///////////////////////////////////////////////////////
-
     
     /**
      * Vue de création d'un item parent.
@@ -363,12 +469,14 @@ HTML;
 
         return <<<HTML
         <div>
-            <h5>
+            <h6>
                 {$childrenCategorie}
                 <span class="badge bg-primary text-white">{$childrenNumber}</span>
-            </h5>
-            <div class="row px-2">
-                {$childrenList}
+            </h6>
+            <div class="row">
+                <div class="col-12">
+                    {$childrenList}
+                </div>
             </div>
         </div>
 HTML;
@@ -406,7 +514,7 @@ HTML;
     {
         return <<<HTML
         <tr>
-            <td>Nombre d'inscrit</td>
+            <td>Nombre d'inscrit :</td>
             <td>{$this->getSuscribersNumber()}</td>
         </tr>
 HTML;

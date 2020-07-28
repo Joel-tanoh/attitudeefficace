@@ -54,7 +54,6 @@ HTML;
 
         return <<<HTML
         <div class="bg-white">
-            <div class="border-bottom p-2">Vidéo descriptive</div>
             <div class="p-2">{$result}</div>
         </div>
 HTML;
@@ -74,17 +73,15 @@ HTML;
         $title = ucfirst($title);
         $contextMenu = self::contextMenu();
 
-        $itemsNumber = '<div class="badge bg-primary text-white px-2 py-1 rounded">' . $itemsNumber . '</div>';
-
         return <<<HTML
         <div class="row mb-2">
             <div class="col-6">
-                <div>
+                <div class="d-flex align-items-center">
+                    <span class="d-inline-block h6 bg-primary text-white px-2 py-1 mr-2">{$action}</span>
                     <div class="d-flex align-items-center">
                         <h3 class="mr-2">{$title}</h3>
-                        {$itemsNumber}
+                        <div class="badge bg-primary text-white">{$itemsNumber}</div>
                     </div>
-                    <span class="d-inline-block h6 bg-primary text-white rounded px-2 py-1">{$action}</span>
                 </div>
             </div>
             <div class="col-6">
@@ -130,21 +127,13 @@ HTML;
      */
     public static function manageButtons($item)
     {
-        $buttons = self::button($item->getUrl("edit"), "Editer", "text-success mr-1", null, "fas fa-edit mr-1", "editButton");
-
-        if ($item->isPosted()) {
-            $buttons .= self::button($item->getUrl("unpost"), "Ne plus poster", "text-warning mr-1", null, "fas fa-times mr-1", "unpostButton");
-        } else {
-            $buttons .= self::button($item->getUrl("post"), "Poster", null, "text-warning mr-1", "fas fa-reply mr-1", "postButton");
-        }
-
-        $buttons .= self::button($item->getUrl("delete"), "Supprimer", null, "text-danger", "fas fa-trash-alt", "deleteItemButton");
+        $buttons = self::editButton($item);
+        $buttons .= self::postUnpostButton($item);
+        $buttons .= self::deleteButton($item);
         
         return <<<HTML
-        <div>
-            <div class="d-flex">
-                {$buttons}
-            </div>
+        <div class="d-flex">
+            {$buttons}
         </div>
 HTML;
     }
@@ -215,7 +204,7 @@ HTML;
         $content = null !== $item->getThumbsSrc() ? self::thumbs($item) : self::noThumbsBox();
 
         return <<<HTML
-        <div class="mb-3">
+        <div class="bg-white p-2 mb-3">
             {$content}
         </div>
 HTML;
@@ -396,6 +385,46 @@ HTML;
     }
 
     /**
+     * Bouton d'édition d'un item.
+     * 
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item L'objet pour lequel on doit afficher le bouton.
+     * 
+     * @return string
+     */
+    public static function editButton($item)
+    {
+        return self::button($item->getUrl("edit"), "Editer", "text-success mr-1", null, "fas fa-edit mr-1", "editButton");
+    }
+
+    /**
+     * Bouton de post ou de unpost d'un item.
+     * 
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item L'objet pour lequel on doit afficher le bouton.
+     * 
+     * @return string
+     */
+    public static function postUnpostButton($item)
+    {
+        if ($item->isPosted()) {
+            return self::button($item->getUrl("unpost"), "Ne plus poster", "text-warning mr-1", null, "fas fa-times mr-1", "unpostButton");
+        } else {
+            return self::button($item->getUrl("post"), "Poster", "text-warning mr-1", null, "fas fa-reply mr-1", "postButton");
+        }
+    }
+
+    /**
+     * Bouton de suppression d'un item.
+     * 
+     * @param \App\BackEnd\Models\Items\ItemParent|\App\BackEnd\Models\Items\ItemChild $item L'objet pour lequel on doit afficher le bouton.
+     * 
+     * @return string
+     */
+    public static function deleteButton($item)
+    {
+        return self::button($item->getUrl("delete"), "Supprimer", "text-danger", null, "fas fa-trash-alt", "deleteItemButton");
+    }
+
+    /**
      * Retourne un lien du contextMenu.
      * 
      * @param string $href 
@@ -413,7 +442,7 @@ HTML;
         }
 
         return <<<HTML
-        <a class="d-flex flex-row justify-content-center align-items-center {$btnClass}" href="{$href}" id="{$id}">
+        <a class="d-flex align-items-center {$btnClass}" href="{$href}" id="{$id}">
             {$faIconClass} <span class="{$captionClass}">{$caption}</span>
         </a>
 HTML;
@@ -507,7 +536,7 @@ HTML;
     {
         return <<<HTML
         <div>
-            Aucune vidéo.
+            Aucune vidéo de description.
         </div>
 HTML;
     }

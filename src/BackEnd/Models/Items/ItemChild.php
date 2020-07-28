@@ -55,13 +55,6 @@ class ItemChild extends Item
     ];
 
     /**
-     * Le parent de l'élément courant.
-     * 
-     * @var \App\BackEnd\Models\Items\ItemParent
-     */
-    private $parent;
-
-    /**
      * Instancie un nouvel élement en prenant en paramètre le code.
      * 
      * @param string $code Code de l'élément.
@@ -114,23 +107,21 @@ class ItemChild extends Item
      */
     public function getParent()
     {
-        $parent = null;
+        if ($this->parentID === 0) {
+            $parent = null;
+        } elseif ($this->parentID === -1) {
+            $parent = "motivation +";
+        } else {
+            $result = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $this->parentID);
 
-        if ($this->parentID) {
-            if ($this->parentID === -1) {
-                $parent = "Motivation plus";
+            if (!empty($result[0]["code"])) {
+                $parent = new ItemParent($result[0]["code"]);
             } else {
-                $result = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $this->parentID);
-
-                if (!empty($result[0]["code"])) {
-                    $parent = new ItemParent($result[0]["code"]);
-                }
+                $parent = null;
             }
         }
 
-        $this->parent = $parent;
-
-        return $this->parent;
+        return $parent;
     }
 
     /**
@@ -268,9 +259,117 @@ class ItemChild extends Item
         return count(self::getAllItems($categorie));
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///                                      LES VUES                                                   ////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Retourne les items postés en fonction de la catégorie.
+     * 
+     * @param string $categorie La catégorie des items postés qu'on veut récupérer.
+     * 
+     * @return array $itemsPosted Un tableau qui contient les items objets
+     */
+    public static function getPosted(string $categorie = null)
+    {
+        $query = "SELECT code from " . self::TABLE_NAME
+            . " WHERE categorie = ?"
+            . " AND posted_at IS NOT NULL";
+        
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$categorie]);
+        $result = $rep->fecthAll();
+
+        $itemsPosted = [];
+
+        foreach($result as $item) {
+            $item = new self($item["code"]);
+            $itemsPosted[] = $item;
+        }
+
+        return $itemsPosted;
+    }
+
+    /**
+     * Retourne les items qui ont été vus.
+     * 
+     * @param string $categorie La catégorie des items vus qu'on veut récupérer.
+     * 
+     * @return array $itemsPosted Un tableau qui contient les items objets
+     */
+    public static function getViewed(string $categorie = null)
+    {
+        $query = "SELECT code from " . self::TABLE_NAME
+            . " WHERE categorie = ?"
+            . " AND views != 0";
+        
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$categorie]);
+        $result = $rep->fecthAll();
+
+        $itemsViewed = [];
+
+        foreach($result as $item) {
+            $item = new self($item["code"]);
+            $itemsViewed[] = $item;
+        }
+
+        return $itemsViewed;
+    }
+
+    /**
+     * Retourne les items qui sont gratuits.
+     * 
+     * @param string $categorie La catégorie des items gratuits qu'on veut récupérer.
+     * 
+     * @return array $itemsFree Un tableau qui contient les items objets
+     */
+    public static function getFree(string $categorie = null)
+    {
+        $query = "SELECT code from " . self::TABLE_NAME
+            . " WHERE categorie = ?"
+            . " AND price = 0";
+        
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$categorie]);
+        $result = $rep->fecthAll();
+
+        $itemsFree = [];
+
+        foreach($result as $item) {
+            $item = new self($item["code"]);
+            $itemsFree[] = $item;
+        }
+
+        return $itemsFree;
+    }
+
+    /**
+     * Rétourne les items qui ont une vidéo de description.
+     * 
+     * @param string $categorie La catégorie des items qu'on veut récupérer.
+     * 
+     * @return array $itemsWithVideo Un tableau qui contient les items objets
+     */
+    public static function getItemsWithVideo(string $categorie = null)
+    {
+        $query = "SELECT code from " . self::TABLE_NAME
+            . " WHERE categorie = ?"
+            . " AND youtube_video_link IS NOT NULL";
+        
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$categorie]);
+        $result = $rep->fecthAll();
+
+        $items = [];
+
+        foreach($result as $item) {
+            $item = new self($item["code"]);
+            $items[] = $item;
+        }
+
+        return $items;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///                                      LES VUES                                                   /////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Retourne la page d'affichage d'un item enfant.
@@ -350,11 +449,9 @@ HTML;
             return <<<HTML
             <div class="row mb-3">
                 <div class="col-12">
-                    <div class="card">
-                        <div class="card-header bg-white">Contenu de l'article</div>
-                        <div class="card-body">
-                            <article>{$this->getArticleContent()}</article>
-                        </div>
+                    <div class="bg-white">
+                        <div class="border-bottom p-2">Contenu de l'article</div>
+                        <article class="p-2">{$this->getArticleContent()}</article>
                     </div>
                 </div>
             </div>
@@ -369,18 +466,19 @@ HTML;
      */
     public function showParent()
     {
-        if ($this->parent !== null) {
-            $parentTitle = $this->getParent()->getTitle();
-            $parentCategorie = " / " . $this->getParent()->getCategorie();
+        if ($this->getParent() === null) {
+            $result = "Aucun";
+        } elseif ($this->getParent() === "motivation +") {
+            $result = "Motivation +";
         } else {
-            $parentTitle = "Motivation +";
-            $parentCategorie = null;
+            $result = '<a href="'. $this->getParent()->getUrl("administrate") . '">'. $this->getParent()->getTitle() .'</a>';
+            $result .= " &#8250 " . ucfirst($this->getParent()->getCategorie());
         }
 
         return <<<HTML
         <tr>
-            <td>Parent</td>
-            <td>: {$parentTitle} {$parentCategorie}</td>
+            <td>Parent :</td>
+            <td>{$result}</td>
         </tr>
 HTML;
     }

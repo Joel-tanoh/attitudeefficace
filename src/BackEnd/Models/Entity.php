@@ -360,7 +360,7 @@ abstract class Entity
      * 
      * @return string
      */
-    public static function listEntities()
+    public static function showAll()
     {
         return <<<HTML
 
@@ -378,7 +378,7 @@ HTML;
 
         return <<<HTML
         <tr>
-            <td>Catégorie</td>
+            <td>Catégorie :</td>
             <td>{$categorie}</td>
         </tr>
 HTML;
