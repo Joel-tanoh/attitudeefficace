@@ -693,7 +693,7 @@ abstract class Item extends Entity
         return <<<HTML
         <div class="d-flex align-items-center">
             <span class="mr-2">{$categorie} &#8250</span>
-            <span>{$this->getTitle()}</span>
+            <span class="h4">{$this->getTitle()}</span>
         </div>
 HTML;
     }

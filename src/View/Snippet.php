@@ -107,12 +107,10 @@ HTML;
         return <<<HTML
         <div class="row mb-3">
             <div class="col-12">
-            <div class="bg-white p-2">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center bg-white p-2">
                     {$item->showTitle()}
                     {$manageButtons}
                 </div>
-            </div>
             </div>
         </div>
 HTML;
