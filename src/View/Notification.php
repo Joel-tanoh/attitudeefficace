@@ -32,7 +32,7 @@ class Notification
      * 
      * @return string
      */
-    public function exception(string $message) : string
+    public static function exception(string $message) : string
     {
         return <<<HTML
         <div class="container">

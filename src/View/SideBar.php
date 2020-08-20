@@ -47,12 +47,12 @@ class SideBar extends View
      **/
     public static function sidebar()
     {
-        $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL. "/logo_3.png", ADMIN_URL);
+        $sidebarBrand = self::sidebarBrand(LOGOS_DIR_URL."/logo_3.png");
         $searchBar = Snippet::searchBar();
         $links = self::links();
 
         return <<<HTML
-        <input type="checkbox" id="check">
+        <input type="checkbox" id="check" checked>
         <label for="check">
             <i class="fas fa-bars" id="commandSidebar"></i>
         </label>
@@ -120,7 +120,7 @@ HTML;
      * 
      * @return string
      */
-    public static function sidebarBrand(string $brandSrc, string $href = null) : string
+    public static function sidebarBrand(string $brandSrc, string $href = "administration") : string
     {
         return <<<HTML
         <a class="brand text-center" href="{$href}">

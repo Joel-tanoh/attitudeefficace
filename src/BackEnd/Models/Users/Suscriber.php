@@ -90,7 +90,7 @@ class Suscriber extends User
         $this->categorie        = self::CATEGORIE;
 
         // Les items auxquels le suscriber a souscrit
-        $result = parent::bddManager()->get("id", Subscription::TABLE_NAME, "suscriber_id", $this->id);
+        $result = parent::bddManager()->get("id", Subscription::TABLE_NAME, "suscriber_email_address", $this->id);
         foreach ($result as $item) {
             $code = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $result["id"]);
             $item = new ItemParent($code["code"]);
@@ -141,7 +141,7 @@ class Suscriber extends User
     {
         $query = "SELECT date_format(subscritption_date, '%d %b. %Y à %H:%i') as subscription_date"
                 . " FROM " . Subscription::TABLE_NAME
-                . " WHERE suscriber_id = ? AND item_id = ?";
+                . " WHERE suscriber_email_address = ? AND item_code = ?";
         
         $rep = parent::connect()->prepare($query);
         $rep->execute([$this->getID(), $item->getID()]);

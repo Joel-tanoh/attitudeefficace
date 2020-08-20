@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  sam. 20 juin 2020 à 11:10
+-- Généré le :  jeu. 20 août 2020 à 20:47
 -- Version du serveur :  5.7.19
 -- Version de PHP :  7.1.9
 
@@ -56,6 +56,56 @@ INSERT INTO `administrators` (`id`, `code`, `login`, `password`, `email_address`
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `baskets`
+--
+
+DROP TABLE IF EXISTS `baskets`;
+CREATE TABLE IF NOT EXISTS `baskets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `session_id` varchar(50) COLLATE utf8_bin NOT NULL,
+  `email_address` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `products_codes` text COLLATE utf8_bin,
+  `statut` varchar(255) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_session_id` (`session_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `categories`
+--
+
+DROP TABLE IF EXISTS `categories`;
+CREATE TABLE IF NOT EXISTS `categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) COLLATE utf8_bin NOT NULL,
+  `slug` varchar(255) COLLATE utf8_bin NOT NULL,
+  `description` text COLLATE utf8_bin,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Déchargement des données de la table `categories`
+--
+
+INSERT INTO `categories` (`id`, `title`, `slug`, `description`, `created_at`, `updated_at`) VALUES
+(1, 'formations', 'formations', NULL, '2020-08-05 20:48:10', NULL),
+(2, 'thèmes', 'themes', NULL, '2020-08-05 20:48:21', NULL),
+(3, 'étapes', 'etapes', NULL, '2020-08-05 20:48:56', NULL),
+(4, 'articles', 'articles', NULL, '2020-08-05 20:49:04', NULL),
+(5, 'vidéos', 'videos', NULL, '2020-08-05 20:49:15', NULL),
+(6, 'livres', 'livres', NULL, '2020-08-05 20:49:37', NULL),
+(7, 'ebooks', 'ebooks', NULL, '2020-08-05 20:49:45', NULL),
+(8, 'mini services', 'mini-services', NULL, '2020-08-05 21:21:10', NULL),
+(9, 'motivation plus', 'motivation-plus', NULL, '2020-08-05 21:22:50', NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `items_child`
 --
 
@@ -68,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `items_child` (
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `slug` varchar(300) DEFAULT NULL,
-  `article_content` text,
+  `article_content` longtext,
   `author` varchar(255) DEFAULT NULL,
   `provider` varchar(255) DEFAULT NULL,
   `pages` int(11) DEFAULT NULL,
@@ -82,8 +132,19 @@ CREATE TABLE IF NOT EXISTS `items_child` (
   `youtube_video_link` varchar(255) DEFAULT NULL,
   `views` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UN_CODE` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=94 DEFAULT CHARSET=utf8;
+  UNIQUE KEY `UN_CODE` (`code`),
+  KEY `fk_parent_id` (`parent_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=110 DEFAULT CHARSET=utf8;
+
+--
+-- Déchargement des données de la table `items_child`
+--
+
+INSERT INTO `items_child` (`id`, `code`, `categorie`, `parent_id`, `title`, `description`, `slug`, `article_content`, `author`, `provider`, `pages`, `price`, `rank`, `edition_home`, `parution_year`, `created_at`, `updated_at`, `posted_at`, `youtube_video_link`, `views`) VALUES
+(107, '2G_ylpTWSk', 'videos', 0, 'Lorem toto', 'Une belle description', 'lorem-toto-107', NULL, NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-07-26 21:25:21', '2020-08-18 05:39:57', NULL, 'R9gACncMkoo', 0),
+(108, 'ScBJUp3cxG', 'livres', 145, 'Lorem idor', 'Une belle description', 'lorem-idor-108', '', NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-07-26 21:32:23', '2020-07-26 21:32:24', NULL, '', 0),
+(105, 'OxKgbS', 'articles', 0, 'Lorem ipsum', 'Lorem ipsum dolor sit amet consectetur a. Reiciendis tempore quae odio perferendis pariatur. Placeat aliquid sapiente consequuntur ullam alias vitae rem iure aperiam dolor dolorum culpa sit eius quas fugit blanditiis nisi nemo dolores repellat pariatur, maiores corrupti ipsa commodi enim.ipisicing elit. Eveniet voluptatem labore cupiditate molestiae porro velit inventore totam eos?', 'lorem-ipsum-105', 'Vide<br>', NULL, NULL, NULL, 0, 1, NULL, NULL, '2020-07-21 22:03:47', '2020-08-20 15:11:54', NULL, '', 0),
+(109, 'sexjYacqto', 'articles', 143, 'Papa mange su riz', 'Du bon riz je vous dit...', 'papa-mange-su-riz-109', '&lt;br&gt;', NULL, NULL, NULL, 0, 10, NULL, NULL, '2020-08-13 19:40:33', '2020-08-13 19:40:33', NULL, '', 0);
 
 -- --------------------------------------------------------
 
@@ -106,34 +167,17 @@ CREATE TABLE IF NOT EXISTS `items_parent` (
   `posted_at` datetime DEFAULT NULL,
   `views` int(11) DEFAULT '0',
   `youtube_video_link` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=138 DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Structure de la table `items_parent_suscribed`
---
-
-DROP TABLE IF EXISTS `items_parent_suscribed`;
-CREATE TABLE IF NOT EXISTS `items_parent_suscribed` (
-  `id` int(11) NOT NULL,
-  `item_parent_id` int(11) NOT NULL,
-  `suscriber_id` int(11) NOT NULL,
-  `date_begin` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `date_end` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK_id_categorie` (`item_parent_id`),
-  KEY `FK_suscriber_id` (`suscriber_id`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  UNIQUE KEY `items_parent` (`code`)
+) ENGINE=MyISAM AUTO_INCREMENT=146 DEFAULT CHARSET=utf8;
 
 --
--- Déchargement des données de la table `items_parent_suscribed`
+-- Déchargement des données de la table `items_parent`
 --
 
-INSERT INTO `items_parent_suscribed` (`id`, `item_parent_id`, `suscriber_id`, `date_begin`, `date_end`) VALUES
-(1, 51, 1, '2020-04-24 15:16:47', NULL),
-(2, 52, 1, '2020-04-24 15:18:35', NULL);
+INSERT INTO `items_parent` (`id`, `code`, `categorie`, `title`, `description`, `slug`, `price`, `rank`, `created_at`, `updated_at`, `posted_at`, `views`, `youtube_video_link`) VALUES
+(143, 'PGJThbPBiqw', 'formations', 'Lorem ipsum', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 'lorem-ipsum-143', 0, 1, '2020-07-13 05:56:05', '2020-07-27 12:02:08', NULL, 0, ''),
+(140, 'XG1Cny', 'themes', 'Développement personnel', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet voluptatem labore cupiditate molestiae porro velit inventore totam eos? Reiciendis tempore quae odio perferendis pariatur.', 'developpement-personnel-140', 0, 1, '2020-07-09 15:35:19', '2020-07-10 09:08:29', '2020-07-10 09:08:29', 0, 'R9gACncMkoo');
 
 -- --------------------------------------------------------
 
@@ -224,12 +268,12 @@ DROP TABLE IF EXISTS `subscriptions`;
 CREATE TABLE IF NOT EXISTS `subscriptions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) COLLATE utf8_bin NOT NULL,
-  `suscriber_id` int(11) NOT NULL,
-  `item_id` int(11) NOT NULL,
+  `suscriber_email_address` int(11) NOT NULL,
+  `item_code` int(11) NOT NULL,
   `subscription_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `FK_suscriber_id` (`suscriber_id`),
-  KEY `FK_item_id` (`item_id`)
+  KEY `FK_suscriber_email_address` (`suscriber_email_address`) USING BTREE,
+  KEY `FK_item_code` (`item_code`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -246,48 +290,61 @@ CREATE TABLE IF NOT EXISTS `suscribers` (
   `first_names` varchar(255) COLLATE utf8_bin NOT NULL,
   `password` varchar(255) COLLATE utf8_bin NOT NULL,
   `role` int(11) NOT NULL DEFAULT '1',
-  `state` int(11) NOT NULL DEFAULT '1',
+  `state` varchar(255) COLLATE utf8_bin DEFAULT 'activé',
   `contact_1` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `contact_2` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `email_address` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UN_MAIL` (`email_address`)
+  UNIQUE KEY `UN_MAIL` (`email_address`),
+  UNIQUE KEY `suscrierbers` (`code`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
---
--- Déchargement des données de la table `suscribers`
---
-
-INSERT INTO `suscribers` (`id`, `code`, `last_name`, `first_names`, `password`, `role`, `state`, `contact_1`, `contact_2`, `email_address`) VALUES
-(1, 'XdvCjK202', 'tanoh', 'bassa patrick joel', '$2y$10$NlCt2e.XtG8DmZFYiSB0suGNVX6G0ZeNLny6mdLAriyTUnxXgMQge', 1, 1, '+22549324696', NULL, 'tanohbassapatrick@gmail.com');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `visit_counter`
+-- Structure de la table `visitors`
 --
 
-DROP TABLE IF EXISTS `visit_counter`;
-CREATE TABLE IF NOT EXISTS `visit_counter` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `year` varchar(4) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `month` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `day` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `number` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+DROP TABLE IF EXISTS `visitors`;
+CREATE TABLE IF NOT EXISTS `visitors` (
+  `session_id` varchar(50) COLLATE utf8_bin NOT NULL,
+  `date_visit` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_action_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`session_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
--- Déchargement des données de la table `visit_counter`
+-- Déchargement des données de la table `visitors`
 --
 
-INSERT INTO `visit_counter` (`id`, `year`, `month`, `day`, `number`) VALUES
-(3, '2020', '05', '26', 2),
-(4, '2020', '05', '27', 20),
-(5, '2020', '06', '01', 2),
-(6, '2020', '06', '04', 1),
-(7, '2020', '06', '05', 7),
-(8, '2020', '06', '08', 1);
+INSERT INTO `visitors` (`session_id`, `date_visit`, `last_action_date`) VALUES
+('4SGK5IspuVEX9BztdoBKwkd5jw', '2020-08-06 22:37:23', NULL),
+('p0R5T_2DTlI9gUOQg', '2020-08-06 22:53:31', NULL),
+('zEpoLs9jBChy', '2020-08-07 05:28:16', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `visits`
+--
+
+DROP TABLE IF EXISTS `visits`;
+CREATE TABLE IF NOT EXISTS `visits` (
+  `date` date NOT NULL,
+  `number` int(11) DEFAULT '1',
+  PRIMARY KEY (`date`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Déchargement des données de la table `visits`
+--
+
+INSERT INTO `visits` (`date`, `number`) VALUES
+('2020-08-06', 1),
+('2020-08-07', 1),
+('2020-08-13', 1),
+('2020-08-16', 1),
+('2020-08-19', 1);
 
 --
 -- Index pour les tables déchargées
@@ -297,12 +354,14 @@ INSERT INTO `visit_counter` (`id`, `year`, `month`, `day`, `number`) VALUES
 -- Index pour la table `items_child`
 --
 ALTER TABLE `items_child` ADD FULLTEXT KEY `RECH_CONTENT` (`article_content`);
-ALTER TABLE `items_child` ADD FULLTEXT KEY `title` (`title`);
+ALTER TABLE `items_child` ADD FULLTEXT KEY `RECH_TITLE` (`title`);
+ALTER TABLE `items_child` ADD FULLTEXT KEY `RCH_SLUG` (`slug`);
 
 --
 -- Index pour la table `items_parent`
 --
-ALTER TABLE `items_parent` ADD FULLTEXT KEY `title` (`title`);
+ALTER TABLE `items_parent` ADD FULLTEXT KEY `RCH_TITLE` (`title`);
+ALTER TABLE `items_parent` ADD FULLTEXT KEY `RCH_SLUG` (`slug`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -245,9 +245,9 @@ HTML;
         <form id="myForm" method="post" enctype="multipart/form-data" action="{$_SERVER['REQUEST_URI']}">
             <div class="row">
                 <div class="col-12">
-                    <table class="table border bg-white">
+                    <table class="table bg-white">
                         <thead>
-                            <th><input type="checkbox" id="checkAllItems"> Tout cocher</th>
+                            <th><label for="checkAllItems"><input type="checkbox" id="checkAllItems"> Tout cocher</label></th>
                             <th>Titre</th>
                             <th>Description</th>
                             <th>Date de création</th>
@@ -257,6 +257,12 @@ HTML;
                             {$itemsList}
                             {$actionsRow}
                         </tbody>
+                        <tfoot>
+                            <th><label for="checkAllItems">Tout cocher</label></th>
+                            <th>Titre</th>
+                            <th>Description</th>
+                            <th>Date de création</th>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -572,10 +578,7 @@ HTML;
     {
         return <<<HTML
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><input class="btn-sm btn-danger" name="suppression" type="submit" value="Supprimer"></td>
+            <td colspan="4"><input class="btn-sm btn-danger" name="suppression" type="submit" value="Supprimer"></td>
         </tr>
 HTML;
     }

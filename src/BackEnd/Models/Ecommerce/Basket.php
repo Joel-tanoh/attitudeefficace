@@ -16,7 +16,7 @@ class Basket extends Entity
      * 
      * @var string
      */
-    protected $sessionID;
+    protected $sessionId;
 
     /**
      * Email de l'utilisateur a qui appartient le panier.
@@ -45,6 +45,17 @@ class Basket extends Entity
      * @var string
      */
     const TABLE_NAME = "baskets";
+
+    /**
+     * Constructeur d'un panier.
+     * 
+     * 
+     */
+    public function __construct()
+    {
+        
+    }
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////                           LES VUES                                                /////////////

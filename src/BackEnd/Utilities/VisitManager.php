@@ -3,7 +3,9 @@
 namespace App\BackEnd\Utilities;
 
 use App\BackEnd\Bdd\BddManager;
+use App\BackEnd\Models\Users\Visitor;
 use App\BackEnd\Utilities\Utility;
+use App\BackEnd\Session;
 
 /**
  * Fichier de classe gestionnaire des visites sur l'app.
@@ -12,6 +14,13 @@ use App\BackEnd\Utilities\Utility;
  */
 class VisitManager extends Utility
 {
+    /**
+     * Date de la visite.
+     * 
+     * @var string
+     */
+    private $date;
+
     /**
      * Année de la visite.
      * 
@@ -45,26 +54,26 @@ class VisitManager extends Utility
      * 
      * @var string
      */
-    const TABLE_NAME = "visit_counter";
+    const TABLE_NAME = "visits";
 
     /**
      * Constructeur.
      * 
-     * @param string $year  Format YYYY.
-     * @param string $month Format MM.
-     * @param string $day   Format DD.
+     * @param string $date
      * 
      * @return void
      */
-    public function __construct(string $year, string $month, string $day)
+    public function __construct(string $date)
     {
         $bddManager = new BddManager();
-        $query = "SELECT year, month, day, number FROM " . self::TABLE_NAME
-                . " WHERE year = ? AND month = ? AND day = ?";
+        $query = "SELECT date, number"
+                . " date_format(date, '%Y') year"
+                . " date_format(date, '%m') month"
+                . " date_format(date, '%d') day"
+                . " FROM " . self::TABLE_NAME
+                . " WHERE date = ?";
         $rep = $bddManager->getPDO()->prepare($query);
-        $rep->execute([
-            $year, $month, $day
-        ]);
+        $rep->execute([$date]);
         $result = $rep->fetch();
 
         $this->year = $result["year"];
@@ -116,76 +125,78 @@ class VisitManager extends Utility
     /**
      * Permet de mettre à jour le compteur de visite de l'app.
      * 
-     * @return bool 
+     * @return void 
      */
-    public static function appVisitCounter()
+    public static function manage()
+    {
+        if (!Session::visitorSessionIsActive()) {
+            Visitor::manageVisitorPresence();
+        }
+        self::setVisit();
+    }
+
+    /**
+     * Enregistre la visite dans la base de données ou incrémente le nombre de
+     * visite du jour courant.
+     * 
+     * @return void
+     */
+    public static function setVisit()
     {
         $bddManager = new BddManager();
-        $year = date("Y");
-        $month = date("m");
-        $day = date("d");
-        $visite = self::verifyDateVisitIsset($year, $month, $day);
-
-        if (self::isNewVisit()) {
-            if ($visite["date_isset"]) {
-                $bddManager->incOrDecColValue("increment", "number", self::TABLE_NAME, $visite["id"]);
-            } else {
-                self::insertNewVisit($year, $month, $day, 1);
-            }
+        $date = date('Y-m-d');
+        $visit = self::verifyDateVisitIsset($date);
+        
+        if ($visit["dateIsset"]) {
+            $bddManager->incOrDecColValue("increment", "number", self::TABLE_NAME, "date", $visit["date"]);
+        } else {
+            self::insertNewVisit($date, 1);
         }
+    }
+
+    /**
+     * Vérifie si une date est déjà dans la table qui compte les visites sur l'app.
+     * Cette méthode dépend fortement du format de la table comptant les visites dans
+     * la base de données.
+     * 
+     * @param string $date
+     * 
+     * @return array
+     */
+    public static function verifyDateVisitIsset(string $date)
+    {
+        $bddManager = new BddManager();
+        $query = "SELECT date, COUNT(*) as dateIsset"
+                . " FROM " . self::TABLE_NAME
+                . " WHERE date = ?";
+
+        $rep = $bddManager->getPDO()->prepare($query);
+        $rep->execute([$date]);
+
+        return $rep->fetch();
     }
 
     /**
      * Insère une nouvelle date de visite dans la table compteur_visite. Cette méthode
      * dépend fortement du format de la table dans la base de données.
      * 
-     * @param string $tableName Le nom de la table ou on insère le compteur de visite.
-     * @param string $year
-     * @param string $month
-     * @param string $day
-     * @param int    $number
+     * @param string $date
      * 
      * @return bool
      */
-    public static function insertNewVisit(string $year, string $month, string $day, int $number = 1)
+    public static function insertNewVisit(string $date, int $number = 1)
     {
         $bddManager = new BddManager();
-        $tableName = self::TABLE_NAME;
-        $query = "INSERT INTO $tableName(year, month, day, number)
-                  VALUES(:year, :month, :day, :number)";
+        $query = "INSERT INTO " . self::TABLE_NAME
+                . "(date, number) VALUES(:date, :number)";
 
         $rep = $bddManager->getPDO()->prepare($query);
         $rep->execute([
-            "year" => $year,
-            "month" => $month,
-            "day" => $day,
+            "date" => $date,
             "number" => $number,
         ]);
 
         return true;
-    }
-    /**
-     * Vérifie si une date est déjà dans la table qui compte les visites sur l'app.
-     * Cette méthode dépend fortement du format de la table comptant les visites dans
-     * la base de données.
-     * 
-     * @return array
-     */
-    public static function verifyDateVisitIsset(string $year, string $month, string $day)
-    {
-        $bddManager = new BddManager();
-        $query = "SELECT id, COUNT(id) as date_isset"
-                  . " FROM " . self::TABLE_NAME
-                  . " WHERE year = :year AND month = :month AND day = :day";
-
-        $rep = $bddManager->getPDO()->prepare($query);
-        $rep->execute([
-            "year" => $year,
-            "month" => $month,
-            "day" => $day
-        ]);
-
-        return $rep->fetch();
     }
 
 }

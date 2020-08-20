@@ -19,16 +19,39 @@ $(document).ready(function(){
 		$('.add-button-content').toggle('fast');
 	});
 
-	
-	let sidebarShadow = document.getElementById("sidebarShadow")
-	let checkSidebar = document.getElementById("check")
+	// Déclaration des variables
+	let contentContainer = document.getElementById("containerWithFixedSidebarNavbar")
+	let commandeSidebarButton = document.getElementById("check")
+	let sidebarLinks = document.querySelectorAll(".sidebar a")
 
-	checkSidebar.addEventListener("click", function(){
-		// if (checkSidebar.checked === true) {
-		// 	alert("la sidebar est ouverte")
-		// } else {
-		// 	alert("La sidebar est fermée")
-		// }
-	})
+	// Pour gérer la marge interne gauche du container du content
+	let manageSidebar = function () {
+		commandeSidebarButton.addEventListener("click", function () {
+			if (this.checked === false) {
+				contentContainer.style.paddingLeft = "1.45rem";
+			} else {
+				contentContainer.style.paddingLeft = "17.5rem";
+			}
+		})
+	}
+
+	// Pour donner la classe active au lien concerné dans la sidebar
+	let setSidebarLinkActive = function () {
+		let activeUrl = document.URL
+		let urlParts = activeUrl.split("/")
+		let recomposedUrl = urlParts[0]
+
+		for (var i = 1; i < 5; i++ ) {
+			recomposedUrl += "/" + urlParts[i]
+		}
+
+		for(var i = 2; i < sidebarLinks.length; i++) {
+			if (sidebarLinks[i].href == recomposedUrl) {
+				sidebarLinks[i].classList.add('active')
+			}
+		}
+	}
 	
+	manageSidebar()
+	setSidebarLinkActive()
 });

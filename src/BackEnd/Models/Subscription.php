@@ -15,32 +15,18 @@ use App\BackEnd\Utilities\Utility;
 class Subscription extends Entity
 {
     /**
-     * ID du subscriber.
-     * 
-     * @var string
-     */
-    private $subscriberID;
-    
-    /**
      * La personne ayant souscrit.
      * 
      * @var \App\BackEnd\Models\Users\Suscriber
      */
-    private $suscriber;
+    private $suscriberEmailAddress;
 
     /**
-     * ID de l'élément souscrit.
+     * Code de l'élément souscrit.
      * 
      * @var string
      */
-    private $itemID;
-
-    /**
-     * L'item souscrit.
-     * 
-     * @var \App\BackEnd\Models\ItemParent
-     */
-    private $suscribedItem;
+    private $itemCode;
 
     /**
      * Date de la souscription.
@@ -66,7 +52,7 @@ class Subscription extends Entity
     public function __construct(string $code)
     {
         $sqlQuery = new SqlQueryFormater();
-        $query = $sqlQuery->select("id, code, subscriber_id, item_id, subscription_date")
+        $query = $sqlQuery->select("id, code, subscriber_email_address, item_code, subscription_date")
                           ->from(self::TABLE_NAME)
                           ->where("code = ?")
                           ->returnQueryString();
@@ -75,11 +61,11 @@ class Subscription extends Entity
         $rep->execute([$code]);
         $result = $rep->fetch();
 
-        $this->id = $result["id"];
-        $this->code = $result["code"];
-        $this->subscriberID = $result["subscriber_id"];
-        $this->itemID = $result["item_id"];
-        $this->subscriptionDate = $result["subscription_date"];
+        $this->id                       = $result["id"];
+        $this->code                     = $result["code"];
+        $this->suscriberEmailAddress    = $result["subscriber_email_address"];
+        $this->itemID                   = $result["item_code"];
+        $this->subscriptionDate         = $result["subscription_date"];
     }
 
     /**
@@ -134,6 +120,5 @@ class Subscription extends Entity
     }
 
     ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
-
     
 }

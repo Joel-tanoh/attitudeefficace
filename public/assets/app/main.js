@@ -1,6 +1,6 @@
 $(document).ready(function(){
  
-  function getHttpRexquest () {
+  let xhr = function getHttpRexquest () {
 		if (window.XMLHttpRequest) { // Mozilla, Safari, IE7+...
 			return new XMLHttpRequest();
 		}
@@ -9,7 +9,7 @@ $(document).ready(function(){
 		}
 	}
   
-  // Initialize Select2 Elements
+  // Initialize Select2 Elements pour la liste des select des parents
   $('.select2').select2();
 
   // Editor CkEditor
@@ -24,30 +24,34 @@ $(document).ready(function(){
   //     console.error( err.stack );
   //   } );
 
-  // Bootstrap Custom File Input
+  // Bootstrap Custom File Input pour customiser l'input de fichier
   bsCustomFileInput.init();
+
+  (function () {
+    $('#summernote').summernote({
+      placeholder: 'Commencez à écrire...',
+      tabsize: 2,
+      height: 450,
+      lang: 'fr-FR',
+      toolbar: [
+        ['style', ['style']],
+        ['fontname', ['fontname'] ],
+        ['fontsize', ['fontsize'] ],
+        ['style', ['bold', 'italic', 'underline', 'clear'] ],
+        ['font', ['strikethrough', 'superscript', 'subscript'] ],
+        ['color', ['color'] ],
+        ['height', ['height'] ],
+        ['para', ['ul', 'ol', 'paragraph'] ],
+        ['table', ['table'] ],
+        ['insert', ['link', 'picture'] ],
+        ['view', ['codeview', 'help'] ],
+        ['undo', ['undo'] ],
+        ['redo', ['redo'] ],
+      ],
+    });
   
-  // Summernote
-  $('#summernote').summernote({
-    placeholder: 'Commencez à écrire...',
-    tabsize: 2,
-    height: 600,
-    lang: 'fr-FR',
-    toolbar: [
-      // [groupName, [list of button]]
-      ['fontname', ['fontname'] ],
-      ['fontsize', ['fontsize'] ],
-      ['style', ['bold', 'italic', 'underline', 'clear'] ],
-      ['font', ['strikethrough', 'superscript', 'subscript'] ],
-      ['color', ['color'] ],
-      ['height', ['height'] ],
-      ['para', ['ul', 'ol', 'paragraph']],
-      ['table', ['table'] ],
-      ['insert', ['link',] ],
-      ['view', ['code', 'help'] ],
-      ['undo', ['undo'] ],
-      ['redo', ['redo'] ],
-    ],
-  });
+    articleContentToModify = document.getElementById("articleContentToModify").innerHTML
+    $('#summernote').summernote('pasteHTML', articleContentToModify);
+  })()
 
 });

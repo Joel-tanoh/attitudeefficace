@@ -106,7 +106,7 @@ class ItemParent extends Item
     public function isSuscribed()
     {
         $bddManager = parent::bddManager();
-        $result = $bddManager->count("id", Subscription::TABLE_NAME, "item_id", $this->id);
+        $result = $bddManager->count("id", Subscription::TABLE_NAME, "item_code", $this->id);
         return $result != 0;
     }
 
@@ -117,14 +117,14 @@ class ItemParent extends Item
      */
     public function getSuscribers()
     {
-        $dbSuscribersIDs = parent::bddManager()->get("suscriber_id", Subscription::TABLE_NAME, "item_id", $this->id);
+        $dbSuscribersIDs = parent::bddManager()->get("suscriber_email_address", Subscription::TABLE_NAME, "item_code", $this->id);
 
         $suscribers = [];
 
         if (!empty($dbSuscribersIDs)) {
 
             foreach ($dbSuscribersIDs as $subscriber) {
-                $suscriber = parent::bddManager()->get("code", Suscriber::TABLE_NAME, "id", $subscriber["suscriber_id"]);
+                $suscriber = parent::bddManager()->get("code", Suscriber::TABLE_NAME, "id", $subscriber["suscriber_email_address"]);
                 $suscribers[] = new Suscriber($suscriber[0]["code"]);
             }
         }

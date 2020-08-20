@@ -82,20 +82,6 @@ class Utility
     }
 
     /**
-     * Vérifie si c'est une nouvelle visite.
-     * 
-     * @return bool
-     */
-    public static function isNewVisit()
-    {
-        if (isset($_SERVER["HTTP_REFERER"]) && strchr($_SERVER["HTTP_REFERER"], $_SERVER["SERVER_NAME"])) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Permet de convertir ue date en français.
      * 
      * @param string $date      Au format YYYY-mm-dd HH:ii:ss.

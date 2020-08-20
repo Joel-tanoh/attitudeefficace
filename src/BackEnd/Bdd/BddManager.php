@@ -114,7 +114,8 @@ class BddManager
      * @param string $whereColValue La valeur de la clause pour spécifier l'élément qu'on veut
      *                              précisement.
      * 
-     * @return array Retourn un tableau numérique de tableaux qui contient les résultats de la requête.
+     * @return array Retourne un tableau à deux dimensions, un niveua numérique et un niveau qui contient
+     *               les résultats de la requête.
      */
     public function get(string $toGet, string $tableName, string $whereColName = null, $whereColValue = null)
     {

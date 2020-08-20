@@ -31,4 +31,35 @@ class Session extends Authentification
         }
     }
 
+    /**
+     * Permet de vérifier que la session du visiteur dest active.
+     * 
+     * @return bool
+     */
+    public static function visitorSessionIsActive()
+    {
+        return isset($_SESSION["attitude_efficace_visitor_session_id"]);
+    }
+
+    /**
+     * Permet d'activer la session du visiteur.
+     * 
+     * @param string $sessionId Id de session du visiteur
+     * 
+     * @return void
+     */
+    public static function setVisitorSessionId($sessionId)
+    {
+        $_SESSION["attitude_efficace_visitor_session_id"] = $sessionId;
+    }
+
+    /**
+     * Retourne l'id de session du visiteur.
+     * 
+     * @return string
+     */
+    public static function getVisitorSessionId()
+    {
+        return self::visitorSessionIsActive() ? $_SESSION["attitude_efficace_visitor_session_id"] : null;
+    }
 }

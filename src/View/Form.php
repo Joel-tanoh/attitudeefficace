@@ -14,7 +14,6 @@
 
 namespace App\View;
 
-use App\BackEnd\Bdd\BddManager;
 use App\BackEnd\Models\Items\ItemParent;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\Item;
@@ -46,7 +45,7 @@ class Form extends View
 
         elseif (Item::isParentCategorie($categorie)) $formContent = self::addParentForm($item, $categorie);
 
-        elseif ($categorie === "articles") $formContent = self::addArticleForm();
+        elseif ($categorie === "articles") $formContent = self::addArticleForm($item);
 
         elseif ($categorie === "videos"|| $categorie === "motivation-plus") $formContent = self::addVideoForm($item);
 
@@ -179,22 +178,23 @@ HTML;
      * 
      * @return string Le formulaire.
      */
-    public static function addArticleForm($item = null, string $categorie = null)
+    public static function addArticleForm($item = null)
     {
         $priceLabel = <<<HTML
         Prix :
         <p class="notice">Ce sera la somme que les utilisateurs devront payer pour
         avoir accès à cet élément</p>
 HTML;
-        $selectParent = self::selectParent("videos");
-        $titleInput = self::titleInput($item);
-        $descriptionTextarea = self::descriptionTextarea($item);
-        $videoInput = self::videoInput($item);
-        $prixInput = self::prixInput($item, $priceLabel);
-        $rankInput = self::rankInput($item, "videos");
-        $imageInput = self::imageInput();
-        $notifyUserBox = self::notifyUsersBox();
-        $articleTextarea = self::articleContentTextarea($item, "articles");
+        $selectParent           = self::selectParent("videos");
+        $titleInput             = self::titleInput($item);
+        $descriptionTextarea    = self::descriptionTextarea($item);
+        $videoInput             = self::videoInput($item);
+        $prixInput              = self::prixInput($item, $priceLabel);
+        $rankInput              = self::rankInput($item, "videos");
+        $imageInput             = self::imageInput();
+        $notifyUserBox          = self::notifyUsersBox();
+        $articleContentToModify = self::articleContentToModify($item);
+        $articleTextarea        = self::articleContentTextarea($item, "articles");
 
         return <<<HTML
         <div class="row">
@@ -211,6 +211,7 @@ HTML;
                 {$notifyUserBox}
             </div>
         </div>
+        {$articleContentToModify}
         {$articleTextarea}
 HTML;
     }
@@ -778,6 +779,54 @@ HTML;
     }
 
     /**
+     * Retourne un input.
+     * 
+     * @param string $type        
+     * @param string $name        [[Description]]
+     * @param string $id          [[Description]]
+     * @param string $value       [[Description]] 
+     * @param string $placeholder [[Description]] 
+     * @param string $class       
+     * @param int    $min         
+     * @param int    $max  
+     * 
+     * @return string
+     */
+    public static function input(
+        string $type = null,
+        string $name = null,
+        string $id = null,
+        string $value = null,
+        string $placeholder = null,
+        string $class = null,
+        int    $min = null,
+        int    $max = null
+    ) {
+        return <<<HTML
+        <input type="{$type}" name="{$name}" id="{$id}" value="{$value}"
+            placeholder="{$placeholder}" min="{$min}" max="{$max}" class="{$class}"/>
+HTML;
+    }
+    
+    /**
+     * Retourne une balise HTML button
+     * 
+     * @param string $type 
+     * @param string $name  
+     * @param string $text  
+     * @param string $class  
+     * 
+     * @author Joel
+     * @return string [[Description]]
+     */
+    public static function button(string $type = null, string $name = null,  string $text = null, string $class = null)
+    {
+        return <<<HTML
+		<button type="{$type}" name="{$name}" class="{$class}">{$text}</button>
+HTML;
+    }
+
+    /**
      * Retourne le formulaire.
      * 
      * @param string $formContent 
@@ -960,36 +1009,6 @@ HTML;
     }
 
     /**
-     * Retourne un input.
-     * 
-     * @param string $type        
-     * @param string $name        [[Description]]
-     * @param string $id          [[Description]]
-     * @param string $value       [[Description]] 
-     * @param string $placeholder [[Description]] 
-     * @param string $class       
-     * @param int    $min         
-     * @param int    $max  
-     * 
-     * @return string
-     */
-    public static function input(
-        string $type = null,
-        string $name = null,
-        string $id = null,
-        string $value = null,
-        string $placeholder = null,
-        string $class = null,
-        int    $min = null,
-        int    $max = null
-    ) {
-        return <<<HTML
-        <input type="{$type}" name="{$name}" id="{$id}" value="{$value}"
-            placeholder="{$placeholder}" min="{$min}" max="{$max}" class="{$class}"/>
-HTML;
-    }
-
-    /**
      * Retourne une balise HTML textarea.
      * 
      * @param string $name        
@@ -1014,23 +1033,21 @@ HTML;
         <textarea name="{$name}" id="{$id}" rows="{$rows}" placeholder="{$placeholder}" class="col-12 {$class}">{$value}</textarea>
 HTML;
     }
-    
-    /**
-     * Retourne une balise HTML button
-     * 
-     * @param string $type 
-     * @param string $name  
-     * @param string $text  
-     * @param string $class  
-     * 
-     * @author Joel
-     * @return string [[Description]]
-     */
-    public static function button(string $type = null, string $name = null,  string $text = null, string $class = null)
-    {
-        return <<<HTML
-		<button type="{$type}" name="{$name}" class="{$class}">{$text}</button>
-HTML;
-    }
 
+    /**
+     * Retourne une textarea pour qui contient le contenu de l'article à modifier,
+     * ce contenu est récupéré et afficher comme texte par défaut du textarea summernote.
+     * 
+     * @param \App\BackEnd\Models\Items\ItemChild $item
+     * 
+     * @return string Une balise de type textarea
+     */
+    private static function articleContentToModify($item = null)
+    {
+        if (null !== $item) {
+            return <<<HTML
+            <div id="articleContentToModify" class="d-none">{$item->getArticleContent()}</div>
+HTML;
+        }
+    }
 }

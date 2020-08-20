@@ -14,13 +14,17 @@ a:hover {
 /* Les Utilities */
 
 /* Les Templates */
+
 /* Conteneur d'une Template avec une fixed sidebar et une navbar */
 #containerWithFixedSidebarNavbar {
-	padding-left: 1.5rem; /* Une marge à gauche interne d'une taille supérieure ou égale à celle de la sidebar */
-	margin-top: 2.2rem; /* Une marge de haut externe d'une taille supérieure ou égale à celle de la navbar */
+	margin-top: 3.5rem;
+	padding-right: 1.45rem;
+	padding-left: 17.5rem;
+	transition: .3s;
 }
 
 @media (max-width: 992px) {
+
 }
 
 /* Les barres de navigation */

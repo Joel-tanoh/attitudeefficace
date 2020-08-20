@@ -14,11 +14,8 @@
 
 namespace App\BackEnd\Models\Users;
 
-use App\BackEnd\Bdd\SqlQueryFormater;
 use App\BackEnd\Files\Image;
 use App\BackEnd\Models\Entity;
-use App\BackEnd\Utilities\Utility;
-use Exception;
 
 /**
  * Gère tout ce qui concerne une personne.
@@ -31,7 +28,7 @@ use Exception;
  * @license  url.com license
  * @link     link
  */
-class User extends \App\BackEnd\Models\Entity
+class User extends Entity
 {
     /**
      * Login

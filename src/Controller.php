@@ -56,7 +56,6 @@ class Controller{
     {
         $metaTitle = "Bienvenu sur " . APP_NAME;
         $page = new PageBuilder($metaTitle, View::publicAccueilView());
-        VisitManager::appVisitCounter();
         $page->publicPage();
     }
 
@@ -163,7 +162,7 @@ class Controller{
      * 
      * @return void
      */
-    public function editItem()
+    public function updateItem()
     {
         $item = Entity::getObjectBy("slug", $this->url[1], Entity::getTableName($this->categorie), $this->categorie);
         $errors = null;
