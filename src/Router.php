@@ -97,7 +97,7 @@ class Router
     /**
      * Retourne l'url de la page courante grâce au fichier .htacces qui
      * permet de ramener toutes les urls vers l'index du dossier où le
-     * fichier il se trouve en générant une variable global $_GET["url"].
+     * fichier il se trouve en générant une variable globale $_GET["url"].
      * 
      * @return string
      */
@@ -109,7 +109,7 @@ class Router
             $urlLength = strlen($url);
             $urlOtherChars = substr($url, 0, $urlLength - 1);
             $urlLastChar = substr($url, $urlLength - 1, 1);
-    
+            
             if ($urlLastChar === "/") {
                 $url = $urlOtherChars;
             }    

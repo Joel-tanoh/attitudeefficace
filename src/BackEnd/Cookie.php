@@ -10,7 +10,7 @@ class Cookie extends Authentification
     /**
      * Initie la variable de session.
      * 
-     * @param \App\BackEnd\Models\Users\Administrateur $administrator
+     * @param \App\BackEnd\Models\Users\Administrator $administrator
      * 
      * @return bool
      */

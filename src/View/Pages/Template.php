@@ -13,10 +13,10 @@
  * @link     Link
  */
 
-namespace App\View;
+namespace App\View\Pages;
 
-use App\BackEnd\Models\Entity;
-use App\View\ModelsView\ChildView;
+use App\View\Card;
+use App\View\View;
 
 /**
  * Une template est un type de disposition du contenu d'une page.

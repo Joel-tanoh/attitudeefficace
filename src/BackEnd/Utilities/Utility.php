@@ -85,11 +85,14 @@ class Utility
      * Permet de convertir ue date en français.
      * 
      * @param string $date      Au format YYYY-mm-dd HH:ii:ss.
-     * @param string $precision
+     * @param string $precision Permet de spécifier si l'on veut seulement
+     *                          le jour ou l'heure. Si l'on veut le jour, on
+     *                          passe en paramètre "day", si l'on veut l'heure
+     *                          , on passe en paramètre "hour".
      * 
      * @return string
      */
-    public static function convertDate($date, string $precision = null) 
+    public static function formatDate($date, string $precision = null) 
     {
         if (null === $date) {
             return null;
@@ -106,7 +109,7 @@ class Utility
         } elseif ($precision === "hour") {
             return $hour . ':' . $min;
         } else {
-            return $day ." ". $month ." ". $year ." à ". $hour .':'. $min;
+            return $day ." ". $month ." ". $year ." ". $hour .':'. $min;
         }
     }
 
@@ -119,8 +122,8 @@ class Utility
      */
     public static function convertMonth(int $monthNumber)
     {
-        $frenchMonths = array('janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre');
-        return $frenchMonths[$monthNumber - 1];
+        $monthsInFrench = array('janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre');
+        return $monthsInFrench[$monthNumber - 1];
     }
 
 }

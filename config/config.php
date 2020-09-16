@@ -14,9 +14,16 @@
  */
 
 /*** Constantes des bases de données ***/
+
+/** Nom de l'application */
 define("APP_NAME",    "Attitude efficace");
+/** Nom de la base de données */
 define("DB_NAME",     "attitude_efficace");
+/** Adresse du serveur */
 define("DB_ADDRESS",  "localhost");
+/** Login de la base de données */
 define("DB_LOGIN",    "root");
+/** Mot de passe de connexion à la base de données */
 define("DB_PASSWORD", "Joel1997@admin");
+// Chemin du dossier principal
 define("ROOT_PATH",   dirname(__DIR__) . DIRECTORY_SEPARATOR);

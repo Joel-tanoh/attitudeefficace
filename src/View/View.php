@@ -12,9 +12,12 @@ use App\Router;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Models\Items\ItemChild;
-use App\BackEnd\Models\Users\Administrateur;
+use App\BackEnd\Models\Users\Administrator;
 use App\View\Notification;
 use App\View\Form;
+use App\View\Models\Items\ItemChildView;
+use App\View\Models\Items\ItemParentView;
+use App\View\Models\Users\AdministratorView;
 use App\View\ModelsView\AdministrateurView;
 use App\View\ModelsView\ParentView;
 use App\View\ModelsView\ChildView;
@@ -90,10 +93,21 @@ HTML;
      * 
      * @return string
      */
-    public static function administrattionDashboard()
+    public static function administrationDashboard()
     {
-        return <<<HTML
+        $visitorsOnlineNumberSnippet = Snippet::showVisitorsOnlineNumber();
 
+        return <<<HTML
+        <div class="row mb-3">
+            <div class="col-12">
+                <h3>Tableau de bord</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                {$visitorsOnlineNumberSnippet}
+            </div>
+        </div>
 HTML;
     }
 
@@ -177,7 +191,7 @@ HTML;
             $notification = new Notification();
             $toReturn = $notification->info( $notification->noAdministrateurs() );
         } else {
-            $toReturn = Administrateur::list($admins);
+            $toReturn = (new AdministratorView())->list($admins);
         }
 
         return $toReturn;
@@ -224,10 +238,12 @@ HTML;
     public static function readItem($item)
     {
         if ($item->isParent()) {
-            return $item->readView();
+            $itemParentView = new ItemParentView($item);
+            return $itemParentView->readView();
 
         } elseif ($item->isChild() || $item->getCategorie() === "motivation-plus") {
-            return $item->readView();
+            $itemChildView = new ItemChildView($item);
+            return $itemChildView->readView();
         }
     }
 

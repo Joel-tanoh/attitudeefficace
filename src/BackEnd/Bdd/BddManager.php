@@ -133,6 +133,23 @@ class BddManager
     }
 
     /**
+     * Permet d'insérer des valeurs dans la base de données.
+     * **Méthode non terminée**.
+     * 
+     * @param string $tableName     Nom de la table dans laquelle on insère les données.
+     * @param array  $colsName      Un tableau qui contient les noms des colonnes dans lesquelles
+     *                              on insère les données.
+     * @param string $whereColName  Le nom de la colonne sur laquelle on met une clause where
+     * @param string $whereColVlaue La valeur de la clause.
+     * 
+     * @return bool
+     */
+    public function insert(string $tableName, array $colsName, string $whereColName = null, $whereColValue = null)
+    {
+        $query = "INSERT INTO $tableName() VALUES() WHERE $whereColName = $whereColValue";
+    }
+
+    /**
      * Compte toutes les occurences d'une table. On peut lui passer une clause where
      * 
      * @param string $colToCount    La colonne à compter.
@@ -221,7 +238,7 @@ class BddManager
      * @param string $tableName     Le nom de la table.
      * @param string $colForExcept  C'est le nom de la colonne à prendre en compte pour rétirer
      *                              l'élémént.
-     * @param string $exceptedValue Id de l'élément à exclure de la liste des résultats.
+     * @param string $exceptedValue Valeur identifiant l'élément à exclure de la liste des résultats.
      * @param string $whereColName  Une colonne sur laquelle on peut passer une clause pour
      *                              spécifier les occurences
      *                              à retourner.
@@ -230,7 +247,7 @@ class BddManager
      * 
      * @return array
      */
-    public function getTableOccurencesExecepted(string $colToGet, string $tableName, string $colForExcept, $exceptedValue, string $whereColName, string $whereColValue = null)
+    public function getTableOccurencesExcepted(string $colToGet, string $tableName, string $colForExcept, $exceptedValue, string $whereColName, string $whereColValue = null)
     {
         $pdo = $this->pdo;
         $query = "SELECT $colToGet FROM $tableName WHERE $colForExcept !== ?";
@@ -311,7 +328,7 @@ class BddManager
      * @param string $tableName     Le nom de la table de l'item à modifier.
      * @param string $whereColName  Une clause where sur cette colonne pour donner une précision sur
      *                              les résultats.
-     * @param mixed  $whereColValue Id L'item dont on veut incrémenter ou décrémenter la valeur.
+     * @param mixed  $whereColValue Valeur identifiant l'item dont on veut incrémenter ou décrémenter la valeur.
      * 
      * @return bool
      */
@@ -321,7 +338,7 @@ class BddManager
         $query .= $action === "increment" ? "$colName+1" : "$colName-1";
 
         if (null !== $whereColName) {
-            $query .= " WHERE $whereColName = " . $whereColValue;
+            $query .= " WHERE $whereColName = '$whereColValue'";
         }
 
         $this->pdo->query($query);

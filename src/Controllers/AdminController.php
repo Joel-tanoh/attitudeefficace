@@ -1,64 +1,35 @@
 <?php
 
-/**
- * Fichier de classe
- * 
- * @author Joel <joel.developpeur@gmail.com>
- */
+namespace App\Controllers;
 
-namespace App;
-
-use App\BackEnd\Models\MiniserviceOrder;
+use App\BackEnd\Ecommerce\Order;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Models\Items\ItemChild;
-use App\BackEnd\Models\Users\Administrateur;
+use App\BackEnd\Models\Users\Administrator;
+use App\BackEnd\Models\Users\Visitor;
 use App\BackEnd\Utilities\Validator;
 use App\BackEnd\Utilities\Utility;
-use App\BackEnd\Utilities\VisitManager;
-use App\View\PageBuilder;
+use App\View\Models\Items\ItemChildView;
 use App\View\View;
 use App\View\Notification;
+use App\View\Pages\PageBuilder;
 
 /**
- * Gère le controlleur. Une méthode du controlleur peut être appelée en fonction du routage.
- * 
- * @author Joel <joel.developpeur@gmail.com>
+ * Controlleur de la partie admin
  */
-class Controller{
-
-    private $url;
-    private $categorie;
-    private $itemIdentifier;
-    private $action;
-
+class AdminController extends Controller
+{
     /**
-     * Permet d'instancier un controlleur.
+     * Constructeur du controlleur de la partie admin.
      * 
-     * @param array $url 
-     * 
-     * @return void
+     * @param string $url
      */
     public function __construct($url)
     {
-        $this->url = $url;
-        $this->categorie = !empty($this->url[0]) ? $this->url[0] : null;
-        $this->itemIdentifier = !empty($this->url[1]) ? $this->url[1] : null;
-        $this->action = !empty($this->url[2]) ? $this->url[2] : null;
+        parent::__construct($url);
     }
-
-    /**
-     * Controlleur appelé pour la page d'accueil de la partie publique.
-     * 
-     * @return void
-     */
-    public function publicAccueilPage()
-    {
-        $metaTitle = "Bienvenu sur " . APP_NAME;
-        $page = new PageBuilder($metaTitle, View::publicAccueilView());
-        $page->publicPage();
-    }
-
+    
     /**
      * Controlleur appelé pour le dashboard de l'administration dashboard (Tableau de bord).
      * 
@@ -66,10 +37,11 @@ class Controller{
      */
     public function dashboard()
     {
-        $page = new PageBuilder(null, View::administrattionDashboard());
+        $page = new PageBuilder(null, View::administrationDashboard());
         $page->adminPage();
     }
-      
+    
+    
     /**
      * Controlleur appelé lorsque url = categorie
      * 
@@ -80,7 +52,7 @@ class Controller{
         $items = Item::getAll($this->categorie);
 
         if ($this->categorie === "mini-services") {
-            $view = ItemChild::listMiniservices($items);
+            $view = ItemChildView::listMiniservices($items);
 
         } elseif ($this->categorie === "motivation-plus") {
             $items = Item::getMotivationPlusVideos();
@@ -101,7 +73,7 @@ class Controller{
      */
     public function listAdministrators()
     {
-        $admins = Administrateur::getAll(2);
+        $admins = Administrator::getAll(2);
         $page = new PageBuilder(null, View::listAdministrators($admins));
         $page->adminPage();
     }
@@ -113,7 +85,7 @@ class Controller{
      */
     public function listMiniservicesCommands()
     {
-        $commands = MiniserviceOrder::getAll();
+        $commands = Order::getAll();
         $page = new PageBuilder(null, View::listMiniservicesOrders($commands));
         $page->adminPage();
     }
@@ -191,12 +163,13 @@ class Controller{
         $bddManager = Entity::bddManager();
         
         if ($this->categorie === "motivation-plus") {
-            $toDelete = $bddManager->get("code", ItemChild::TABLE_NAME, "parent_id", "-1");
+            $toDelete = $bddManager->get("code", ItemChild::TABLE_NAME, "parent_code", "MTVP");
         } else {
             $toDelete = $bddManager->get("code", Entity::getTableName($this->categorie), "categorie", $this->categorie);
         }
 
         if (isset($_POST["suppression"])) {
+            
             if (empty($_POST["codes"])) {
                 $notification = new Notification();
                 $error = $notification->nothingSelected();
@@ -250,28 +223,25 @@ class Controller{
     }
 
     /**
+     * Retourne le nombre de visiteur en ligne.
+     * 
+     */
+    public function getVisitorsOnlineNumber()
+    {
+        echo Visitor::countVisitorsOnline();
+    }
+
+    /**
      * Controlleur appelé sur la partie admin lorsque l'url n'est pas encore géré par 
      * le système.
      * 
      * @return void
      */
-    public function adminError404()
+    public function error404()
     {
         $page = new PageBuilder(null, View::adminError404View());
         $page->adminPage();
     }
 
-    /**
-     * Controlleur appelé sur la partie publique lorsque l'url n'est pas encore géré par 
-     * le système.
-     * 
-     * @return void
-     */
-    public function publicError404()
-    {
-        $metaTitle = "Page non trouvée !";
-        $page = new PageBuilder($metaTitle, View::publicError404View());
-        $page->publicPage();
-    }
 
 }

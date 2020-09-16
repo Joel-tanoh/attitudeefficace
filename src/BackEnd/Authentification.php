@@ -2,7 +2,7 @@
 
 namespace App\BackEnd;
 
-use App\BackEnd\Models\Users\Administrateur;
+use App\BackEnd\Models\Users\Administrator;
 use App\BackEnd\Models\Users\ServiceProvider;
 use App\BackEnd\Models\Users\Suscriber;
 use App\BackEnd\Utilities\Validator;
@@ -104,7 +104,7 @@ class Authentification
                     $user = Suscriber::getByEmail($emailAddress);
 
                 elseif ($userCategorie === "administrateurs")
-                    $user = Administrateur::getByEmail($emailAddress);
+                    $user = Administrator::getByEmail($emailAddress);
 
                 if ($user) {
 

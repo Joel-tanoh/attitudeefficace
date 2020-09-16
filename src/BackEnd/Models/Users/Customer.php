@@ -16,7 +16,7 @@
 namespace App\BackEnd\Models\Users;
 
 use App\BackEnd\Models\Entity;
-use App\BackEnd\Models\MiniserviceOrder;
+use App\BackEnd\Ecommerce\Order;
 
 /**
  * Classe qui gère tout ce qui est en relation avec le client.
@@ -31,7 +31,7 @@ use App\BackEnd\Models\MiniserviceOrder;
  * @license  url.com license
  * @link     Link
  */
-class MiniserviceCustomer extends Entity
+class Customer extends Entity
 {
     /**
      * Les commandes faites par le client.
@@ -47,6 +47,9 @@ class MiniserviceCustomer extends Entity
      */
     const TABLE_NAME = "miniservices_customers";
 
+    /** Catégorie de l'item
+     * @var string
+     */
     const CATEGORIE = "miniservices_customers";
 
     /**
@@ -58,21 +61,20 @@ class MiniserviceCustomer extends Entity
      */
     public function __construct(string $code)
     {
-        $result = parent::bddManager()->get("id, last_name, first_names, email_address, contact_1, contact_2", self::TABLE_NAME, "code", $code);
+        $result = parent::bddManager()->get("last_name, first_names, email_address, contact_1, contact_2", self::TABLE_NAME, "code", $code)[0];
 
-        $this->id = $result["id"];
         $this->code = $result["code"];
+        $this->firstName = $result["first_names"];
         $this->lastName = $result["last_name"];
-        $this->firstNames = $result["first_names"];
         $this->emailAddress = $result["email_address"];
         $this->contact1 = $result["contact_1"];
         $this->contact2 = $result["contact_2"];
         $this->categorie = self::CATEGORIE;
 
         /* On récupère les commandes éffectuées par le client */
-        $result = parent::bddManager()->get("code", MiniserviceOrder::TABLE_NAME, "customer_id", $this->id);
+        $result = parent::bddManager()->get("code", Order::TABLE_NAME, "customer_code", $this->code);
         foreach ($result as $order) {
-            $order = new MiniserviceOrder($order["code"]);
+            $order = new Order($order["code"]);
             $this->orders[] = $order;
         }
 
@@ -103,9 +105,5 @@ class MiniserviceCustomer extends Entity
         }
         return $customers;
     }
-
-    
-    ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
-
 
 }

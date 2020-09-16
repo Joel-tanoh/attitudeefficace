@@ -61,26 +61,25 @@ class Suscriber extends User
     /**
      * Constructeur.
      * 
-     * @param string $code
+     * @param string $suscriberCode
      * 
      * @return void
      */
-    public function __construct(string $code)
+    public function __construct(string $suscriberCode)
     {
         $sqlQuery = new SqlQueryFormater();
         $query = $sqlQuery
-                ->select("id, code, last_name, first_names, password, email_address, role, contact_1, contact_2, state")
-                ->from(self::TABLE_NAME)
-                ->where("code = ?")
-                ->returnQueryString();
+            ->select("code, last_name, first_names, password, email_address, contact_1, contact_2, state")
+            ->from(self::TABLE_NAME)
+            ->where("code = ?")
+            ->returnQueryString();
         $rep = self::connect()->prepare($query);
-        $rep->execute([$code]);
+        $rep->execute([$suscriberCode]);
         $result = $rep->fetch();
 
-        $this->id               = $result["id"];
         $this->code             = $result["code"];
         $this->lastName         = $result["last_name"];
-        $this->firstNames       = $result["first_names"];
+        $this->firstName        = $result["first_names"];
         $this->password         = $result["password"];
         $this->emailAddress     = $result["email_address"];
         $this->role             = $result["role"];
@@ -88,14 +87,6 @@ class Suscriber extends User
         $this->contact2         = $result["contact_2"];
         $this->state            = $result["state"];
         $this->categorie        = self::CATEGORIE;
-
-        // Les items auxquels le suscriber a souscrit
-        $result = parent::bddManager()->get("id", Subscription::TABLE_NAME, "suscriber_email_address", $this->id);
-        foreach ($result as $item) {
-            $code = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $result["id"]);
-            $item = new ItemParent($code["code"]);
-            $this->suscribedItems[] = $item;
-        }
     }
 
     /**
@@ -105,17 +96,14 @@ class Suscriber extends User
      */
     public function getSuscribedItems()
     {
-        return $this->suscribedItems;
-    }
+        $result = parent::bddManager()->get(Subscription::TABLE_NAME, "suscriber_email_address", $this->code);
+        foreach ($result as $item) {
+            $code = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $result["id"]);
+            $item = new ItemParent($code["code"]);
+            $this->suscribedItems[] = $item;
+        }
 
-    /**
-     * Retourne la liste de tous ceux qui ont souscrit à un élément.
-     * 
-     * @return array
-     */
-    public function getAll()
-    {
-        
+        return $this->suscribedItems;
     }
 
     /**
@@ -129,7 +117,7 @@ class Suscriber extends User
     }
 
     /**
-     * Retourne la date à laquelle il a souscrit.
+     * Retourne la date à laquelle il a souscrit à un item.
      * 
      * @param \App\BackEnd\Models\Items\ItemParent $item L'item dont
      *                                                   on veut connaitre la date de
@@ -137,14 +125,13 @@ class Suscriber extends User
      * 
      * @return string
      */
-    public function getSubscriptionDate(\App\BackEnd\Models\Items\ItemParent $item)
+    public function getSuscribedAt(\App\BackEnd\Models\Items\ItemParent $item)
     {
-        $query = "SELECT date_format(subscritption_date, '%d %b. %Y à %H:%i') as subscription_date"
-                . " FROM " . Subscription::TABLE_NAME
-                . " WHERE suscriber_email_address = ? AND item_code = ?";
+        $query = "SELECT subscription_date FROM " . Subscription::TABLE_NAME
+            . " WHERE suscriber_email_address = ? AND item_code = ?";
         
         $rep = parent::connect()->prepare($query);
-        $rep->execute([$this->getID(), $item->getID()]);
+        $rep->execute([$this->getCode(), $item->getCode()]);
         return $rep->fetch()["subscription_date"];
     }
 
@@ -165,6 +152,26 @@ class Suscriber extends User
         if ($result["code"]) {
             return new self($result["code"]);
         }
+    }
+
+    /**
+     * Retourne la liste de tous ceux qui ont souscrit à un item.
+     * 
+     * @return array
+     */
+    public static function getAll()
+    {
+        $query = "SELECT code FROM " . self::TABLE_NAME;
+        $rep = parent::connect()->query($query);
+        $result = $rep->fetchAll();
+
+        $suscribers = [];
+
+        foreach($result as $suscriberCode) {
+            $suscriber[] = new self($suscriberCode);
+        }
+
+        return $suscribers;
     }
 
 }

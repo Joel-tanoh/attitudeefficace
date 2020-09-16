@@ -96,7 +96,7 @@ abstract class Item extends Entity
         if ($this->title) {
             return $this->title;
         } else {
-            return "motivation plus";
+            return "Motivation plus";
         }
     }
 
@@ -154,7 +154,7 @@ abstract class Item extends Entity
      */
     public function getCreatedAt(string $precision = null)
     {
-        return Utility::convertDate($this->createdAt, $precision);
+        return Utility::formatDate($this->createdAt, $precision);
     }
 
     /**
@@ -166,7 +166,7 @@ abstract class Item extends Entity
      */
     public function getUpdatedAt(string $precision = null)
     {
-        return Utility::convertDate($this->updatedAt, $precision);
+        return Utility::formatDate($this->updatedAt, $precision);
     }
 
     /**
@@ -179,7 +179,7 @@ abstract class Item extends Entity
      */
     public function getPostedAt(string $precision = null)
     {
-        return Utility::convertDate($this->postedAt, $precision);
+        return Utility::formatDate($this->postedAt, $precision);
     }
 
     /**
@@ -265,7 +265,7 @@ abstract class Item extends Entity
     public function getClassement()
     {
         if (null === $this->rank || $this->rank == 0) {
-            return "non classé";
+            return "Non classé";
         } else {
             return $this->rank == 1 ? $this->rank . " er" : $this->rank . " eme";
         }
@@ -308,7 +308,7 @@ abstract class Item extends Entity
      */
     public function post()
     {
-        $this->set("posted_at", date("Y-m-d H:i:s"), $this->tableName, "id", $this->id);
+        $this->set("posted_at", date("Y-m-d H:i:s"), $this->tableName, "code", $this->code);
         return true;
     }
 
@@ -319,7 +319,7 @@ abstract class Item extends Entity
      */
     public function unpost()
     {
-        $this->set("posted_at", null, $this->tableName, "id", $this->id);
+        $this->set("posted_at", null, $this->tableName, "code", $this->code);
         return true;
     }
 
@@ -332,7 +332,7 @@ abstract class Item extends Entity
     {
         $this->unsetRank();
         $this->deleteImage();
-        parent::bddManager()->delete($this->tableName, "id", $this->id);
+        parent::bddManager()->delete($this->tableName, "code", $this->code);
         return true;
     }
 
@@ -355,17 +355,17 @@ abstract class Item extends Entity
      */
     public function setRank(int $rank)
     {
-        if ($rank!== 0 && parent::bddManager()->checkIsset("rank", $this->tableName, "rank", $rank)) {
+        if ($rank !== 0 && parent::bddManager()->checkIsset("rank", $this->tableName, "rank", $rank)) {
 
-            $items = parent::bddManager()->getItemsOfValueMoreOrEqualTo("code", $this->tableName, "rank", $rank, "categorie", $this->categorie );
+            $items = parent::bddManager()->getItemsOfValueMoreOrEqualTo("code", $this->tableName, "rank", $rank, "categorie", $this->categorie);
             
             foreach ($items as $item) {
                 $obj = parent::createObjectByCategorieAndCode($this->categorie, $item["code"]);
-                parent::bddManager()->incOrDecColValue("increment", "rank", $this->tableName, "id", $obj->getID());
+                parent::bddManager()->incOrDecColValue("increment", "rank", $this->tableName, "code", $obj->getCode());
             }
         }
 
-        $this->set("rank", (int)$rank, $this->tableName, "id", $this->id);
+        $this->set("rank", (int)$rank, $this->tableName, "code", $this->code);
     }
 
     /**
@@ -378,7 +378,7 @@ abstract class Item extends Entity
         $items = parent::bddManager()->getItemsOfValueMoreOrEqualTo("code", $this->tableName, "rank", $this->rank, "categorie", $this->categorie);
         foreach ($items as $item) {
             $item = parent::createObjectByCategorieAndCode($this->categorie, $item["code"]);
-            parent::bddManager()->incOrDecColValue("decrement", "rank", $this->tableName, "id", $item->id);
+            parent::bddManager()->incOrDecColValue("decrement", "rank", $this->tableName, "code", $item->code);
         }
 
         return true;
@@ -394,7 +394,7 @@ abstract class Item extends Entity
      */
     public static function createItem(string $categorie)
     {
-        if (self::isParentCategorie($categorie)) {
+        if (ItemParent::isParentCategorie($categorie)) {
             $newItem = ItemParent::create($categorie);
         } else {
             $newItem = ItemChild::create($categorie);
@@ -433,7 +433,7 @@ abstract class Item extends Entity
 
         $title              = htmlspecialchars($_POST["title"]);
         $description        = htmlspecialchars($_POST["description"]);
-        $parentID           = $_POST["parent_id"]           ?? null;
+        $parentCode         = $_POST["parent_code"]           ?? null;
         $articleContent     = $_POST["article_content"]     ?? null;
         $author             = $_POST["author_name"]         ?? null;
         $provider           = $_POST["provider"]            ?? null;
@@ -451,7 +451,7 @@ abstract class Item extends Entity
                 Image::saveImages($this->getCategorie() . "-" . $this->getSlug());
             }
         } else {
-            $slug = Utility::slugify($title) .'-'. $this->getID();
+            $slug = Utility::slugify($title) .'-'. $this->getCode();
             $oldThumbsName = $this->getThumbsName();
             $newThumbsName = $this->getCategorie() . "-" . $slug;
 
@@ -469,26 +469,26 @@ abstract class Item extends Entity
             }
         }
 
-        $this->set("title", $title, $this->tableName, "id", $this->getID());
+        $this->set("title", $title, $this->tableName, "code", $this->getCode());
         
-        $this->set("description", $description, $this->tableName, "id", $this->getID());
+        $this->set("description", $description, $this->tableName, "code", $this->getCode());
         
-        $this->set("slug", $slug, $this->tableName, "id", $this->getID());
+        $this->set("slug", $slug, $this->tableName, "code", $this->getCode());
         
-        $this->set("price", $price, $this->tableName, "id", $this->getID());
+        $this->set("price", $price, $this->tableName, "code", $this->getCode());
 
-        $this->set("youtube_video_link", $youtubeVideoLink, $this->tableName, "id", $this->getID());
+        $this->set("youtube_video_link", $youtubeVideoLink, $this->tableName, "code", $this->getCode());
 
         $this->setRank($rank);
 
         if ($this->isChild()) {
-            $this->set("parent_id", $parentID, $this->tableName, "id", $this->getID());
-            $this->set("article_content", $articleContent, $this->tableName, "id", $this->getID());
-            $this->set("edition_home", $editionHome, $this->tableName, "id", $this->getID());
-            $this->set("parution_year", $parutionYear, $this->tableName, "id", $this->getID());
-            $this->set("author", $author, $this->tableName, "id", $this->getID());
-            $this->set("provider", $provider, $this->tableName, "id", $this->getID());
-            $this->set("pages", $pages, $this->tableName, "id", $this->getID());
+            $this->set("parent_code", $parentCode, $this->tableName, "code", $this->getCode());
+            $this->set("article_content", $articleContent, $this->tableName, "code", $this->getCode());
+            $this->set("edition_home", $editionHome, $this->tableName, "code", $this->getCode());
+            $this->set("parution_year", $parutionYear, $this->tableName, "code", $this->getCode());
+            $this->set("author", $author, $this->tableName, "code", $this->getCode());
+            $this->set("provider", $provider, $this->tableName, "code", $this->getCode());
+            $this->set("pages", $pages, $this->tableName, "code", $this->getCode());
         }
 
         $itemUpdated = $this->refresh();
@@ -513,55 +513,6 @@ abstract class Item extends Entity
         }
 
         return true;
-    }
-
-    /**
-     * Retourne true si la chaine passée en paramètre est une catégorie.
-     * 
-     * @param string $slug 
-     * 
-     * @return bool
-     */
-    public static function isParentSlug(string $slug)
-    {
-        return in_array($slug, ItemParent::getSlugs());
-    }
-
-    /**
-     * Vérifie si la chaîne passé en paramètre est un élément.
-     * 
-     * @param string $slug La chaîne à vérifier.
-     * 
-     * @return bool True si la chaîne passé en paramètre est un élément.
-     */
-    public static function isChildSlug(string $slug)
-    {
-        return in_array($slug, ItemChild::getSlugs());
-    }
-
-    /**
-     * Vérifie si la catégorie passée en paramètre est une l'une des catégories des items
-     * parents.
-     * 
-     * @param string $categorie La catégorie à vérifier.
-     * 
-     * @return bool.
-     */
-    public static function isParentCategorie(string $categorie)
-    {
-        return in_array($categorie, ItemParent::CATEGORIES);
-    }
-
-    /**
-     * Vérifie si la catégorie passée en paramètre est une catégorie d'item enfant.
-     * 
-     * @param string $categorie La catégorie à vérifier.
-     * 
-     * @return bool
-     */
-    public static function isChildCategorie(string $categorie)
-    {
-        return in_array($categorie, ItemChild::CATEGORIES);
     }
 
     /**
@@ -603,7 +554,7 @@ abstract class Item extends Entity
      */
     public function incrementView() : bool
     {
-        parent::bddManager()->incOrDecColValue("increment", "views", $this->tableName, "id", $this->getID());
+        parent::bddManager()->incOrDecColValue("increment", "views", $this->tableName, "code", $this->getCode());
         return true;
     }
 
@@ -614,9 +565,8 @@ abstract class Item extends Entity
      */
     public static function getMotivationPlusVideos()
     {
-        $query = "SELECT code"
-                . " FROM " . ItemChild::TABLE_NAME
-                . " WHERE categorie = 'videos' AND parent_id = -1";
+        $query = "SELECT code FROM " . ItemChild::TABLE_NAME
+            . " WHERE categorie = 'videos' AND parent_code = 'MTVP'";
         
         $rep = self::connect()->query($query);
         $result = $rep->fetchAll();
@@ -652,7 +602,7 @@ abstract class Item extends Entity
         if (null === $categorie) {
             return array_merge(ItemParent::getAllItems(), ItemChild::getAllItems());
 
-        } elseif (self::isParentCategorie($categorie)) {
+        } elseif (ItemParent::isParentCategorie($categorie)) {
             return ItemParent::getAllItems($categorie);
 
         } else {
@@ -669,139 +619,13 @@ abstract class Item extends Entity
      */
     public static function countAllItems(string $categorie = null)
     {
-        if (self::isParentCategorie($categorie)) {
+        if (ItemParent::isParentCategorie($categorie)) {
             return ItemParent::countAllItems($categorie);
-        } elseif (self::isChildCategorie($categorie)) {
+        } elseif (ItemChild::isChildCategorie($categorie)) {
             return ItemChild::countAllItems($categorie);
         } else {
             return ItemParent::countAllItems($categorie) + ItemChild::countAllItems($categorie);
         }
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////// LES VUES ///////////////////////////////////////////////////////
-
-    /**
-     * Affiche le titre de l'item courant.
-     * 
-     * @return string
-     */
-    public function showTitle()
-    {
-        $categorie = ucfirst(parent::getCategorieFormated($this->getCategorie()));
-
-        return <<<HTML
-        <div class="d-flex align-items-center">
-            <span class="mr-2">{$categorie} &#8250</span>
-            <span class="h4">{$this->getTitle()}</span>
-        </div>
-HTML;
-    }
-
-    /**
-     * Affiche la description de l'item
-     * 
-     * @param int $charsNumber Le nom de caractère à afficher.
-     * 
-     * @return string
-     */
-    public function showDescription(int $charsNumber = null)
-    {
-        return <<<HTML
-        <tr>
-            <td>Description :</td>
-            <td>{$this->getDescription($charsNumber)}</td>
-        </tr>
-HTML;
-    }
-
-    /**
-     * Affiche le nombre de vue de l'item courant
-     * 
-     * @return string
-     */
-    public function showViews()
-    {
-        return <<<HTML
-        <tr>
-            <td>Vue :</td>
-            <td>{$this->getViews()}</td>
-        </tr>
-HTML;
-    }
-
-    /**
-     * Affiche le prix d'un item
-     * 
-     * @return string
-     */
-    public function showPrice()
-    {
-        $devise = "F CFA";
-        $prix = $this->getPrice() == 0 ? "Gratuit" : $this->getPrice() . $devise;
-
-        return <<<HTML
-        <tr>
-            <td>Prix :</td>
-            <td>{$prix}</td>
-        </tr>
-HTML;
-    }
-
-    /**
-     * Affiche la date de création d'un item
-     * 
-     * @return string
-     */
-    public function showCreatedAt()
-    {
-        return <<<HTML
-        <tr>
-            <td>Date de création :</td>
-            <td>{$this->getCreatedAt()}</td>
-        </tr>
-HTML;
-    }
-
-    /**
-     * Affiche la date de modification (mise à jour)
-     * 
-     * @return string
-     */
-    public function showUpdatedAt()
-    {
-        if (null !== $this->getUpdatedAt()) {
-            return <<<HTML
-            <tr>
-                <td>Date de mise à jour :</td>
-                <td>{$this->getUpdatedAt()}</td>
-            </tr>
-HTML;
-        }
-    }
-
-    /**
-     * Affiche la de publication (de post)
-     * 
-     * @return string
-     */
-    public function showPostedAt()
-    {
-        if ($this->isPosted()) {
-            return <<<HTML
-            <tr>
-                <td>Date de publication :</td>
-                <td>{$this->getPostedAt()}</td>
-            </tr>
-HTML;
-        }
-
-        return <<<HTML
-        <tr>
-            <td>Publié :</td>
-            <td>non</td>
-        </tr>
-HTML;
     }
 
 }

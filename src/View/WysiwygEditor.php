@@ -7,7 +7,7 @@ namespace App\View;
  * 
  * @author Joel <joel.developpeur@gmail.com>
  */
-class EditeurWysiwyg
+class WysiwygEditor
 {
     
 }

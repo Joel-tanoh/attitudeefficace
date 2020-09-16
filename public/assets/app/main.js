@@ -52,6 +52,6 @@ $(document).ready(function(){
   
     articleContentToModify = document.getElementById("articleContentToModify").innerHTML
     $('#summernote').summernote('pasteHTML', articleContentToModify);
-  })()
+  })();
 
 });

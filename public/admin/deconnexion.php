@@ -11,8 +11,9 @@
  * @link     Link
  */
 
-require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SEPARATOR . 'config.php';
-require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SEPARATOR . 'functions.php';
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
+require_once ROOT_PATH . 'src' . DIRECTORY_SEPARATOR . 'constants.php';
+require_once ROOT_PATH . 'src' . DIRECTORY_SEPARATOR . 'functions.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 session_start();

@@ -66,7 +66,7 @@ class ItemChild extends Item
         $pdo = parent::connect();
         $sqlQuery = new SqlQueryFormater();
         $query = $sqlQuery
-            ->select("id, code, categorie, parent_id, title, description, slug, article_content")
+            ->select("code, categorie, parent_code, title, description, slug, article_content")
             ->select("author, provider, pages, price, rank, edition_home, parution_year, created_at")
             ->select("posted_at, updated_at, youtube_video_link, views")
             ->from(self::TABLE_NAME)
@@ -77,10 +77,9 @@ class ItemChild extends Item
         $rep->execute([$code]);
         $result = $rep->fetch();
 
-        $this->id = (int)$result['id'];
         $this->code = $result['code'];
         $this->categorie = $result['categorie'];
-        $this->parentID = (int)$result["parent_id"];
+        $this->parentCode = (int)$result["parent_code"];
         $this->title = $result['title'];
         $this->description = $result['description'];
         $this->slug = $result['slug'];
@@ -107,12 +106,12 @@ class ItemChild extends Item
      */
     public function getParent()
     {
-        if ($this->parentID === 0) {
+        if (empty($this->parentCode)) {
             $parent = null;
-        } elseif ($this->parentID === -1) {
-            $parent = "motivation +";
+        } elseif ($this->parentCode === "MTVP") {
+            $parent = "Motivation +";
         } else {
-            $result = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $this->parentID);
+            $result = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "code", $this->parentCode);
 
             if (!empty($result[0]["code"])) {
                 $parent = new ItemParent($result[0]["code"]);
@@ -132,6 +131,30 @@ class ItemChild extends Item
     public function getArticleContent()
     {
         return ucfirst(nl2br(trim(htmlspecialchars_decode($this->articleContent))));
+    }
+
+    /**
+     * Vérifie si la chaîne passé en paramètre est un élément.
+     * 
+     * @param string $slug La chaîne à vérifier.
+     * 
+     * @return bool True si la chaîne passé en paramètre est un élément.
+     */
+    public static function isChildSlug(string $slug)
+    {
+        return in_array($slug, self::getSlugs());
+    }
+
+    /**
+     * Vérifie si la catégorie passée en paramètre est une catégorie d'item enfant.
+     * 
+     * @param string $categorie La catégorie à vérifier.
+     * 
+     * @return bool
+     */
+    public static function isChildCategorie(string $categorie)
+    {
+        return in_array($categorie, self::CATEGORIES);
     }
 
     /**
@@ -165,7 +188,7 @@ class ItemChild extends Item
 
         $title              = htmlspecialchars($_POST["title"]);
         $description        = htmlspecialchars($_POST["description"]);
-        $parentID           = $_POST["parent_id"]           ?? null;
+        $parentCode         = $_POST["parent_code"]         ?? null;
         $articleContent     = $_POST["article_content"]     ?? null;
         $author             = $_POST["author"]              ?? null;
         $provider           = $_POST["provider"]            ?? null;
@@ -182,13 +205,13 @@ class ItemChild extends Item
             
             $newThis = new self($code);
                                                             
-            $slug = Utility::slugify($newThis->title) . '-' . $newThis->getID();
+            $slug = Utility::slugify($newThis->title) . '-' . $newThis->getCode();
             
             $newThis->set("slug", $slug, self::TABLE_NAME);
 
             $newThis->setRank((int)$rank);
            
-            $newThis->set("parent_id", (int)$parentID, self::TABLE_NAME);
+            $newThis->set("parent_code", $parentCode, self::TABLE_NAME);
 
             $newThis->set("price", (int)$price, self::TABLE_NAME);
 
@@ -366,123 +389,6 @@ class ItemChild extends Item
 
         return $items;
     }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///                                      LES VUES                                                   /////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Retourne la page d'affichage d'un item enfant.
-     * 
-     * @return string
-     */
-    public function readView()
-    {
-        $readItemContentHeader = Snippet::readItemContentHeader($this);
-        $showData = Snippet::showData($this);
-
-        return <<<HTML
-        <div id="res"></div>
-        {$readItemContentHeader}
-        {$showData}
-        {$this->showArticle()}
-HTML;
-    }
-
-    /**
-     * La vue qui liste les minis services et affiche le résumé des commandes de minis
-     * service.
-     * 
-     * @param array $items      La liste des items à lister.
-     * 
-     * @return string Code HTML de la page qui liste les mini services.
-     */
-    public static function listMiniservices(array $items)
-    {
-        $title = ucfirst(parent::getCategorieFormated(Router::getUrlAsArray()[0], "pluriel"));
-
-        $itemsNumber = self::countAllItems("mini-services");
-
-        $contentHeader = Snippet::listItemsContentHeader($title, "Liste", $itemsNumber);
-        $miniServiceCommandsResume = Snippet::miniServicesCommandsResume();
-
-        if (empty($items)) {
-            $notification = new Notification();
-            $content = '<div>'. $notification->info($notification->noItems("mini-services")) .'</div>';
-        } else {
-            $content = Template::gridOfCards($items, "px-2");
-        }
-
-        return <<<HTML
-        {$contentHeader}
-        <section class="row mb-3">
-            <section class="col-12 col-md-10 mb-3">
-                {$content}
-            </section>
-            <section class="col-12 col-md-2">
-                {$miniServiceCommandsResume}
-            </section>
-        </section>
-HTML;
-    }
-
-    /**
-     * Fiche détails d'un miniservice.
-     * 
-     * @return string HTML.
-     */
-    public function miniserviceDetailsCard()
-    {
-        return <<<HTML
-
-HTML;
-    }
-
-    /**
-     * Retourne une carte dans laquelle on a le contenu de l'article.
-     * 
-     * @return string
-     */
-    private function showArticle()
-    {
-        if ($this->articleContent) {
-            return <<<HTML
-            <div class="row mb-3">
-                <div class="col-12">
-                    <div class="bg-white">
-                        <div class="border-bottom p-2">Contenu de l'article</div>
-                        <article class="p-2">{$this->getArticleContent()}</article>
-                    </div>
-                </div>
-            </div>
-HTML;
-        }
-    }
-
-    /**
-     * Affiche le parent de l'item courant.
-     * 
-     * @return string
-     */
-    public function showParent()
-    {
-        if ($this->getParent() === null) {
-            $result = "Aucun";
-        } elseif ($this->getParent() === "motivation +") {
-            $result = "Motivation +";
-        } else {
-            $result = '<a href="'. $this->getParent()->getUrl("administrate") . '">'. $this->getParent()->getTitle() .'</a>';
-            $result .= " &#8250 " . ucfirst($this->getParent()->getCategorie());
-        }
-
-        return <<<HTML
-        <tr>
-            <td>Parent :</td>
-            <td>{$result}</td>
-        </tr>
-HTML;
-    }
-
 
 }
 

@@ -15,8 +15,6 @@
 
 namespace App\BackEnd\Bdd;
 
-use App\BackEnd\Bdd\BddManager;
-
 /**
  * Gère les requêtes SQL.
  * 

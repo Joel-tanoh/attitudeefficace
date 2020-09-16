@@ -49,7 +49,7 @@ class User extends Entity
      * 
      * @var string
      */
-    protected $firstNames;
+    protected $firstName;
     
     /**
      * Password
@@ -123,7 +123,7 @@ class User extends Entity
     public function setAvatar()
     {
         $image = new Image();
-        $avatarName = $this->getLogin() ."-". $this->getID();
+        $avatarName = $this->getLogin() ."-". $this->getCode();
         $image->saveAvatar($avatarName);
     }
     
@@ -136,7 +136,7 @@ class User extends Entity
      */
     public function setRole($role)
     {
-        $this->set("role", $role, $this->tableName, "id", $this->id);
+        $this->set("role", $role, $this->tableName, "code", $this->code);
         return true;
     }
 
@@ -147,7 +147,7 @@ class User extends Entity
      */
     public function delete()
     {
-        parent::bddManager()->delete($this->tableName, "id", $this->id);
+        parent::bddManager()->delete($this->tableName, "code", $this->code);
         return true;
     }
 
@@ -168,7 +168,7 @@ class User extends Entity
      */
     public function getName()
     {
-        return $this->getLastName() . " " . $this->getFirstNames();
+        return $this->getLastName() . " " . $this->getfirstName();
     }
 
     /**
@@ -186,9 +186,9 @@ class User extends Entity
      * 
      * @reuturn string
      */
-    public function getFirstNames()
+    public function getfirstName()
     {
-        return $this->firstNames;
+        return $this->firstName;
     }
 
     /**
@@ -325,8 +325,5 @@ class User extends Entity
     {
         return $this->contact2;
     }
-    
-    ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
-
 
 }

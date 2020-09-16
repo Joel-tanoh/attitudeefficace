@@ -10,7 +10,11 @@ namespace App\View;
 
 use App\Router;
 use App\BackEnd\Models\Entity;
-use App\BackEnd\Models\MiniserviceOrder;
+use App\BackEnd\Ecommerce\Order;
+use App\BackEnd\Models\Users\Visitor;
+use App\View\Models\Items\ItemView;
+use App\View\Models\Items\ItemParentView;
+use App\View\Models\Items\ItemChildView;
 
 /**
  * Gère les fragments de code.
@@ -102,13 +106,14 @@ HTML;
      */
     public static function readItemContentHeader($item)
     {
+        $itemView = new ItemView($item);
         $manageButtons = Snippet::manageButtons($item);
 
         return <<<HTML
         <div class="row mb-3">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center bg-white p-2">
-                    {$item->showTitle()}
+                    {$itemView->showTitle()}
                     {$manageButtons}
                 </div>
             </div>
@@ -144,24 +149,22 @@ HTML;
      */
     public static function miniServicesCommandsResume()
     {
-        $bddManager = Entity::bddManager();
-
-        $newCommandsNbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME, "state", "news");
-        $newCommandsBoxInfo = Card::boxInfo($newCommandsNbr, "Nouvelles commandes", ADMIN_URL . "/mini-services/commands/new", "success");
+//         $newCommandsNbr = Order::getNumber("news"); // $bddManager->count("code", Order::TABLE_NAME, "state", "news");
+//         $newCommandsBoxInfo = Card::boxInfo($newCommandsNbr, "Nouvelles commandes", ADMIN_URL . "/mini-services/commands/new", "success");
         
-        $waitingCommandsNbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME, "state", "en attente");
-        $waitingCommandsBoxInfo = Card::boxInfo($waitingCommandsNbr, "Commandes en attente", ADMIN_URL . "/mini-services/commands/waiting", "warning");
+//         $waitingCommandsNbr = Order::getNumber("wait"); // $bddManager->count("code", Order::TABLE_NAME, "state", "en attente");
+//         $waitingCommandsBoxInfo = Card::boxInfo($waitingCommandsNbr, "Commandes en attente", ADMIN_URL . "/mini-services/commands/waiting", "warning");
         
-        $allCommandsNbr = $bddManager->count("id", MiniserviceOrder::TABLE_NAME);
-        $allCommandsBoxInfo = Card::boxInfo($allCommandsNbr, "Commandes totales", ADMIN_URL . "/mini-services/commands/all", "primary");
+//         $allCommandsNbr = Order::getNumber("*"); // $bddManager->count("code", Order::TABLE_NAME);
+//         $allCommandsBoxInfo = Card::boxInfo($allCommandsNbr, "Commandes totales", ADMIN_URL . "/mini-services/commands/all", "primary");
 
-        return <<<HTML
-        <div class="row px-2">
-            {$newCommandsBoxInfo}
-            {$waitingCommandsBoxInfo}
-            {$allCommandsBoxInfo}
-        </div>
-HTML;
+//         return <<<HTML
+//         <div class="row px-2">
+//             {$newCommandsBoxInfo}
+//             {$waitingCommandsBoxInfo}
+//             {$allCommandsBoxInfo}
+//         </div>
+// HTML;
     }
 
     /**
@@ -217,12 +220,10 @@ HTML;
     public static function contextMenu()
     {
         $createButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/create", null, "btn btn-success mr-1", null, "fas fa-plus");
-        $deleteItemsButton = self::button(Entity::getCategorieUrl(Router::getUrlAsArray()[0], ADMIN_URL)."/delete", null, "btn btn-danger", null, "fas fa-trash-alt");
 
         return <<<HTML
         <div class="d-flex flex-row">
             {$createButton}
-            {$deleteItemsButton}
         </div>
 HTML;
     }
@@ -280,20 +281,29 @@ HTML;
      */
     public static function showBddData($item)
     {
-        $suscriberNumber = $item->isParent() ? $item->showSuscribersNumber() : null;
-        $parent = $item->isChild() ? $item->showParent() : null;
+        $itemView = new ItemView($item);
+
+        if ($item->isChild()) {
+            $itemChildView = new ItemChildView($item);
+            $parent = $itemChildView->showParent();
+            $suscriberNumber = null;
+        } else {
+            $itemParentView = new ItemParentView($item);
+            $suscriberNumber = $itemParentView->showSuscribersNumber();
+            $parent = null;
+        }
 
         return <<<HTML
         <table class="table bg-white p-3 mb-3">
-            {$item->showCategorie()}
+            {$itemView->showCategorie()}
             {$parent}
-            {$item->showPrice()}
-            {$item->showViews()}
-            {$item->showCreatedAt()}
-            {$item->showUpdatedAt()}
-            {$item->showPostedAt()}
+            {$itemView->showPrice()}
+            {$itemView->showViews()}
+            {$itemView->showCreatedAt()}
+            {$itemView->showUpdatedAt()}
+            {$itemView->showPostedAt()}
             {$suscriberNumber}
-            {$item->showDescription()}
+            {$itemView->showDescription()}
         </table>
 
 HTML;
@@ -453,6 +463,42 @@ HTML;
     }
 
     /**
+     * Ligne qui permet de faire des actions sur le tableau qiui liste les items.
+     * 
+     * @return string
+     */
+    public static function listingItemsTableActionsRow()
+    {
+        return <<<HTML
+        <tr>
+            <td colspan="4"><input class="btn-sm btn-danger" name="suppression" type="submit" value="Supprimer"></td>
+        </tr>
+HTML;
+    }
+
+    /**
+     * Le bloc de code HTML qui permet d'afficher le nombre
+     * de personnes en ligne.
+     * 
+     * @return string
+     */
+    public static function showVisitorsOnlineNumber()
+    {
+        $visitorsOnline = Visitor::countVisitorsOnline();
+
+        return <<<HTML
+        <div class="small-box text-small text-white bg-success rounded p-2">
+            <div class="inner">
+                <h3 id="visitorsOnlineNumber">{$visitorsOnline}</h3>
+                <p>visiteur(s) en ligne</p>
+            </div>
+        </div>
+HTML;
+    }
+
+    // METHODE PRIVEES //
+
+    /**
      * Retourne le vue pour lire la vidéo issue de Youtube.
      * 
      * @param string $youtubeVideoLink
@@ -565,20 +611,6 @@ HTML;
                 {$itemManageButtons}
             </td>
             <td><label for="{$item->getSlug()}">{$item->getCreatedAt()}</label></td>
-        </tr>
-HTML;
-    }
-
-    /**
-     * Ligne qui permet de faire des actions sur le tableau qiui liste les items.
-     * 
-     * @return string
-     */
-    public static function listingItemsTableActionsRow()
-    {
-        return <<<HTML
-        <tr>
-            <td colspan="4"><input class="btn-sm btn-danger" name="suppression" type="submit" value="Supprimer"></td>
         </tr>
 HTML;
     }

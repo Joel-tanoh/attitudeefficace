@@ -73,7 +73,7 @@ class ItemParent extends Item
         $pdo = parent::connect();
         $sqlQuery1 = new SqlQueryFormater();
         $query = $sqlQuery1
-            ->select("id, code, categorie, title, description, slug, price, rank, created_at, updated_at, posted_at, youtube_video_link, views")
+            ->select("code, categorie, title, description, slug, price, rank, created_at, updated_at, posted_at, youtube_video_link, views")
             ->from(self::TABLE_NAME)
             ->where("code = ?")
             ->returnQueryString();
@@ -82,7 +82,6 @@ class ItemParent extends Item
         $rep->execute([$code]);
         $result = $rep->fetch();
 
-        $this->id               = (int)$result['id'];
         $this->code             = $result['code'];
         $this->categorie        = $result['categorie'];
         $this->title            = $result['title'];
@@ -106,7 +105,7 @@ class ItemParent extends Item
     public function isSuscribed()
     {
         $bddManager = parent::bddManager();
-        $result = $bddManager->count("id", Subscription::TABLE_NAME, "item_code", $this->id);
+        $result = $bddManager->count("code", Subscription::TABLE_NAME, "item_code", $this->code);
         return $result != 0;
     }
 
@@ -117,7 +116,7 @@ class ItemParent extends Item
      */
     public function getSuscribers()
     {
-        $dbSuscribersIDs = parent::bddManager()->get("suscriber_email_address", Subscription::TABLE_NAME, "item_code", $this->id);
+        $dbSuscribersIDs = parent::bddManager()->get("suscriber_email_address", Subscription::TABLE_NAME, "item_code", $this->code);
 
         $suscribers = [];
 
@@ -155,14 +154,13 @@ class ItemParent extends Item
     public function getChildren(string $categorie = null)
     {
         if (null === $categorie) {
-            $dbChildren = parent::bddManager()->get("code", ItemChild::TABLE_NAME, "parent_id", $this->id);
+            $dbChildren = parent::bddManager()->get("code", ItemChild::TABLE_NAME, "parent_code", $this->code);
         } else {
-            $query = "SELECT code "
-                    . " FROM " . ItemChild::TABLE_NAME
-                    . " WHERE parent_id = ? AND categorie = ?";
+            $query = "SELECT code FROM " . ItemChild::TABLE_NAME
+                . " WHERE parent_code = ? AND categorie = ?";
 
             $rep = parent::connect()->prepare($query);
-            $rep->execute([$this->id, $categorie]);
+            $rep->execute([$this->code, $categorie]);
             $dbChildren = $rep->fetchAll();
         }
 
@@ -180,6 +178,31 @@ class ItemParent extends Item
     }
 
     /**
+     * Retourne true si la chaine passée en paramètre est une catégorie.
+     * 
+     * @param string $slug 
+     * 
+     * @return bool
+     */
+    public static function isParentSlug(string $slug)
+    {
+        return in_array($slug, self::getSlugs());
+    }
+
+    /**
+     * Vérifie si la catégorie passée en paramètre est une l'une des catégories des items
+     * parents.
+     * 
+     * @param string $categorie La catégorie à vérifier.
+     * 
+     * @return bool.
+     */
+    public static function isParentCategorie(string $categorie)
+    {
+        return in_array($categorie, self::CATEGORIES);
+    }
+
+    /**
      * Retourne tous les slugs des items parents.
      * 
      * @return array
@@ -194,6 +217,36 @@ class ItemParent extends Item
         }
 
         return $slugs;
+    }
+
+    /**
+     * Permet de vérifier que la chaine passée en paramètre est un code d'item 
+     * Parent.
+     * 
+     * @param string $code 
+     * 
+     * @return bool
+     */
+    public static function isParentCode(string $code)
+    {
+        return in_array($code, self::getCodes());
+    }
+
+    /**
+     * Retourne tous les codes des items parents.
+     * 
+     * @return array
+     */
+    public static function getCodes()
+    {
+        $codes = ["MTVP"];
+        $bddCodes = parent::bddManager()->get("code", self::TABLE_NAME);
+
+        foreach ($bddCodes as $row) {
+            $codes[] = $row["code"];
+        }
+
+        return $codes;
     }
 
     /**
@@ -254,13 +307,13 @@ class ItemParent extends Item
      */
     public static function getAllItems(string $categorie = null)
     {
+        $items = [];
+
         if (null === $categorie) {
             $result = parent::bddManager()->get("code", self::TABLE_NAME);
         } else {
             $result = parent::bddManager()->get("code", self::TABLE_NAME, "categorie", $categorie);
         }
-
-        $items = [];
 
         foreach ($result as $item) {
             $items[] = new self($item["code"]);
@@ -318,8 +371,7 @@ class ItemParent extends Item
     public static function getViewed(string $categorie = null)
     {
         $query = "SELECT code from " . self::TABLE_NAME
-            . " WHERE categorie = ?"
-            . " AND views != 0";
+            . " WHERE categorie = ? AND views != 0";
         
         $rep = parent::connect()->prepare($query);
         $rep->execute([$categorie]);
@@ -345,12 +397,11 @@ class ItemParent extends Item
     public static function getFree(string $categorie = null)
     {
         $query = "SELECT code from " . self::TABLE_NAME
-            . " WHERE categorie = ?"
-            . " AND price = 0";
+            . " WHERE categorie = ? AND price = 0";
         
         $rep = parent::connect()->prepare($query);
         $rep->execute([$categorie]);
-        $result = $rep->fecthAll();
+        $result = $rep->fetchAll();
 
         $itemsFree = [];
 
@@ -372,8 +423,7 @@ class ItemParent extends Item
     public static function getItemsWithVideo(string $categorie = null)
     {
         $query = "SELECT code from " . self::TABLE_NAME
-            . " WHERE categorie = ?"
-            . " AND youtube_video_link IS NOT NULL";
+            . " WHERE categorie = ? AND youtube_video_link IS NOT NULL";
         
         $rep = parent::connect()->prepare($query);
         $rep->execute([$categorie]);
@@ -389,136 +439,22 @@ class ItemParent extends Item
         return $items;
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////// LES VUES ///////////////////////////////////////////////////////
-    
     /**
-     * Vue de création d'un item parent.
+     * Retourne un tableau contenant la ou les propriétées passées en paramètre
+     * pour des items parents.
      * 
-     * @return string
+     * @param string $property La propriété qu'on veut.
+     * 
+     * @return array
      */
-    public static function createView(string $categorie = null, $errors = null)
+    public static function getProperty(string $property)
     {
-        return <<<HTML
+        $query = "SELECT ? FROM " .self::TABLE_NAME;
 
-HTML;
+        $rep = parent::connect()->prepare($query);
+        $rep->execute([$property]);
+
+        return $rep->fetchAll();
     }
-
-    /**
-     * Retourne la page qui permet d'afficher un parent parent et toutes ses
-     * informations.
-     * 
-     * @return string
-     */
-    public function readView()
-    {
-        $contentHeader = Snippet::readItemContentHeader($this);
-        $showData = Snippet::showData($this);
-
-        return <<<HTML
-        {$contentHeader}
-        {$showData}
-        {$this->showChildren()}
-HTML;
-    }
-
-    /**
-     * Affiche les cartes des articles, des vidéos, des ebooks et des livres.
-     * 
-     * @return string
-     */
-    private function showChildren()
-    {
-        return <<<HTML
-        <div class="row mb-3">
-            <div class="col-12">
-                <div class="bg-white p-3">
-                    {$this->showChildrenByCategorie('articles')}
-                    {$this->showChildrenByCategorie('videos')}
-                    {$this->showChildrenByCategorie('ebooks')}
-                    {$this->showChildrenByCategorie('livres')}
-                </div>
-            </div>
-        </div>
-HTML;
-    }
-
-    /**
-     * Affiche les parents enfants en fonction de leur catégorie.
-     * 
-     * @param $childrenCategorie La catégorie des items enfants qu'il faut qu'il faut afficher.
-     * 
-     * @return string
-     */
-    private function showChildrenByCategorie(string $childrenCategorie)
-    {
-        $children = $this->getChildren($childrenCategorie);
-        $childrenNumber = count($children);
-
-        if (empty($children)) {
-            $childrenList = '<div class="col-12 text-italic text-muted mb-2">Vide</div>';
-        } else {
-            $childrenList = null;
-
-            foreach ($children as $child) {
-                $childrenList .= Card::card(null, $child->getTitle(), $child->getUrl("administrate"));
-            }
-        }
-
-        $childrenCategorie = ucfirst($childrenCategorie);
-
-        return <<<HTML
-        <div>
-            <h6>
-                {$childrenCategorie}
-                <span class="badge bg-primary text-white">{$childrenNumber}</span>
-            </h6>
-            <div class="row">
-                <div class="col-12">
-                    {$childrenList}
-                </div>
-            </div>
-        </div>
-HTML;
-    }
-
-    /**
-     * Affiche les tous ceux qui ont souscrits à l'item courante.
-     * 
-     * @return string
-     */
-    public function showSuscribers()
-    {
-        $suscribers = null;
-
-        foreach ($this->item->getSuscribers() as $suscriber) {
-            $suscribers .= $suscriber->getName();
-        }
-
-        return <<<HTML
-        <div class="card">
-            <div class="card-header">Liste des inscrits</div>
-            <div class="card-body">
-                {$suscribers}
-            </div>
-        </div>
-HTML;
-    }
-
-    /**
-     * Montre le nombre de personne ayant souscrit l'item parent courant.
-     * 
-     * @return string
-     */
-    public function showSuscribersNumber()
-    {
-        return <<<HTML
-        <tr>
-            <td>Nombre d'inscrit :</td>
-            <td>{$this->getSuscribersNumber()}</td>
-        </tr>
-HTML;
-    }
-
 
 }

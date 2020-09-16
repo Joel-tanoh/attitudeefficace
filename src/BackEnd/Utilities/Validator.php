@@ -17,6 +17,7 @@ namespace App\BackEnd\Utilities;
 
 use App\BackEnd\Files\FileUploaded;
 use App\View\Notification;
+use App\BackEnd\Models\Items\ItemParent;
 
 /**
  * Permet de faire toutes les vérifications sur les données entrées dans les
@@ -128,8 +129,8 @@ class Validator
             $this->validatePdfFile();
         }
 
-        if (!empty($parent_id)) {
-            $this->validateParentId($parent_id);
+        if (!empty($parent_code)) {
+            $this->validateParentCode($parent_code);
         }
         
     }
@@ -146,17 +147,17 @@ class Validator
     }
 
     /**
-     * Effectue les validations sur un id d'item parent.
+     * Effectue les validations sur  d'item parent.
      * 
-     * @param string $parent_id Id provenant du formulaire
+     * @param string $parentCode Code provenant du formulaire
      * 
      * @return string|null
      */
-    public function validateParentId(string $parent_id = null)
+    public function validateParentCode(string $parentCode = null)
     {
-        $this->toValidate["parent_id"] = $parent_id;
-        if (!is_int((int)$parent_id)) {
-            $this->errors["parent_id"] = "Le parent que vous avez fait est invalide.";
+        $this->toValidate["parent_code"] = $parentCode;
+        if (!ItemParent::isParentCode($parentCode)) {
+            $this->errors["parent_code"] = "Le code du parent que vous avez est invalide.";
         }
     }
     

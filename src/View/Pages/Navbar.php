@@ -12,11 +12,12 @@
  * @link     Link
  */
 
-namespace App\View;
+namespace App\View\Pages;
 
 use App\BackEnd\Cookie;
-use App\BackEnd\Models\Users\Administrateur;
+use App\BackEnd\Models\Users\Administrator;
 use App\BackEnd\Session;
+use App\View\View;
 
 /**
  * Perlet de gérer tout ce qui concerne la barre de navigation supérieure.
@@ -111,7 +112,7 @@ HTML;
      */
     private static function addItemsLinksView()
     {
-        $adminUrl = "administration";
+        $adminUrl = "admin";
 
         return <<<HTML
         <li id="addButton" class="mr-3">
@@ -144,11 +145,11 @@ HTML;
      */
     private static function manageAdministratorsButtons()
     {
-        $adminUrl = "administration";
+        $adminUrl = "admin";
         
         $login = Session::getAdministratorSessionVar() ?? Cookie::getAdministratorCookieVar();
 
-        $adminUser = Administrateur::getByLogin($login);
+        $adminUser = Administrator::getByLogin($login);
 
         $privateButtons = self::administratorReservedActions();
 
@@ -196,9 +197,9 @@ HTML;
     private static function administratorReservedActions()
     {
         $login = Session::getAdministratorSessionVar() ?? Cookie::getAdministratorCookieVar();
-        $adminUser = Administrateur::getByLogin($login);
+        $adminUser = Administrator::getByLogin($login);
 
-        $adminUrl = "administration";
+        $adminUrl = "admin";
 
         if ($adminUser->hasAllRights()) {
             return <<<HTML

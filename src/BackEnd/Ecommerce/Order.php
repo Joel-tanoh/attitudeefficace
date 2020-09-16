@@ -1,11 +1,11 @@
 <?php
 
-namespace App\BackEnd\Models;
+namespace App\BackEnd\Ecommerce;
 
 use App\BackEnd\Bdd\SqlQueryFormater;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\ItemChild;
-use App\BackEnd\Models\Users\MiniserviceCustomer;
+use App\BackEnd\Models\Users\Customer;
 use App\BackEnd\Utilities\Utility;
 
 /**
@@ -13,35 +13,14 @@ use App\BackEnd\Utilities\Utility;
  * 
  * @author Joel <joel.developpeur@gmail.com>
  */
-class MiniserviceOrder extends Entity
+class Order extends Entity
 {
     /**
-     * ID du miniservice commandé
+     * Code de la personne ayant commandé le miniservice.
      * 
      * @var mixed
      */
-    private $miniserviceID;
-
-    /**
-     * Le miniservice commandé.
-     * 
-     * @var \App\BackEnd\Models\ItemChild
-     */
-    private $miniservice;
-
-    /**
-     * ID de la personne ayant commandé le miniservice.
-     * 
-     * @var mixed
-     */
-    private $customerID;
-
-    /**
-     * La personne ayant commandé le miniservice
-     * 
-     * @var \App\BackEnd\Models\Users\MiniserviceCustomer
-     */
-    private $customer;
+    private $customerCode;
 
     /**
      * Etat de la commande.
@@ -62,7 +41,7 @@ class MiniserviceOrder extends Entity
      * 
      * @var string
      */
-    const TABLE_NAME = "miniservices_orders";
+    const TABLE_NAME = "orders";
 
     /**
      * Constructeur
@@ -76,7 +55,7 @@ class MiniserviceOrder extends Entity
         $this->pdo = self::connect();
         $sql_query = new SqlQueryFormater();
 
-        $query = $sql_query->select("id, code, miniservice_id, customer_id, description, state, ordered_at")
+        $query = $sql_query->select("code, miniservice_id, customer_id, description, state, ordered_at")
             ->from(self::TABLE_NAME)
             ->where("code = ?")
             ->returnQueryString();
@@ -85,46 +64,38 @@ class MiniserviceOrder extends Entity
         $rep->execute([$code]);
         $result = $rep->fetch();
 
-        $this->id = $result['id'];
         $this->code = $result['code'];
-        $this->miniserviceID = $result['miniservice_id'];
-        $this->customerID = $result['customer_id'];
+        $this->miniserviceCode = $result['miniservice_code'];
+        $this->customerCode = $result['customer_code'];
         $this->description = $result['description'];
         $this->state = $result['state'];
-        $this->orderedAt = $result['ordered_at'];
-
-        // On récupère le mini service commandé
-        $miniservice = parent::bddManager()->get("code", ItemChild::TABLE_NAME, "id", $this->miniserviceID);
-        if ($miniservice["code"]) {
-            $this->miniservice = new ItemChild($miniservice["code"]);
-        }
-
-        /* On récupère la personne qui a commandé le miniservice */
-        $customer = parent::bddManager()->get("code", MiniserviceCustomer::TABLE_NAME, "id", $this->customerID);
-        if ($customer["code"]) {
-            $this->customer = new MiniserviceCustomer($customer["code"]);
-        }
-        
+        $this->orderedAt = $result['ordered_at'];  
     }
 
     /**
      * Retourne le client qui a commandé le miniservice.
      * 
-     * @return \App\BackEnd\Models\Users\MiniserviceCustomer
+     * @return \App\BackEnd\Models\Users\Customer
      */
     public function getCustomer()
     {
-        return $this->customer;
+        $res = parent::bddManager()->get("code", Customer::TABLE_NAME, "code", $this->customerCode);
+        if ($res["code"]) {
+            return new Customer($res["code"]);
+        }
     }
     
     /**
-     * Retourne le mini service commandé
+     * Retourne le mini service commandé.
      * 
      * @return \App\BackEnd\Models\ItemChild
      */
     public function getMiniservice()
     {
-        return $this->miniservice;
+        $res = parent::bddManager()->get("code", ItemChild::TABLE_NAME, "code", $this->miniserviceCode);
+        if ($res["code"]) {
+            return new ItemChild($res["code"]);
+        }
     }
 
     /**
@@ -146,7 +117,7 @@ class MiniserviceOrder extends Entity
      */
     public function getOrderedAt(string $precision = null)
     {
-        return Utility::convertDate($this->orderedAt, $precision);
+        return Utility::formatDate($this->orderedAt, $precision);
     }
 
     /**
@@ -157,11 +128,11 @@ class MiniserviceOrder extends Entity
     public function getState()
     {
         if ($this->state == 1) {
-            return "Nouvelle commande";
+            return "nouvelle commande";
         } elseif ($this->state == 2) {
-            return "Commande en attente";
+            return "commande en attente";
         } elseif ($this->state == 3) {
-            return "Commande gérée";
+            return "commande gérée";
         }
     }
 
@@ -175,10 +146,12 @@ class MiniserviceOrder extends Entity
         $bddManager = parent::bddManager();
         $result = $bddManager->get("code", self::TABLE_NAME);
         $orders = [];
+
         foreach ($result as $order) {
             $order = new self($order["code"]);
             $orders[] = $order;
         }
+
         return $orders;
     }
 

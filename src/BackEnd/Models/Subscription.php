@@ -52,20 +52,19 @@ class Subscription extends Entity
     public function __construct(string $code)
     {
         $sqlQuery = new SqlQueryFormater();
-        $query = $sqlQuery->select("id, code, subscriber_email_address, item_code, subscription_date")
-                          ->from(self::TABLE_NAME)
-                          ->where("code = ?")
-                          ->returnQueryString();
+        $query = $sqlQuery->select("code, subscriber_email_address, item_code, suscribed_at")
+            ->from(self::TABLE_NAME)
+            ->where("code = ?")
+            ->returnQueryString();
         
         $rep = self::connect()->prepare($query);
         $rep->execute([$code]);
         $result = $rep->fetch();
 
-        $this->id                       = $result["id"];
         $this->code                     = $result["code"];
         $this->suscriberEmailAddress    = $result["subscriber_email_address"];
         $this->itemID                   = $result["item_code"];
-        $this->subscriptionDate         = $result["subscription_date"];
+        $this->suscribedAt              = $result["suscribed_at"];
     }
 
     /**
@@ -75,8 +74,7 @@ class Subscription extends Entity
      */
     public function getSuscriber()
     {
-        $result = parent::bddManager()->get("code", Suscriber::TABLE_NAME, "id", $this->suscriberID);
-        return new Suscriber($result[0]["code"]);
+       
     }
 
     /**
@@ -86,8 +84,7 @@ class Subscription extends Entity
      */
     public function getSuscribedItem()
     {
-        $result = parent::bddManager()->get("code", ItemParent::TABLE_NAME, "id", $this->itemID);
-        return new ItemParent($result[0]["code"]);
+        
     }
 
     /**
@@ -99,7 +96,7 @@ class Subscription extends Entity
      */
     public function getSubscriptionDate(string $precision = null)
     {
-        return Utility::convertDate($this->susbcriptionDate, $precision);
+        return Utility::formatDate($this->susbcriptionDate, $precision);
     }
 
     /**
@@ -118,7 +115,5 @@ class Subscription extends Entity
         
         return $subscriptions;
     }
-
-    ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
     
 }

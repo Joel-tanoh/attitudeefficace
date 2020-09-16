@@ -12,7 +12,7 @@ use Exception;
  * 
  * @author Joel <joel.developpeur@gmail.com>
  */
-class Administrateur extends User
+class Administrator extends User
 {
     /**
      * Nom de la table.
@@ -48,7 +48,7 @@ class Administrateur extends User
         $sqlQuery = new SqlQueryFormater();
 
         $query = $sqlQuery
-                ->select("id, code, login, password, email_address, role, state")
+                ->select("code, login, password, email_address, role, state")
                 ->select("date_format(created_at, '%d %b. %Y') AS day_created_at")
                 ->select("date_format(created_at, '%H:%i') AS hour_created_at")
                 ->select("date_format(updated_at, '%d %b. %Y') AS day_modified_at")
@@ -61,7 +61,6 @@ class Administrateur extends User
         $rep->execute([$code]);
         $result = $rep->fetch();
 
-        $this->id               = (int)$result['id'];
         $this->code             = $result['code'];
         $this->login            = $result['login'];
         $this->password         = $result['password'];
@@ -73,7 +72,7 @@ class Administrateur extends User
         $this->dayUpdatedAt     = $result["day_modified_at"];
         $this->hourUpdatedAt    = $result["hour_modified_at"];
         $this->url              = self::TABLE_NAME . "/" . $this->code;
-        $this->avatarName       = Utility::slugify($this->login) . "-" . $this->id . Image::EXTENSION;
+        $this->avatarName       = Utility::slugify($this->login) . "-" . $this->code . Image::EXTENSION;
         $this->avatarPath       = AVATARS_PATH . $this->avatarName;
         $this->avatarSrc        = AVATARS_DIR_URL . "/" . $this->avatarName;
         $this->tableName        = self::TABLE_NAME;
@@ -97,9 +96,9 @@ class Administrateur extends User
         if (self::insertNotNullData( $code, $login, $passwordHashed )) {
             $newUser = new self($code);
         
-            $newUser->set("email_address", $emailAddress, self::TABLE_NAME, "id", $newUser->getID());
+            $newUser->set("email_address", $emailAddress, self::TABLE_NAME, "code", $newUser->getCode());
         
-            $newUser->set("role", $role, self::TABLE_NAME, "id", $newUser->getID());
+            $newUser->set("role", $role, self::TABLE_NAME, "code", $newUser->getCode());
             
             if (!empty($_FILES["avatar_uploaded"]["name"])) {
                 $newUser->setAvatar();
@@ -131,7 +130,7 @@ class Administrateur extends User
     public function setAvatar()
     {
         $image = new Image();
-        $avatar_name = $this->getLogin() ."-". $this->getID();
+        $avatar_name = $this->getLogin() ."-". $this->getCode();
         $image->saveAvatar($avatar_name);
     }
     
@@ -144,7 +143,7 @@ class Administrateur extends User
      */
     public function setRole($role)
     {
-        $this->set("role", $role, $this->tableName, "id", $this->getID());
+        $this->set("role", $role, $this->tableName, "code", $this->getCode());
         return true;
     }
 
@@ -155,7 +154,7 @@ class Administrateur extends User
      */
     public function delete()
     {
-        parent::bddManager()->delete(self::TABLE_NAME, "id", $this->getID());
+        parent::bddManager()->delete(self::TABLE_NAME, "code", $this->getCode());
         return true;
     }
 
@@ -172,7 +171,7 @@ class Administrateur extends User
 
         $sql_query = new SqlQueryFormater();
         $query = $sql_query
-                ->select("COUNT(id) AS user")
+                ->select("COUNT(code) AS user")
                 ->from(self::TABLE_NAME)
                 ->where("login = ?")
                 ->returnQueryString();
@@ -185,7 +184,7 @@ class Administrateur extends User
     }
 
     /**
-     * Crée un Administrateur par grâce à l'adresse email.
+     * Crée un Administrator par grâce à l'adresse email.
      * 
      * @param string $emailAddress
      * 
@@ -283,60 +282,5 @@ class Administrateur extends User
 
         return $admins;
     }
-
-
-    ///////////////////////// LES VUES ///////////////////////////
-    
-    /**
-     * Liste tous les comptes administrateurs créées sur le site.
-     * 
-     * @param array $admins 
-     * 
-     * @return string
-     */
-    public static function list($admins)
-    {
-        $list = null;
-
-        foreach ($admins as $admin) {
-            $list .= self::listRow($admin);
-        }
-
-        return <<<HTML
-        <div class="row">
-            <div class="col-12">
-                <table class="table border bg-white">
-                    <thead class="thead-light">
-                        <th>Login</th>
-                        <th>Role</th>
-                        <th>Adresse email</th>
-                    </thead>
-                    <tbody>
-                        {$list}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-HTML;
-    }
-
-    /**
-     * Unle ligne du tableau qui liste les comptes administrateurs.
-     * 
-     * @param self $admin
-     * 
-     * @return string
-     */
-    private static function listRow($admin)
-    {
-        return <<<HTML
-        <tr>
-            <td>{$admin->getLogin()}</td>
-            <td>{$admin->getRole()}</td>
-            <td>{$admin->getEmailAddress()}</td>
-        </tr>
-HTML;
-    }
-
 
 }

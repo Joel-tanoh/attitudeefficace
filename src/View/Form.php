@@ -15,6 +15,7 @@
 namespace App\View;
 
 use App\BackEnd\Models\Items\ItemParent;
+use App\BackEnd\Models\Items\ItemChild;
 use App\BackEnd\Models\Entity;
 use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Utilities\Utility;
@@ -43,7 +44,7 @@ class Form extends View
     {
         if ($categorie === "administrateurs") return self::addAdministratorForm($item);
 
-        elseif (Item::isParentCategorie($categorie)) $formContent = self::addParentForm($item, $categorie);
+        elseif (ItemParent::isParentCategorie($categorie)) $formContent = self::addParentForm($item, $categorie);
 
         elseif ($categorie === "articles") $formContent = self::addArticleForm($item);
 
@@ -51,7 +52,7 @@ class Form extends View
 
         elseif ($categorie === "mini-services") $formContent = self::addMiniserviceForm($item, $categorie);
 
-        elseif (Item::isChildCategorie($categorie)) $formContent = self::addChildForm($item, $categorie);
+        elseif (ItemChild::isChildCategorie($categorie)) $formContent = self::addChildForm($item, $categorie);
 
         else Utility::header(ADMIN_URL);
 
@@ -394,7 +395,7 @@ HTML;
     public static function chooseAdministratorRole()
     {
         $label = self::label("", "Type de compte :");
-        $adminRadio = self::radio("role", "3", "Administrateur");
+        $adminRadio = self::radio("role", "3", "Administrator");
         $userRadio = self::radio("role", "2", "Utilisateur");
         
         return <<<HTML
@@ -443,16 +444,16 @@ HTML;
      */
     public static function selectParent(string $categorie = null)
     {
-        if (null !== $categorie && Item::isChildCategorie($categorie) && $categorie !== "mini-services") {
+        if (null !== $categorie && ItemChild::isChildCategorie($categorie) && $categorie !== "mini-services") {
             $label = self::label("selectParentList", "Choisir le parent :");
             $parentListOptions = self::parentList();
 
             return <<<HTML
             <div id="chooseParentBox" class="mb-2">
                 {$label}
-                <select name="parent_id" id="selectParentList" class="select2 col-12 form-control">
+                <select name="parent_code" id="selectParentList" class="select2 col-12 form-control">
                     <option value="0">-- Sans parent --</option>
-                    <option value="-1">Motivation plus</option>
+                    <option value="MTVP">Motivation plus</option>
                     {$parentListOptions}
                 </select>
             </div>
@@ -863,7 +864,7 @@ HTML;
         $items = ItemParent::getAllItems();
 
         foreach ($items as $item) {
-            $options .= '<option value="'. $item->getID() . '">';
+            $options .= '<option value="'. $item->getCode() . '">';
             $options .= ucfirst($item->getTitle()) . ' - ' . ucfirst($item->getCategorie());
             $options .= '</option>';
         }

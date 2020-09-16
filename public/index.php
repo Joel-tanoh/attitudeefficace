@@ -8,24 +8,25 @@
 
 session_start();
 
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'global' . DIRECTORY_SEPARATOR . 'config.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
 require_once ROOT_PATH . 'src' . DIRECTORY_SEPARATOR . 'constants.php';
 require_once ROOT_PATH . 'src' . DIRECTORY_SEPARATOR . 'functions.php';
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use App\Router;
-use App\Controller;
 use App\View\Notification;
 use App\BackEnd\Models\Users\Visitor;
+use App\Controllers\PublicController;
 
 try {
+
     $route = new Router(Router::getUrl());
-    $controller = new Controller($route->getUrl());
+    $publicController = new PublicController($route->getUrl());
 
     Visitor::manageVisitorPresence();
 
-    if ($route->match("")) $controller->publicAccueilPage();
-    else $controller->publicError404();
+    if ($route->match("")) $publicController->index();
+    else $publicController->error404();
     
 } catch(Error|TypeError|Exception|PDOException $e) {
     $exception = 'Erreur : ' . $e->getMessage() . ', Fichier : ' . $e->getFile() . ', Ligne : ' . $e->getLine();

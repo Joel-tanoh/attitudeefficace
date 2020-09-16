@@ -10,13 +10,23 @@ class Session extends Authentification
     /**
      * Initie la variable de session.
      * 
-     * @param \App\BackEnd\Models\Users\Administrateur $administrator
+     * @param \App\BackEnd\Models\Users\Administrator $administrator
      * 
      * @return bool
      */
-    public static function setAdministratorSessionVar(\App\BackEnd\Models\Users\Administrateur $administrator)
+    public static function setAdministratorSessionVar(\App\BackEnd\Models\Users\Administrator $administrator)
     {
         $_SESSION["attitude_efficace_administrator_login"] = ucfirst($administrator->getLogin());
+    }
+
+    /**
+     * Permet de vérifier si la session de l'administrateur est activée.
+     * 
+     * @return bool
+     */
+    public static function administratorSessionIsActive()
+    {
+        return !empty($_SESSION["attitude_efficace_administrator_login"]);
     }
 
     /**
@@ -26,9 +36,7 @@ class Session extends Authentification
      */
     public static function getAdministratorSessionVar()
     {
-        if (!empty($_SESSION["attitude_efficace_administrator_login"])) {
-            return $_SESSION["attitude_efficace_administrator_login"];
-        }
+        return self::administratorSessionIsActive() ? $_SESSION["attitude_efficace_administrator_login"] : null;
     }
 
     /**
@@ -38,7 +46,7 @@ class Session extends Authentification
      */
     public static function visitorSessionIsActive()
     {
-        return isset($_SESSION["attitude_efficace_visitor_session_id"]);
+        return !empty($_SESSION["attitude_efficace_visitor_session_id"]);
     }
 
     /**

@@ -17,12 +17,11 @@ namespace App\BackEnd\Models;
 
 use Exception;
 use App\BackEnd\Bdd\BddManager;
-use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Models\Items\ItemParent;
 use App\BackEnd\Models\Items\ItemChild;
 use App\BackEnd\Models\Users\Suscriber;
-use App\BackEnd\Models\MiniserviceOrder;
-use App\BackEnd\Models\Users\Administrateur;
+use App\BackEnd\Ecommerce\Order;
+use App\BackEnd\Models\Users\Administrator;
 
 /**
  * Classe de gestion des données.
@@ -37,13 +36,7 @@ use App\BackEnd\Models\Users\Administrateur;
  */
 abstract class Entity
 {
-    /**
-     * ID de l'instance dans la base de données
-     * 
-     * @var int
-     */
-    protected $id;
-    
+
     /**
      * Code de l'instance
      * 
@@ -83,16 +76,6 @@ abstract class Entity
     public static function connect()
     {
         return self::bddManager()->getPDO();
-    }
-
-    /**
-     * Retourne l'ID.
-     * 
-     * @return int
-     */
-    public function getID()
-    {
-        return (int)$this->id;
     }
 
     /**
@@ -182,7 +165,6 @@ abstract class Entity
     public static function getObjectBy(string $colName = null, string $colValue = null, string $tableName = null, string $categorie = null)
     {
         $code = self::bddManager()->get("code", $tableName, $colName, $colValue)[0];
-
         return self::createObjectByCategorieAndCode($categorie, $code["code"]);
     }
 
@@ -197,13 +179,13 @@ abstract class Entity
      */
     public static function createObjectByCategorieAndCode(string $categorie, string $code)
     {
-        if (Item::isParentCategorie($categorie)) return new ItemParent($code);
+        if (ItemParent::isParentCategorie($categorie)) return new ItemParent($code);
 
-        elseif (Item::isChildCategorie($categorie) || $categorie === "motivation-plus") return new ItemChild($code);
+        elseif (ItemChild::isChildCategorie($categorie) || $categorie === "motivation-plus") return new ItemChild($code);
         
-        elseif ($categorie === "administrateurs")  return new Administrateur($code);
+        elseif ($categorie === "administrateurs")  return new Administrator($code);
 
-        elseif ($categorie === "commandes") return new MiniserviceOrder($code);
+        elseif ($categorie === "commandes") return new Order($code);
         
         else {
             throw new Exception("La méthode returnObject ne gère pas encore cette catégorie ou classe $categorie.");
@@ -221,13 +203,13 @@ abstract class Entity
      */
     public static function getTableName(string $categorie = null)
     {
-        if ($categorie == "administrateurs") return Administrateur::TABLE_NAME;
+        if ($categorie == "administrateurs") return Administrator::TABLE_NAME;
 
-        elseif (Item::isParentCategorie($categorie)) return ItemParent::TABLE_NAME;
+        elseif (ItemParent::isParentCategorie($categorie)) return ItemParent::TABLE_NAME;
 
-        elseif (Item::isChildCategorie($categorie) || $categorie === "motivation-plus") return ItemChild::TABLE_NAME;
+        elseif (ItemChild::isChildCategorie($categorie) || $categorie === "motivation-plus") return ItemChild::TABLE_NAME;
 
-        elseif ($categorie === "commandes") return MiniserviceOrder::TABLE_NAME;
+        elseif ($categorie === "commandes") return Order::TABLE_NAME;
 
         else throw new Exception("La méthode getTableName ne gère pas encore la classe ou la catégorie $categorie.");
     }
@@ -288,7 +270,7 @@ abstract class Entity
         $femaleCategorieWords = ["formations", "etapes", "videos"];
         $categorieBeginningByVowel = ["articles", "ebooks"];
 
-        if ($categorie == Administrateur::TABLE_NAME) {
+        if ($categorie == Administrator::TABLE_NAME) {
             return "Nouvel administrateur";
         } elseif (in_array($categorie, $femaleCategorieWords)) {
             return "Nouvelle " . self::getCategorieFormated($categorie);
@@ -313,10 +295,8 @@ abstract class Entity
     }
 
     /**
-     * Mets à jour une propriété de l'élément. Par défaut le nom de la table est
-     * la propriété $tableName, le nom de la colonne utilisée pour identifier
-     * l'élément à mettre à jour est l'id et sa valeur est celle de la propriété id,
-     * mais on peut passer un autre nom de colonne identifiant (exemple : code).
+     * Mets à jour une propriété de l'élément. 
+     * On peut passer un nom de colonne identifiant (exemple : code).
      * Si le nom de la propriété identifiant l'élément est le code, alors la valeur de
      * $identifierColValue sera égale à la propriété code.
      * 
@@ -330,11 +310,10 @@ abstract class Entity
      * 
      * @return bool
      */
-    protected function set(string $colToUpdate, $valueToPut, string $tableName = null, string $identifierColName = "id", $identifierColValue = null) : bool
+    protected function set(string $colToUpdate, $valueToPut, string $tableName = null, string $identifierColName = "code", $identifierColValue = null) : bool
     {
         if (null === $tableName) $tableName = $this->tableName;
-        if ($identifierColName === "code") $identifierColValue = $this->code;
-        if (null === $identifierColValue) $identifierColValue = $this->id;
+        if (null === $identifierColValue || $identifierColName === "code") $identifierColValue = $this->code;
 
         self::bddManager()->update($colToUpdate, $valueToPut, $tableName, $identifierColName, $identifierColValue);
         self::bddManager()->update("updated_at", date("Y-m-d H:i:s"), $tableName, $identifierColName, $identifierColValue);
@@ -350,38 +329,6 @@ abstract class Entity
     protected function refresh()
     {
         return self::createObjectByCategorieAndCode($this->categorie, $this->code);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////// LES VUES ///////////////////////////////////////////
-
-    /**
-     * Vue permettant de lister toutes les entitiés.
-     * 
-     * @return string
-     */
-    public static function showAll()
-    {
-        return <<<HTML
-
-HTML;
-    }
-
-    /**
-     * Affiche la catégorie.
-     * 
-     * @return string
-     */
-    public function showCategorie()
-    {
-        $categorie = ucfirst(self::getCategorieFormated($this->getCategorie()));
-
-        return <<<HTML
-        <tr>
-            <td>Catégorie :</td>
-            <td>{$categorie}</td>
-        </tr>
-HTML;
     }
 
 }

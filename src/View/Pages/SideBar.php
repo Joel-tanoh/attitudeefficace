@@ -13,10 +13,12 @@
  * @link     Link
  */
 
-namespace App\View;
+namespace App\View\Pages;
 
 use App\BackEnd\Models\Items\Item;
 use App\BackEnd\Utilities\Utility;
+use App\View\Snippet;
+use App\View\View;
 
 /**
  * Permet de gérer les barres de menu sur le coté.
@@ -120,7 +122,7 @@ HTML;
      * 
      * @return string
      */
-    public static function sidebarBrand(string $brandSrc, string $href = "administration") : string
+    public static function sidebarBrand(string $brandSrc, string $href = "admin") : string
     {
         return <<<HTML
         <a class="brand text-center" href="{$href}">
@@ -154,16 +156,16 @@ HTML;
     private static function links()
     {
         $links = self::setLink(null, "fas fa-home", "Aller vers le site");
-        $links .= self::setLink("administration", "fas fa-desktop", "Tableau de bord");
-        $links .= self::setLink("administration/formations", "fas fa-box", "Formations");
-        $links .= self::setLink("administration/themes", "fas fa-box", "Thèmes");
-        $links .= self::setLink("administration/etapes", "fas fa-box", "Etapes");
-        $links .= self::setLink("administration/motivation-plus", "fas fa-tv", "Motivation plus");
-        $links .= self::setLink("administration/articles", "fas fa-pen-square", "Articles");
-        $links .= self::setLink("administration/videos", "fas fa-video", "Vidéos");
-        $links .= self::setLink("administration/livres", "fas fa-book", "Livres");
-        $links .= self::setLink("administration/ebooks", "fas fa-book", "Ebooks");
-        $links .= self::setLink("administration/mini-services", "fas fa-shopping-basket", "Mini services");
+        $links .= self::setLink("admin", "fas fa-desktop", "Tableau de bord");
+        $links .= self::setLink("admin/formations", "fas fa-box", "Formations");
+        $links .= self::setLink("admin/themes", "fas fa-box", "Thèmes");
+        $links .= self::setLink("admin/etapes", "fas fa-box", "Etapes");
+        $links .= self::setLink("admin/motivation-plus", "fas fa-tv", "Motivation plus");
+        $links .= self::setLink("admin/articles", "fas fa-pen-square", "Articles");
+        $links .= self::setLink("admin/videos", "fas fa-video", "Vidéos");
+        $links .= self::setLink("admin/livres", "fas fa-book", "Livres");
+        $links .= self::setLink("admin/ebooks", "fas fa-book", "Ebooks");
+        $links .= self::setLink("admin/mini-services", "fas fa-shopping-basket", "Mini services");
 
         return $links;
     }
@@ -183,16 +185,14 @@ HTML;
     {
         $badge = null;
 
-        if ($caption !== "Aller vers le site"
-            && $caption !== "Tableau de bord"
-        ) {
+        if ($caption !== "Aller vers le site" && $caption !== "Tableau de bord") {
             $badge = '<span class="badge badge-success">' . Item::countAllItems(Utility::slugify($caption)) . '</span>';
         }
 
         return <<<HTML
         <a class="py-2 px-4" href="{$href}">
             <div class="row">
-                <span class="col-3"><i class="{$fontawesomeIconClass} fa-lg"></i></span>
+                <span class="col-2"><i class="{$fontawesomeIconClass} fa-lg"></i></span>
                 <span class="col-8">{$caption}</span>
                 {$badge}
             </div>

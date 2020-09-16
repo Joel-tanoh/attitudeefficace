@@ -15,7 +15,7 @@
 
 /*** Constantes des chemins des dossiers et des fichiers ***/
 define("PUBLIC_PATH",           ROOT_PATH . "public" . DIRECTORY_SEPARATOR);
-define("ADMIN_PATH",            PUBLIC_PATH . "administration" . DIRECTORY_SEPARATOR);
+define("ADMIN_PATH",            PUBLIC_PATH . "admin" . DIRECTORY_SEPARATOR);
 define("ASSETS_PATH",           PUBLIC_PATH . "assets" . DIRECTORY_SEPARATOR);
 define("FILES_PATH",            PUBLIC_PATH . "files" . DIRECTORY_SEPARATOR);
 define("PDF_PATH",              FILES_PATH . "pdf" . DIRECTORY_SEPARATOR);
@@ -25,9 +25,9 @@ define("THUMBS_PATH",           IMAGES_PATH . "thumbs" . DIRECTORY_SEPARATOR);
 define("AVATARS_PATH",          IMAGES_PATH . "avatars" . DIRECTORY_SEPARATOR);
 define("LOGOS_PATH",            IMAGES_PATH . "logos" . DIRECTORY_SEPARATOR);
 
-/*** Constantes des Urls et des urls des dossiers ***/
+/*** Constantes des Urls et des liens des dossiers ***/
 define("PUBLIC_URL",            "http://attitudeefficace.com");
-define("ADMIN_URL",             "http://attitudeefficace.com/administration");
+define("ADMIN_URL",             "http://attitudeefficace.com/admin");
 define("ASSETS_DIR",            PUBLIC_URL . "/assets");
 define("FILES_DIR_URL",         PUBLIC_URL . "/files");
 define("PDF_DIR",               FILES_DIR_URL . "/pdf");

@@ -13,9 +13,10 @@
  * @link     Link
  */
 
-namespace App\View;
+namespace App\View\Pages;
 
-use App\View\Template;
+use App\View\View;
+use App\View\Pages\Template;
 
 /**
  * Classe qui gère tout ce qui est en rapport à une page.
@@ -31,21 +32,21 @@ class PageBuilder extends View
 {
     private $metaTitle;
     private $description;
-    private $view;
+    private $content;
 
     /**
      * Permet de créer une page.
      * 
-     * @param string $metaTitle  Le titre qui sera affiché dans la page.
-     * @param string $view        Le contenu de la page qui sera affiché dans
+     * @param string $metaTitle   Le titre qui sera affiché dans la page.
+     * @param string $content        Le contenu de la page qui sera affiché dans
      *                            la page.
      * @param string $description La description de la page.
      */
-    public function __construct(string $metaTitle = null, string $view = null, string $description = null)
+    public function __construct(string $metaTitle = null, string $content = null, string $description = null)
     {
         $this->metaTitle = $metaTitle;
         $this->description = $description;
-        $this->view = $view;
+        $this->content = $content;
     }
 
     /**
@@ -75,13 +76,13 @@ class PageBuilder extends View
     /**
      * Permet de modifier le contenu de la page.
      * 
-     * @param string $view
+     * @param string $content
      * 
      * @return void
      */
-    public function setView(string $view)
+    public function setView(string $content)
     {
-        $this->view = $view;
+        $this->content = $content;
     }
 
     /**
@@ -91,7 +92,7 @@ class PageBuilder extends View
      **/
     public function publicPage()
     {
-        $template = Template::navbarAndContainerAndFooter(Navbar::publicNavbar(), $this->view, Footer::publicFooter());
+        $template = Template::navbarAndContainerAndFooter(Navbar::publicNavbar(), $this->content, Footer::publicFooter());
 
         echo <<<HTML
         {$this->debutDePage("fr")}
@@ -114,7 +115,7 @@ HTML;
      **/
     public function adminPage()
     {
-        $template = Template::navbarAndSidebarAndContainer( Navbar::AdministrationNavbar(), Sidebar::adminSidebar(), $this->view );
+        $template = Template::navbarAndSidebarAndContainer( Navbar::AdministrationNavbar(), Sidebar::adminSidebar(), $this->content );
         $this->metaTitle = APP_NAME . ' - Administration';
 
         echo <<<HTML
@@ -145,7 +146,7 @@ HTML;
             {$this->adminCss()}  
         </head>
         <body id="adminSite">
-            {$this->view}
+            {$this->content}
             {$this->adminJs()}
         </body>
         </html>
@@ -245,6 +246,7 @@ HTML;
     private function adminJs()
     {
         $theme = "default";
+        
         return <<<HTML
         {$this->generalAppJs()}
         {$this->callJsFile("app/admin/" . $theme . "/js/admin.js")}
@@ -346,9 +348,9 @@ HTML;
      */
     private function callCssFile($css_file_name)
     {
-        $assets_dir = PUBLIC_URL . "/assets";
+        $assetsDir = PUBLIC_URL . "/assets";
         return <<<HTML
-        <link rel="stylesheet" type="text/css" href="{$assets_dir}/{$css_file_name}">
+        <link rel="stylesheet" type="text/css" href="{$assetsDir}/{$css_file_name}">
 HTML;
     }
 
@@ -362,9 +364,9 @@ HTML;
      */
     private function callJsFile($js_file_name)
     {
-        $assets_dir = PUBLIC_URL . "/assets";
+        $assetsDir = PUBLIC_URL . "/assets";
         return <<<HTML
-        <script src="{$assets_dir}/{$js_file_name}"></script>
+        <script src="{$assetsDir}/{$js_file_name}"></script>
 HTML;
     }
 
